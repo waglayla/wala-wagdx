@@ -1,0 +1,28 @@
+[package]
+name = "wala-wagdx"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+description = "WagDX - Desktop p2p node based on Waglayla Rust"
+readme = "../README.md"
+
+[features]
+console = ["wala-wagdx-core/console"]
+
+[dependencies]
+wala-wagdx-core.workspace = true
+workflow-log.workspace = true
+cfg-if.workspace = true
+eframe.workspace = true
+
+env_logger = "0.10.0"  # Check for the latest version
+log = "0.4.19"  # Often needed with env_logger
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+waglayla-alloc.workspace = true
+tokio.workspace = true
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen-futures.workspace = true
