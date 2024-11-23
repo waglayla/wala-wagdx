@@ -1,11 +1,14 @@
 use super::*;
 
+use crate::components::*;
+
 pub struct Outline {
     selected_tab: Tab,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
 pub enum Tab {
+    Test,
     Wallet,
     NetworkInfo,
     WalaNode,
@@ -15,10 +18,21 @@ pub enum Tab {
 impl Tab {
     fn label(&self) -> &'static str {
         match self {
+            Tab::Test => "Hello!",
             Tab::Wallet => "Wallet",
             Tab::NetworkInfo => "Network Info",
             Tab::WalaNode => "WALA Node",
             Tab::About => "About",
+        }
+    }
+
+    fn component(&self) -> TypeId {
+        match self {
+            Tab::Test => TypeId::of::<hello::Hello>(),
+            Tab::Wallet => TypeId::of::<blank::Blank>(),
+            Tab::NetworkInfo => TypeId::of::<blank::Blank>(),
+            Tab::WalaNode => TypeId::of::<blank::Blank>(),
+            Tab::About => TypeId::of::<blank::Blank>(),
         }
     }
 }
@@ -26,7 +40,7 @@ impl Tab {
 impl Default for Outline {
     fn default() -> Self {
         Self {
-            selected_tab: Tab::Wallet,
+            selected_tab: Tab::iter().next().unwrap(),
         }
     }
 }
@@ -72,7 +86,7 @@ impl ComponentT for Outline {
                     if self.tab_button(ui, ctx, tab) {
                         self.selected_tab = tab;
                         // You might want to notify the core about tab changes
-                        // core.set_active_tab(tab) or similar
+                        core.set_active_component_by_type(tab.component().clone());
                     }
                 }
             });
@@ -97,7 +111,7 @@ impl Outline {
     
         let button_size = vec2(ui.available_width(), 60.0);
         let (rect, mut response) = ui.allocate_exact_size(button_size, egui::Sense::click());
-        if (!selected) {          
+        if !selected {          
           response = response.on_hover_cursor(egui::CursorIcon::PointingHand);
         }
     

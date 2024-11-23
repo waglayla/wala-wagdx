@@ -3,6 +3,8 @@ use crate::imports::*;
 
 use crate::components::HashMapComponentExtension;
 use crate::components::outline::Outline;
+use crate::components::hello::Hello;
+use crate::components::blank::Blank;
 
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
@@ -32,12 +34,11 @@ pub struct Core {
   is_shutdown_pending: bool,
   settings_storage_requested: bool,
   last_settings_storage_request: Instant,
-  selected_tab: Tab,
   // runtime: Runtime,
   // wallet: Arc<dyn WalletApi>,
   // application_events_channel: ApplicationEventsChannel,
   // deactivation: Option<Module>,
-  // component: Component,
+  component: Component,
   components: HashMap<TypeId, Component>,
   // pub stack: VecDeque<Module>,
   pub settings: Settings,
@@ -92,16 +93,20 @@ impl Core {
 
     let mut components = HashMap::new();
     components.insert_typeid(Outline::default());
+    components.insert_typeid(Hello::default());
+    components.insert_typeid(Blank::default());
+
+    let hello_component = components.get(&TypeId::of::<Hello>()).unwrap().clone();
 
     Self {
       is_shutdown_pending: false,
       settings_storage_requested: false,
       last_settings_storage_request: Instant::now(),
-      selected_tab: Tab::Wallet,
       // runtime,
       // wallet: runtime.wallet().clone(),  // Assuming runtime has a wallet() method
       // application_events_channel: runtime.application_events().clone(),  // Assuming this method exists
       // stack: VecDeque::new(),
+      component: hello_component,
       components,
       settings,
       mobile_style,
@@ -137,58 +142,51 @@ impl eframe::App for Core {
   }
 }
 
-// Add menu screens here
-#[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
-enum Tab {
-    Wallet,
-    NetworkInfo,
-    WalaNode,
-    About,
-}
-
-impl Tab {
-  fn label(&self) -> &'static str {
-      match self {
-          Tab::Wallet => "Wallet",
-          Tab::NetworkInfo => "Network Info",
-          Tab::WalaNode => "WALA Node",
-          Tab::About => "About",
-      }
-  }
-}
-// --
-
 impl Core {
   pub fn render_frame(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
     window_frame(self.window_frame, ctx, "Waglayla Wag-DX", |ui| {
+      // Render sidebar
       let outline_type_id = TypeId::of::<Outline>();
       let outline = self.components.get(&outline_type_id).cloned();
       if let Some(outline) = self.components.get(&TypeId::of::<Outline>()) {
-        // Create a clone of self.components
         let mut components_clone = self.components.clone();
-        
-        // Get a mutable reference to the outline component
         let outline_component = components_clone.get_mut(&outline_type_id).unwrap();
-        
-        // Render the outline
         outline_component.render(self, ctx, frame, ui);
       }
+
+      // Render active component with a persistent state
+      let active_component = self.component.clone();
+      let content_rect = ui.available_rect_before_wrap();
+      ui.allocate_ui_at_rect(content_rect, |ui| {
+          // We clone components to avoid the borrow checker issue
+          let mut components_clone = self.components.clone();
+          let component_type_id = active_component.type_id();
+          let active_component_mut = components_clone.get_mut(&component_type_id).unwrap();
+          
+          active_component_mut.render(self, ctx, frame, ui);
+      });
     });
   }
 
-  // pub fn set_active_component<T: ComponentT + 'static>(&mut self) {
-  //     if let Some(component) = self.components.get(&TypeId::of::<T>()) {
-  //         self.component = component.clone();
-  //     }
-  // }
+  pub fn set_active_component<T: ComponentT + 'static>(&mut self) {
+      if let Some(component) = self.components.get(&TypeId::of::<T>()) {
+          self.component = component.clone();
+      }
+  }
 
-  // // Method to get a component
-  // pub fn get_component<T: ComponentT + 'static>(&self) -> Option<&Component> {
-  //     self.components.get(&TypeId::of::<T>())
-  // }
+  pub fn set_active_component_by_type(&mut self, type_id: TypeId) {
+      if let Some(component) = self.components.get(&type_id).cloned() {
+          self.component = component;
+      }
+  }
 
-  // // Method to get a mutable reference to a component
-  // pub fn get_component_mut<T: ComponentT + 'static>(&mut self) -> Option<&mut Component> {
-  //     self.components.get_mut(&TypeId::of::<T>())
-  // }
+  // Method to get a component
+  pub fn get_component<T: ComponentT + 'static>(&self) -> Option<&Component> {
+      self.components.get(&TypeId::of::<T>())
+  }
+
+  // Method to get a mutable reference to a component
+  pub fn get_component_mut<T: ComponentT + 'static>(&mut self) -> Option<&mut Component> {
+      self.components.get_mut(&TypeId::of::<T>())
+  }
 }

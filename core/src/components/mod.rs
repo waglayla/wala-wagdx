@@ -3,6 +3,8 @@ use std::any::type_name;
 use crate::imports::*;
 
 pub mod outline;
+pub mod hello;
+pub mod blank;
 
 // waglayla_ng_macros::register_modules!(
 //     register_generic_modules,
