@@ -30,6 +30,7 @@ cfg_if! {
       };
 
       // Run the async runtime
+      #[allow(clippy::expect_used, clippy::diverging_sub_expression)]
       tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()

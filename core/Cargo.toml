@@ -80,6 +80,9 @@ wasm-bindgen-futures.workspace = true
 xxhash-rust.workspace = true
 zeroize.workspace = true
 
+strum.workspace = true
+strum_macros.workspace = true
+
 eframe.workspace = true
 egui.workspace = true
 epaint.workspace = true

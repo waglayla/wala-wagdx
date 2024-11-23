@@ -1,6 +1,7 @@
 // use crate::interop::Adaptor;
 use crate::result::Result;
 use cfg_if::cfg_if;
+
 use wala_wagdx_core::dx_manager;
 use wala_wagdx_core::settings::Settings;
 use waglayla_wallet_core::api::WalletApi;
@@ -248,10 +249,11 @@ cfg_if! {
             "WagDX",
             native_options,
             Box::new(move |cc| {
-              // let runtime = runtime::Runtime::new(&cc.egui_ctx, &settings, wallet_api, application_events, None);
-              // delegate.lock().unwrap().replace(runtime.clone());
-              // runtime::signals::Signals::bind(&runtime);
-              // runtime.start();
+              // let manager = dx_manager::DXManager::new(&cc.egui_ctx, &settings, wallet_api);
+              // let manager = dx_manager::DXManager::new(&cc.egui_ctx);
+              // delegate.lock().unwrap().replace(manager.clone());
+              // dx_manager::signal_handler::Signals::bind(&manager);
+              // manager.start();
   
               // Ok(Box::new(wala_wagdx_core::Core::new(cc, runtime, settings, window_frame)))
               Ok(Box::new(wala_wagdx_core::Core::new(cc, settings, true)))

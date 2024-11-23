@@ -1,5 +1,9 @@
 use crate::frame::window_frame;
 use crate::imports::*;
+
+use crate::components::HashMapComponentExtension;
+use crate::components::outline::Outline;
+
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
 use egui::load::Bytes;
@@ -17,6 +21,8 @@ pub const MAINNET_EXPLORER: &str = "https://explorer.waglayla.org";
 pub const TESTNET10_EXPLORER: &str = "https://explorer-tn10.waglayla.org";
 pub const TESTNET11_EXPLORER: &str = "https://explorer-tn11.waglayla.org";
 
+use eframe::egui::{self, Context, Ui, RichText, Color32, Stroke};
+
 pub enum Exception {
   #[allow(dead_code)]
   UtxoIndexNotEnabled { url: Option<String> },
@@ -26,13 +32,13 @@ pub struct Core {
   is_shutdown_pending: bool,
   settings_storage_requested: bool,
   last_settings_storage_request: Instant,
-
+  selected_tab: Tab,
   // runtime: Runtime,
   // wallet: Arc<dyn WalletApi>,
   // application_events_channel: ApplicationEventsChannel,
   // deactivation: Option<Module>,
-  // component: Module,
-  // components: HashMap<TypeId, Module>,
+  // component: Component,
+  components: HashMap<TypeId, Component>,
   // pub stack: VecDeque<Module>,
   pub settings: Settings,
   // pub toasts: Toasts,
@@ -84,14 +90,19 @@ impl Core {
       settings.user_interface.theme_style.as_str(),
     );
 
+    let mut components = HashMap::new();
+    components.insert_typeid(Outline::default());
+
     Self {
       is_shutdown_pending: false,
       settings_storage_requested: false,
       last_settings_storage_request: Instant::now(),
+      selected_tab: Tab::Wallet,
       // runtime,
       // wallet: runtime.wallet().clone(),  // Assuming runtime has a wallet() method
       // application_events_channel: runtime.application_events().clone(),  // Assuming this method exists
       // stack: VecDeque::new(),
+      components,
       settings,
       mobile_style,
       default_style,
@@ -126,10 +137,58 @@ impl eframe::App for Core {
   }
 }
 
+// Add menu screens here
+#[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
+enum Tab {
+    Wallet,
+    NetworkInfo,
+    WalaNode,
+    About,
+}
+
+impl Tab {
+  fn label(&self) -> &'static str {
+      match self {
+          Tab::Wallet => "Wallet",
+          Tab::NetworkInfo => "Network Info",
+          Tab::WalaNode => "WALA Node",
+          Tab::About => "About",
+      }
+  }
+}
+// --
+
 impl Core {
-  fn render_frame(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
+  pub fn render_frame(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
     window_frame(self.window_frame, ctx, "Waglayla Wag-DX", |ui| {
-      ui.label("Hello, World!");
+      let outline_type_id = TypeId::of::<Outline>();
+      let outline = self.components.get(&outline_type_id).cloned();
+      if let Some(outline) = self.components.get(&TypeId::of::<Outline>()) {
+        // Create a clone of self.components
+        let mut components_clone = self.components.clone();
+        
+        // Get a mutable reference to the outline component
+        let outline_component = components_clone.get_mut(&outline_type_id).unwrap();
+        
+        // Render the outline
+        outline_component.render(self, ctx, frame, ui);
+      }
     });
   }
+
+  // pub fn set_active_component<T: ComponentT + 'static>(&mut self) {
+  //     if let Some(component) = self.components.get(&TypeId::of::<T>()) {
+  //         self.component = component.clone();
+  //     }
+  // }
+
+  // // Method to get a component
+  // pub fn get_component<T: ComponentT + 'static>(&self) -> Option<&Component> {
+  //     self.components.get(&TypeId::of::<T>())
+  // }
+
+  // // Method to get a mutable reference to a component
+  // pub fn get_component_mut<T: ComponentT + 'static>(&mut self) -> Option<&mut Component> {
+  //     self.components.get_mut(&TypeId::of::<T>())
+  // }
 }

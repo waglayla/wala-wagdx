@@ -1,4 +1,5 @@
-use egui::{FontData, FontDefinitions, FontFamily};
+use egui::{FontData, FontTweak, FontDefinitions, FontFamily};
+use std::path::Path;
 use workflow_core::runtime;
 
 trait RegisterStaticFont {
@@ -35,12 +36,68 @@ pub fn add_to_fonts(fonts: &mut egui::FontDefinitions, variant: Variant) {
         .insert(0, "phosphor".to_owned());
 }
 
+pub fn get_font_family(base_name: &str, bold: bool, italic: bool) -> egui::FontFamily {
+  let mut full_name = String::from(base_name);
+  
+  // Check if we need to modify the name
+  if bold || italic {
+      full_name.push('-');
+      
+      if bold {
+          full_name.push_str("Bold");
+      }
+      
+      if italic {
+          full_name.push_str("Italic");
+      }
+  }
+  
+  egui::FontFamily::Name(full_name.into())
+}
+
+macro_rules! load_font_family {
+  ($fonts:expr, $base_name:literal, $($variant:ident),+) => {{      
+      $(
+          let variant_suffix = stringify!($variant);
+          let name = if variant_suffix == "Regular" {
+              format!("{}", $base_name)
+          } else {
+              format!("{}-{}", $base_name, variant_suffix)
+          };
+          
+          $fonts.font_data.insert(
+              name.clone(),
+              FontData::from_static(include_bytes!(
+                  concat!("../resources/fonts/", $base_name, "/", $base_name, "-", stringify!($variant), ".ttf")
+              ))
+          );
+          $fonts.families
+            .entry(FontFamily::Name(name.clone().into()))
+            .or_default()
+            .insert(0, name.into());
+      )+
+  }};
+}
+
+
+
+
 pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
     let mut fonts = FontDefinitions::default();
     // add_to_fonts(&mut fonts, egui_phosphor::Variant::Bold);
     // add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
     add_to_fonts(&mut fonts, egui_phosphor::Variant::Light);
 
+    // ---
+    load_font_family!(fonts, "DINishCondensed", Regular, Bold, Italic, BoldItalic);
+    let variants = ["", "-Bold", "-Italic", "-BoldItalic"];
+    for variant in variants {
+        let font_name = format!("{}{}", "DINishCondensed", variant);
+        if let Some(font_data) = fonts.font_data.get_mut(&font_name) {
+            font_data.tweak.y_offset_factor = 0.0;
+            font_data.tweak.y_offset = 11.0;
+        }
+    }
     // ---
 
     fonts
@@ -142,8 +199,6 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
             ),
         );
     }
-
-    // ---
 
     // ---
 

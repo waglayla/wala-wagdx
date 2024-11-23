@@ -1,6 +1,15 @@
 use crate::imports::*;
 // use system::*;
 
+cfg_if! {
+  if #[cfg(not(target_arch = "wasm32"))] {
+      // pub mod signal_handler;
+      // pub mod panic;
+  } else {
+      // ...
+  }
+}
+
 pub struct Inner {
   egui_ctx: egui::Context,
   is_running: Arc<AtomicBool>,
@@ -36,6 +45,16 @@ impl DXManager {
 
   pub fn drop(&self) {
     assign_manager(None);
+  }
+
+  pub fn start(&self) {
+    self.inner.is_running.store(true, Ordering::SeqCst);
+    // self.start_services(); TODO
+  }
+
+  // GETTERS
+  pub fn uptime(&self) -> Duration {
+    self.inner.start_time.elapsed()
   }
 }
 

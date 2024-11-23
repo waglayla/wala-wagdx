@@ -64,12 +64,14 @@ pub use egui::epaint::{
 pub use egui::*;
 pub use egui_plot::{PlotPoint, PlotPoints};
 
-
 // pub use crate::collection::Collection;
 pub use crate::core::Core;
 pub use crate::core::MAINNET_EXPLORER;
 pub use crate::core::TESTNET10_EXPLORER;
 pub use crate::core::TESTNET11_EXPLORER;
+
+pub use crate::fonts::get_font_family;
+
 // pub use crate::device::{Device, Orientation};
 pub use crate::gui::*;
 pub use crate::error::Error;
@@ -79,7 +81,7 @@ pub use crate::error::Error;
 // pub use crate::market::MarketData;
 // pub use crate::menu::Menu;
 pub use crate::components;
-// pub use crate::modules::{Module, ModuleCaps, ModuleStyle, ModuleT};
+pub use crate::components::{Component, ComponentCaps, ComponentStyle, ComponentT};
 // pub use crate::network::BASIC_TRANSACTION_MASS;
 // pub use crate::network::{Network, NetworkPressure};
 // pub use crate::notifications::{Notifications, UserNotification, UserNotifyKind};
@@ -99,3 +101,6 @@ pub use crate::settings::{
 pub use crate::storage::{Storage, StorageUpdateOptions};
 // pub use crate::utils::spawn;
 pub use crate::utils::*;
+
+pub use strum::IntoEnumIterator;
+pub use strum_macros::{EnumIter, Display};
