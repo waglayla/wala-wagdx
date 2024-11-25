@@ -5,6 +5,7 @@ use crate::imports::*;
 pub mod outline;
 pub mod hello;
 pub mod blank;
+pub mod console;
 
 // waglayla_ng_macros::register_modules!(
 //     register_generic_modules,

@@ -93,6 +93,8 @@ egui-phosphor = { workspace = true, features = ["light"] }
 # egui-phosphor = { workspace = true, features = ["thin","light","regular","bold"] }
 egui-notify.workspace = true
 
+sys-locale.workspace = true
+
 [dependencies.web-sys]
 workspace = true
 features = [

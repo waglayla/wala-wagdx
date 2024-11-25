@@ -1,3 +1,5 @@
+use crate::imports::*;
+use crate::events::ApplicationEventsChannel;
 // use crate::interop::Adaptor;
 use crate::result::Result;
 use cfg_if::cfg_if;
@@ -228,35 +230,40 @@ cfg_if! {
             })
             .try_init()?;
 
+          let manager: Arc<Mutex<Option<dx_manager::DXManager>>> = Arc::new(Mutex::new(None));
+          let delegate = manager.clone();
+
           let mut viewport = egui::ViewportBuilder::default()
-            .with_resizable(true)
-            .with_title(i18n("WagDX"))
+            .with_title(i18n("Waglayla Wag-DX"))
             .with_min_inner_size([400.0,320.0])
             .with_inner_size([1000.0,600.0])
             // .with_icon(svg_to_icon_data(WAGLAYLA_NG_ICON_SVG, Some(SizeHint::Size(256,256))));
             .with_decorations(false) // For window frame
             .with_transparent(true) // For window frame
+            .with_resizable(true);
             ;
   
           let native_options = eframe::NativeOptions {
-            persist_window : true,
+            // persist_window : true,
             viewport,
             follow_system_theme: false,
             ..Default::default()
           };
+
+          let application_events = ApplicationEventsChannel::unbounded();
   
           eframe::run_native(
             "WagDX",
             native_options,
             Box::new(move |cc| {
-              // let manager = dx_manager::DXManager::new(&cc.egui_ctx, &settings, wallet_api);
-              // let manager = dx_manager::DXManager::new(&cc.egui_ctx);
-              // delegate.lock().unwrap().replace(manager.clone());
-              // dx_manager::signal_handler::Signals::bind(&manager);
-              // manager.start();
+              let daemon_channel = Channel::<DaemonMessage>::unbounded();
+              let manager = dx_manager::DXManager::new(&cc.egui_ctx, Some(application_events), &settings, daemon_channel.clone());
+              delegate.lock().unwrap().replace(manager.clone());
+              dx_manager::signal_handler::Signals::bind(&manager);
+              manager.start();
   
               // Ok(Box::new(wala_wagdx_core::Core::new(cc, runtime, settings, window_frame)))
-              Ok(Box::new(wala_wagdx_core::Core::new(cc, settings, true)))
+              Ok(Box::new(wala_wagdx_core::Core::new(cc, settings, true, daemon_channel.receiver.clone())))
             }),
           )?;
         }

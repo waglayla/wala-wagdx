@@ -5,6 +5,9 @@ use waglayla_wallet_core::storage::local::storage::Storage;
 use waglayla_wrpc_client::WrpcEncoding;
 use workflow_core::{runtime, task::spawn};
 
+use sys_locale::get_locale;
+use serde_json::Value;
+
 const SETTINGS_REVISION: &str = "0.0.0";
 
 // Node endpoint location settings
@@ -414,6 +417,19 @@ impl Default for UserInterfaceSettings {
 
 impl Default for Settings {
   fn default() -> Self {
+    let system_language = get_locale().unwrap_or_else(|| "en".to_string());
+    let base_system_language = system_language.split('-').next().map(|s| s.to_string()).unwrap_or(system_language);
+
+    // Parse the embedded JSON data
+    let translations: Value = serde_json::from_str(include_str!("../resources/i18n/i18n.json"))
+        .expect("Embedded workflow_i18n.json is invalid");
+
+    let language_code = if translations.get("translations").unwrap().get(&base_system_language).is_some() {
+      base_system_language.clone()
+    } else {
+      "en".to_string()
+    };
+
     Self {
       initialized: false,
       revision: SETTINGS_REVISION.to_string(),
@@ -424,7 +440,7 @@ impl Default for Settings {
       update: crate::app::VERSION.to_string(),
       node: NodeSettings::default(),
       user_interface: UserInterfaceSettings::default(),
-      language_code: "en".to_string(),
+      language_code,
       update_monitor: true,
       market_monitor: true,
       // disable_frame: false,

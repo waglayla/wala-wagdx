@@ -75,15 +75,15 @@ pub use crate::fonts::get_font_family;
 // pub use crate::device::{Device, Orientation};
 pub use crate::gui::*;
 pub use crate::error::Error;
-// pub use crate::events::{ApplicationEventsChannel, Events};
+pub use crate::events::{ApplicationEventsChannel, Events};
 // pub use crate::extensions::*;
 // pub use crate::interop;
 // pub use crate::market::MarketData;
 // pub use crate::menu::Menu;
 pub use crate::components;
 pub use crate::components::{Component, ComponentCaps, ComponentStyle, ComponentT};
-// pub use crate::network::BASIC_TRANSACTION_MASS;
-// pub use crate::network::{Network, NetworkPressure};
+pub use crate::network::BASIC_TRANSACTION_MASS;
+pub use crate::network::{Network, NetworkPressure};
 // pub use crate::notifications::{Notifications, UserNotification, UserNotifyKind};
 // pub use crate::primitives::{
 //     Account, AccountCollection, AccountSelectorButtonExtension, BlockDagGraphSettings, DaaBucket,
@@ -91,6 +91,9 @@ pub use crate::components::{Component, ComponentCaps, ComponentStyle, ComponentT
 // };
 pub use crate::result::Result;
 // pub use crate::runtime::{runtime, spawn, spawn_with_result, Payload, Runtime, Service};
+pub use crate::dx_manager::{manager, DXManager, Service};
+pub use crate::dx_manager::channel::{ DaemonMessage };
+
 pub use crate::settings::{
   WaglayladNodeKind, NetworkInterfaceConfig, NetworkInterfaceKind,
   NodeConnectionConfigKind, NodeSettings, RpcConfig, RpcOptions, Settings,

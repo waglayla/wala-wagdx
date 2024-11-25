@@ -119,6 +119,7 @@ xxhash-rust = { version = "0.8.7", features = ["xxh3"] }
 zeroize = { version = "1.6.0", default-features = false, features = ["alloc"] }
 strum = "0.24"
 strum_macros = "0.24"
+sys-locale = "0.3"
 
 [profile.release]
 opt-level = 2

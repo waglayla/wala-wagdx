@@ -5,6 +5,7 @@ use crate::components::HashMapComponentExtension;
 use crate::components::outline::Outline;
 use crate::components::hello::Hello;
 use crate::components::blank::Blank;
+use crate::components::console::DaemonConsole;
 
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
@@ -34,7 +35,7 @@ pub struct Core {
   is_shutdown_pending: bool,
   settings_storage_requested: bool,
   last_settings_storage_request: Instant,
-  // runtime: Runtime,
+  manager: DXManager,
   // wallet: Arc<dyn WalletApi>,
   // application_events_channel: ApplicationEventsChannel,
   // deactivation: Option<Module>,
@@ -69,6 +70,7 @@ pub struct Core {
   // pub feerate : Option<Arc<RpcFeeEstimate>>,
   // pub feerate: Option<FeerateEstimate>, TODO maybe
   pub node_info: Option<Box<String>>,
+  daemon_console: Component,
 }
 
 impl Core {
@@ -76,6 +78,7 @@ impl Core {
     cc: &eframe::CreationContext<'_>,
     settings: Settings,
     window_frame: bool,
+    daemon_receiver: Receiver<DaemonMessage>,
   ) -> Self {
     // Initialize fonts if needed
     crate::fonts::init_fonts(cc);
@@ -96,18 +99,21 @@ impl Core {
     components.insert_typeid(Hello::default());
     components.insert_typeid(Blank::default());
 
+    let daemon_console = DaemonConsole::new(daemon_receiver);
+    components.insert_typeid(daemon_console);
+
     let hello_component = components.get(&TypeId::of::<Hello>()).unwrap().clone();
 
     Self {
       is_shutdown_pending: false,
       settings_storage_requested: false,
       last_settings_storage_request: Instant::now(),
-      // runtime,
+      manager: manager(),
       // wallet: runtime.wallet().clone(),  // Assuming runtime has a wallet() method
       // application_events_channel: runtime.application_events().clone(),  // Assuming this method exists
       // stack: VecDeque::new(),
       component: hello_component,
-      components,
+      components: components.clone(),
       settings,
       mobile_style,
       default_style,
@@ -118,6 +124,7 @@ impl Core {
       // release: None,
       window_frame,
       node_info: None,
+      daemon_console: components.get(&TypeId::of::<DaemonConsole>()).unwrap().clone()
     }
   }
 }
@@ -130,7 +137,6 @@ impl eframe::App for Core {
   fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
     // Update device screen size if needed
     // self.device_mut().set_screen_size(&ctx.screen_rect());
-    
     // Call your render_frame method
     self.render_frame(ctx, frame);
   }

@@ -1,3 +1,4 @@
+use super::*;
 use crate::components::{Component, ComponentT};
 use crate::core::Core;
 
@@ -25,9 +26,12 @@ impl ComponentT for Hello {
         _frame: &mut eframe::Frame,
         ui: &mut egui::Ui,
     ) {
-        ui.heading(format!("Hello, {}!", self.name));
+        ui.heading(i18n_args(
+          "Hello, {name}!",
+          &[("name", self.name.as_str())]
+        ));
         ui.horizontal(|ui| {
-            ui.label("Your name: ");
+            i18n("Your name: ");
             ui.text_edit_singleline(&mut self.name);
         });
     }

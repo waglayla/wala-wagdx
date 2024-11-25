@@ -95,7 +95,7 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
         let font_name = format!("{}{}", "DINishCondensed", variant);
         if let Some(font_data) = fonts.font_data.get_mut(&font_name) {
             font_data.tweak.y_offset_factor = 0.0;
-            font_data.tweak.y_offset = 11.0;
+            font_data.tweak.y_offset = 9.0;
         }
     }
     // ---

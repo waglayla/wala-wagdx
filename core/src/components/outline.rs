@@ -1,5 +1,4 @@
 use super::*;
-
 use crate::components::*;
 
 pub struct Outline {
@@ -18,11 +17,11 @@ pub enum Tab {
 impl Tab {
     fn label(&self) -> &'static str {
         match self {
-            Tab::Test => "Hello!",
-            Tab::Wallet => "Wallet",
-            Tab::NetworkInfo => "Network Info",
-            Tab::WalaNode => "WALA Node",
-            Tab::About => "About",
+            Tab::Test => i18n("Hello!"),
+            Tab::Wallet => i18n("Wallet"),
+            Tab::NetworkInfo => i18n("Network Info"),
+            Tab::WalaNode => i18n("WALA Node"),
+            Tab::About => i18n("About"),
         }
     }
 
@@ -31,7 +30,7 @@ impl Tab {
             Tab::Test => TypeId::of::<hello::Hello>(),
             Tab::Wallet => TypeId::of::<blank::Blank>(),
             Tab::NetworkInfo => TypeId::of::<blank::Blank>(),
-            Tab::WalaNode => TypeId::of::<blank::Blank>(),
+            Tab::WalaNode => TypeId::of::<console::DaemonConsole>(),
             Tab::About => TypeId::of::<blank::Blank>(),
         }
     }
@@ -109,7 +108,7 @@ impl Outline {
         visuals.widgets.active.weak_bg_fill = bg_color;
         ui.style_mut().visuals = visuals;
     
-        let button_size = vec2(ui.available_width(), 60.0);
+        let button_size = vec2(ui.available_width(), 55.0);
         let (rect, mut response) = ui.allocate_exact_size(button_size, egui::Sense::click());
         if !selected {          
           response = response.on_hover_cursor(egui::CursorIcon::PointingHand);
