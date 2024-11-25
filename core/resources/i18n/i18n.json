@@ -85,12 +85,14 @@
     "en": {
       "About": "About",
       "Close the window": "Close the window",
+      "Exit Full Screen": "Exit Full Screen",
       "Full Screen": "Full Screen",
       "Hello!": "Hello!",
       "Hello, {name}!": "Hello, {name}!",
       "Maximize window": "Maximize window",
       "Minimize the window": "Minimize the window",
       "Network Info": "Network Info",
+      "Restore window": "Restore window",
       "WALA Node": "WALA Node",
       "Waglayla Wag-DX": "Waglayla Wag-DX",
       "Wallet": "Wallet",
@@ -98,17 +100,19 @@
     },
     "fr": {
       "About": "Infos",
-      "Close the window": "Fermer l'application",
+      "Close the window": "Fermer la fenêtre",
+      "Exit Full Screen": "Quitter la mode Plein Écran",
       "Full Screen": "Plein Écran",
       "Hello!": "Bonjour!",
-      "Maximize window": "Maximiser l'application",
-      "Minimize the window": "Réduire l'application",
+      "Hello, {name}!": "Bonjour, {name}!",
+      "Maximize window": "Maximiser la fenêtre",
+      "Minimize the window": "Réduire la fenêtre",
       "Network Info": "Infos Réseau",
+      "Restore window": "Restaurer la fenêtre",
       "WALA Node": "Nœud WALA",
       "Waglayla Wag-DX": "Waglayla Wag-DX",
       "Wallet": "Portefeuille",
-      "Your name: ": "Ton nom: ",
-      "Hello, {name}!": "Bonjour, {name}!"
+      "Your name: ": "Ton nom: "
     }
   }
 }
