@@ -67,6 +67,12 @@ impl ComponentT for Outline {
                 fill: darkened_fill,
                 inner_margin: egui::Margin::ZERO,
                 outer_margin: egui::Margin::ZERO,
+                rounding: egui::Rounding {
+                    nw: 0.0,
+                    ne: 0.0,
+                    sw: 10.0,
+                    se: 0.0,
+                },
                 ..Default::default()
             })
             .show_inside(ui, |ui| {

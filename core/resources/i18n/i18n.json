@@ -2,6 +2,8 @@
   "aliases": {
     "en-GB": "en",
     "en-US": "en",
+    "en-CA": "en",
+    "fr-CA": "fr",
     "zh-CN": "zh",
     "zh-TW": "zh"
   },
@@ -100,7 +102,7 @@
     },
     "fr": {
       "About": "Infos",
-      "Close the window": "Fermer la fenêtre",
+      "Close the window": "Quitter l'application",
       "Exit Full Screen": "Quitter la mode Plein Écran",
       "Full Screen": "Plein Écran",
       "Hello!": "Bonjour!",

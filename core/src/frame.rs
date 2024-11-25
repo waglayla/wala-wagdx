@@ -1,6 +1,13 @@
 use crate::imports::*;
+use std::sync::atomic::{AtomicBool, Ordering};
 
-// #[cfg(target_os = "windows")]
+static HAS_BEEN_FULLSCREEN: AtomicBool = AtomicBool::new(false);
+
+#[cfg(target_os = "windows")]
+const WIN32: bool = true;
+#[cfg(not(target_os = "windows"))]
+const WIN32: bool = false;
+
 // const WINDOW_ROUNDING: f32 = 0.0;
 // #[cfg(not(target_os = "windows"))]
 const WINDOW_ROUNDING: f32 = 10.0;
@@ -32,8 +39,10 @@ pub fn window_frame(
 
     let (rounding, stroke_width) = if is_fullscreen || is_maximized {
       (0.0.into(), 0.0)
+    } else if HAS_BEEN_FULLSCREEN.load(Ordering::Relaxed) {
+      (0.0.into(), 0.5)
     } else {
-      (WINDOW_ROUNDING.into(), 1.0)
+      (WINDOW_ROUNDING.into(), 0.5)
     };
 
     stroke.width = stroke_width;
@@ -201,6 +210,9 @@ fn close_maximize_minimize(ui: &mut egui::Ui, is_fullscreen: bool, is_maximized:
       if fullscreen_response.clicked() {
         ui.ctx()
           .send_viewport_cmd(ViewportCommand::Fullscreen(true));
+        if (!is_fullscreen && WIN32) {
+            HAS_BEEN_FULLSCREEN.store(true, Ordering::Relaxed);
+        }
       }
     }
   }

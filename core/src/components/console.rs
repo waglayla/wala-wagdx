@@ -62,6 +62,7 @@ impl ComponentT for DaemonConsole {
           .default_open(true)
           .show(ui, |ui| {
               let available_height = ui.available_height();
+              let available_width = ui.available_width();
               ui.horizontal(|ui| {
                   if ui.button("Clear").clicked() {
                       self.lines.clear();
@@ -74,6 +75,7 @@ impl ComponentT for DaemonConsole {
               });
 
               let frame_height = available_height - ui.spacing().interact_size.y - 20.0;
+              let frame_width = available_width;
 
               egui::Frame::none()
                   .fill(egui::Color32::BLACK)
@@ -83,6 +85,7 @@ impl ComponentT for DaemonConsole {
                   .show(ui, |ui| {
                       egui::ScrollArea::vertical()
                           .max_height(frame_height)
+                          .max_width(frame_width)
                           .stick_to_bottom(true)
                           .show(ui, |ui| {
                               for line in &self.lines {
