@@ -210,7 +210,7 @@ fn close_maximize_minimize(ui: &mut egui::Ui, is_fullscreen: bool, is_maximized:
       if fullscreen_response.clicked() {
         ui.ctx()
           .send_viewport_cmd(ViewportCommand::Fullscreen(true));
-        if (!is_fullscreen && WIN32) {
+        if !is_fullscreen && WIN32 {
             HAS_BEEN_FULLSCREEN.store(true, Ordering::Relaxed);
         }
       }

@@ -16,23 +16,23 @@ cfg_if! {
     #[derive(Default, Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
     #[serde(rename_all = "kebab-case")]
     pub enum WaglayladNodeKind {
+      Disabled,
       Remote,
-      IntegratedInProc,
       #[default]
       IntegratedAsDaemon,
     }
 
     const WAGLAYLAD_NODE_KINDS: [WaglayladNodeKind; 3] = [
+      WaglayladNodeKind::Disabled,
       WaglayladNodeKind::Remote,
-      WaglayladNodeKind::IntegratedInProc,
       WaglayladNodeKind::IntegratedAsDaemon,
     ];
 
     impl std::fmt::Display for WaglayladNodeKind {
       fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+          WaglayladNodeKind::Disabled => write!(f, "{}", i18n("Disabled")),
           WaglayladNodeKind::Remote => write!(f, "{}", i18n("Remote")),
-          WaglayladNodeKind::IntegratedInProc => write!(f, "{}", i18n("Integrated Node")),
           WaglayladNodeKind::IntegratedAsDaemon => write!(f, "{}", i18n("Integrated Daemon")),
         }
       }
@@ -67,9 +67,9 @@ impl WaglayladNodeKind {
 
   pub fn describe(&self) -> &str {
     match self {
-      WaglayladNodeKind::Remote => i18n("Connects to a Remote Rusty Waglayla Node via wRPC."),
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::IntegratedInProc => i18n("The node runs as a part of the Waglayla-NG application process. This reduces communication overhead (experimental)."),
+      WaglayladNodeKind::Disabled => i18n("Disables waglaylad. Required for deleting or changing the storage location. (These can be done in the Settings menu after startup)"),
+      WaglayladNodeKind::Remote => i18n("Connects to a Remote Rusty Waglayla Node via wRPC."),
       #[cfg(not(target_arch = "wasm32"))]
       WaglayladNodeKind::IntegratedAsDaemon => i18n("The node is spawned as a child daemon process (recommended)."),
     }
@@ -77,9 +77,9 @@ impl WaglayladNodeKind {
 
   pub fn is_config_capable(&self) -> bool {
     match self {
-      WaglayladNodeKind::Remote => false,
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::IntegratedInProc => true,
+      WaglayladNodeKind::Disabled => false,
+      WaglayladNodeKind::Remote => false,
       #[cfg(not(target_arch = "wasm32"))]
       WaglayladNodeKind::IntegratedAsDaemon => true,
     }
@@ -87,9 +87,9 @@ impl WaglayladNodeKind {
 
   pub fn is_local(&self) -> bool {
     match self {
-      WaglayladNodeKind::Remote => false,
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::IntegratedInProc => true,
+      WaglayladNodeKind::Disabled => false,
+      WaglayladNodeKind::Remote => false,
       #[cfg(not(target_arch = "wasm32"))]
       WaglayladNodeKind::IntegratedAsDaemon => true,
     }
@@ -116,21 +116,50 @@ impl RpcOptions {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct RpcConfig {
+pub enum RpcConfig {
   // Wrpc is unnecessary here
-  // Wrpc {
-  //   url: Option<String>,
-  //   encoding: WrpcEncoding,
-  //   resolver_urls: Option<Vec<Arc<String>>>,
-  // },
-  url: Option<NetworkInterfaceConfig>,
+  Wrpc {
+    url: Option<String>,
+    encoding: WrpcEncoding,
+    resolver_urls: Option<Vec<Arc<String>>>,
+  },
 }
 
 impl Default for RpcConfig {
   fn default() -> Self {
-    Self {
-      url: Some(NetworkInterfaceConfig::default()),
+    cfg_if! {
+        if #[cfg(not(target_arch = "wasm32"))] {
+            let url = "127.0.0.1";
+        } else {
+            use workflow_dom::utils::*;
+            let url = window().location().hostname().expect("KaspadNodeKind: Unable to get hostname");
+        }
     }
+    RpcConfig::Wrpc {
+      url: Some(url.to_string()),
+      encoding: WrpcEncoding::Borsh,
+      resolver_urls: None,
+    }
+  }
+}
+
+impl RpcConfig {
+  pub fn url(&self) -> Option<String> {
+      match self {
+          RpcConfig::Wrpc { url, .. } => url.clone(),
+      }
+  }
+
+  pub fn encoding(&self) -> Option<WrpcEncoding> {
+      match self {
+          RpcConfig::Wrpc { encoding, .. } => Some(*encoding),
+      }
+  }
+
+  pub fn resolver_urls(&self) -> Option<Vec<Arc<String>>> {
+      match self {
+          RpcConfig::Wrpc { resolver_urls, .. } => resolver_urls.clone(),
+      }
   }
 }
 
@@ -300,7 +329,7 @@ impl NodeSettings {
           || self.wrpc_json_network_interface != other.wrpc_json_network_interface
           || self.enable_upnp != other.enable_upnp
         {
-          Some(self.node_kind != WaglayladNodeKind::IntegratedInProc)
+          Some(true)
         } else if self.waglaylad_daemon_args != other.waglaylad_daemon_args
           || self.waglaylad_daemon_args_enable != other.waglaylad_daemon_args_enable
         {
@@ -334,8 +363,10 @@ impl NodeSettings {
 // Complete settings suite/section for the RPC setup
 impl RpcConfig {
   pub fn from_node_settings(settings: &NodeSettings, _options: Option<RpcOptions>) -> Self {
-    Self {
-      url: Some(settings.grpc_network_interface.clone()),
+    RpcConfig::Wrpc {
+      url: Some(settings.wrpc_url.clone()),
+      encoding: settings.wrpc_encoding,
+      resolver_urls: None,
     }
   }
 }
@@ -451,7 +482,7 @@ impl Default for Settings {
 impl Settings {}
 
 fn storage() -> Result<Storage> {
-  Ok(Storage::try_new("waglayla-ng.settings")?)
+  Ok(Storage::try_new("wala-wagdx.settings")?)
 }
 
 impl Settings {
@@ -467,6 +498,7 @@ impl Settings {
     if runtime::is_chrome_extension() {
       let this = self.clone();
       spawn(async move {
+        println!("{}", storage.filename().display());
         if let Err(err) = workflow_store::fs::write_json(storage.filename(), &this).await {
           log_error!("Settings::store_sync() error: {}", err);
         }

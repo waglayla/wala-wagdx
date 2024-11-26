@@ -72,6 +72,16 @@ impl DXManager {
     assign_manager(None);
   }
 
+  pub fn error(&self, text: impl Into<String>) {
+      // self.inner
+      //     .application_events
+      //     .sender
+      //     .try_send(Events::Notify {
+      //         user_notification: UserNotification::error(text),
+      //     })
+      //     .ok();
+  }
+
   pub fn start_services(&self) {
     let services = self.services();
     for service in services {
@@ -106,6 +116,8 @@ impl DXManager {
   pub async fn shutdown(&self) {
     if self.inner.is_running.load(Ordering::SeqCst) {
       self.inner.is_running.store(false, Ordering::SeqCst);
+      // self.inner.daemon_channel.sender.close();
+      // while let Ok(_) = self.inner.daemon_channel.receiver.try_recv() {}
       self.stop_services();
       self.join_services().await;
       assign_manager(None);

@@ -103,7 +103,7 @@ cfg_if! {
         }
       } else {
         let cmd = Command::new("wala-wagdx")
-          // .about(format!("wala-wagdx v{VERSION}-{GIT_DESCRIBE} (rusty-waglayla {})", waglayla_version()))
+          .about(format!("wala-wagdx v{VERSION}-{GIT_DESCRIBE} (rusty-waglayla {})",  waglayla_wallet_core::version()))
           .arg(arg!(--version "Display software version"))
           .arg(arg!(--daemon "Run as Rusty Waglayla p2p daemon"))
           .arg(arg!(--cli "Run as Rusty Waglayla Cli Wallet"))
@@ -251,12 +251,12 @@ cfg_if! {
           };
 
           let application_events = ApplicationEventsChannel::unbounded();
-  
+          let daemon_channel = Channel::<DaemonMessage>::unbounded();
+          
           eframe::run_native(
             "WagDX",
             native_options,
             Box::new(move |cc| {
-              let daemon_channel = Channel::<DaemonMessage>::unbounded();
               let manager = dx_manager::DXManager::new(&cc.egui_ctx, Some(application_events), &settings, daemon_channel.clone());
               delegate.lock().unwrap().replace(manager.clone());
               dx_manager::signal_handler::Signals::bind(&manager);
@@ -266,6 +266,8 @@ cfg_if! {
               Ok(Box::new(wala_wagdx_core::Core::new(cc, settings, true, daemon_channel.receiver.clone())))
             }),
           )?;
+          let manager = manager.lock().unwrap().take().unwrap();
+          manager.shutdown().await;
         }
       }
 
@@ -373,9 +375,6 @@ cfg_if! {
       //         Ok(Box::new(wala_wagdx_core::Core::new(cc, runtime, settings, window_frame)))
       //       }),
       //     )?;
-
-      //     let runtime = runtime.lock().unwrap().take().unwrap();
-      //     runtime.shutdown().await;
       //   }
       // }
 
@@ -412,7 +411,7 @@ cfg_if! {
         .try_init()?;
 
       use workflow_log::*;
-      log_info!("Welcome to Waglayla NG! Have a great day!");
+      log_info!("Welcome to Waglayla Wag-DX! Have a great day!");
 
       if let Some(element) = document().get_element_by_id("loading") {
         element.remove();

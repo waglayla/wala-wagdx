@@ -6,6 +6,8 @@ pub mod outline;
 pub mod hello;
 pub mod blank;
 pub mod console;
+pub mod welcome;
+pub mod settings;
 
 // waglayla_ng_macros::register_modules!(
 //     register_generic_modules,

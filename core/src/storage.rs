@@ -146,52 +146,63 @@ impl Storage {
     }
   }
 
-  pub fn render_settings(&self, ui: &mut egui::Ui, is_running: bool) {
-    if let Some(folder) = &mut *self.folder.lock().unwrap() {
+  pub fn render_settings(&self, core: &mut Core, ui: &mut Ui) {
+    let mut node_folder = self.folder.lock().unwrap();
+    if let Some(folder) = node_folder.as_mut() {
       ui.vertical_centered(|ui| {
-        egui::CollapsingHeader::new("Storage")
-          .default_open(false)
-          .show(ui, |ui| {
-            ui.vertical(|ui| {
-              ui.horizontal(|ui| {
-                if ui.button("Open Data Folder").clicked() {
-                  if let Err(err) = open::that(&folder.path) {
-                    println!("Error opening folder: {:?}", err);
+        CollapsingHeader::new(i18n("Storage"))
+        .default_open(false)
+        .show(ui, |ui| {
+          ui.vertical(|ui| {
+            let StorageFolder {
+              folder_size_string,
+              path,
+              confirm_deletion,
+              ..
+            } = folder;
+
+            CollapsingHeader::new(format!("{}: {folder_size_string}", "MAINNET".to_string()))
+            .default_open(false)
+            .show(ui, |ui| {
+              let is_running = core.settings.node.node_kind.is_local();
+
+              ui.horizontal(|ui|{
+                if ui.medium_button(i18n("Open Data Folder")).clicked() {
+                  if let Err(err) = open::that(path) {
+                    manager().error(format!("Error opening folder: {:?}", err));
                   }
                 }
-                
-                if !is_running && !folder.confirm_deletion {
-                  if ui.button("Delete Data Folder").clicked() {
-                    folder.confirm_deletion = true;
-                  }
+                if ui.medium_button_enabled(!is_running && !*confirm_deletion, i18n("Delete Data Folder")).clicked() {
+                  *confirm_deletion = true;
                 }
               });
 
               if is_running {
-                ui.label("Cannot delete data folder while running");
+                ui.label(i18n("Cannot delete data folder while the node is running"));
+                ui.label(i18n("Please set node to 'Disabled' to delete the data folder"));
               }
 
-              if folder.confirm_deletion {
-                ui.separator();
-                ui.label("This action will erase all data");
+              if *confirm_deletion {
+                ui.add_sized(vec2(260.,4.), Separator::default());
+                ui.label(i18n("This action will erase Waglayla database and logs"));
                 ui.label("");
-                ui.colored_label(egui::Color32::RED, "Please Confirm Deletion");
-                
-                ui.horizontal(|ui| {
-                  if ui.button("Confirm").clicked() {
-                    folder.confirm_deletion = false;
-                    if let Err(e) = self.remove() {
-                      println!("Error during removal: {:?}", e);
+                ui.colored_label(theme_color().alert_color, i18n("Please Confirm Deletion"));
+                if let Some(response) = ui.confirm_widget_labels("Apply", "Cancel") {
+                  match response {
+                    Confirm::Yes => {
+                      *confirm_deletion = false;
+                      self.remove();
+                    },
+                    Confirm::No => {
+                      *confirm_deletion = false;
                     }
                   }
-                  if ui.button("Cancel").clicked() {
-                    folder.confirm_deletion = false;
-                  }
-                });
-                ui.separator();
+                }
+                ui.add_sized(vec2(260.,4.), Separator::default());
               }
             });
           });
+        });
       });
     }
   }

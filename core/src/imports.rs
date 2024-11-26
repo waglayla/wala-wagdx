@@ -84,6 +84,7 @@ pub use crate::components;
 pub use crate::components::{Component, ComponentCaps, ComponentStyle, ComponentT};
 pub use crate::network::BASIC_TRANSACTION_MASS;
 pub use crate::network::{Network, NetworkPressure};
+pub use crate::gui::widgets::*;
 // pub use crate::notifications::{Notifications, UserNotification, UserNotifyKind};
 // pub use crate::primitives::{
 //     Account, AccountCollection, AccountSelectorButtonExtension, BlockDagGraphSettings, DaaBucket,
@@ -102,7 +103,6 @@ pub use crate::settings::{
 // pub use crate::state::State;
 // pub use crate::status::Status;
 pub use crate::storage::{Storage, StorageUpdateOptions};
-// pub use crate::utils::spawn;
 pub use crate::utils::*;
 
 pub use strum::IntoEnumIterator;

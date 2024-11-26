@@ -10,15 +10,31 @@ pub struct Signals {
 
 impl Signals {
   pub fn bind(manager: &DXManager) {
-    let signals = Arc::new(Self {
-      manager: manager.clone(),
-      iterations: AtomicU64::new(0),
-    });
+      let signals = Arc::new(Signals {
+          manager: manager.clone(),
+          iterations: AtomicU64::new(0),
+      });
 
-    ctrlc::set_handler(move || match signals.iterations.fetch_add(1, Ordering::SeqCst) {
-      0 => signals.manager.try_send(Events::Exit).unwrap_or_else(|e| println!("Exit error: {:?}", e)),
-      1 => crate::dx_manager::abort(),
-      _ => std::process::exit(1),
-    }).expect("Signal handler error");
+      ctrlc::set_handler(move || {
+          let v = signals.iterations.fetch_add(1, Ordering::SeqCst);
+
+          match v {
+              0 => {
+                  println!("^SIGTERM - shutting down...");
+                  signals.manager.try_send(Events::Exit).unwrap_or_else(|e| {
+                      println!("Error sending exit event: {:?}", e);
+                  });
+              }
+              1 => {
+                  println!("^SIGTERM - aborting...");
+                  crate::dx_manager::abort();
+              }
+              _ => {
+                  println!("^SIGTERM - halting");
+                  std::process::exit(1);
+              }
+          }
+      })
+      .expect("Error setting signal handler");
   }
 }

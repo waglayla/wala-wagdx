@@ -37,12 +37,25 @@ cfg_if! {
 }
 
 
-#[derive(Debug, Clone)]
-pub enum WaglayladServiceEvents {
-    #[cfg(not(target_arch = "wasm32"))]
-    StartInternalAsDaemon { config: Config, network: Network },
-    Stdout { line : String },
-    Exit,
+cfg_if! {
+    if #[cfg(not(target_arch = "wasm32"))] {
+        #[derive(Debug, Clone)]
+        pub enum WaglayladServiceEvents {
+            #[cfg(not(target_arch = "wasm32"))]
+            StartInternalAsDaemon { config: Config, network: Network },
+            StartRemoteConnection { rpc_config : RpcConfig, network : Network },
+            Stdout { line : String },
+            Disable { network : Network },
+            Exit,
+        }
+    } else {
+        #[derive(Debug)]
+        pub enum WaglayladServiceEvents {
+            StartRemoteConnection { rpc_config : RpcConfig, network : Network },
+            Disable { network : Network },
+            Exit,
+        }
+    }
 }
 
 pub struct WaglaylaService {
@@ -53,7 +66,8 @@ pub struct WaglaylaService {
     #[cfg(not(target_arch = "wasm32"))]
     pub waglaylad: Mutex<Option<Arc<dyn Waglaylad + Send + Sync + 'static>>>,
     pub log_file: Mutex<std::fs::File>,
-    daemon_sender: Sender<DaemonMessage>,
+    pub daemon_sender: Sender<DaemonMessage>,
+    pub connect_on_startup: Option<NodeSettings>,
 }
 
 impl WaglaylaService {
@@ -67,6 +81,7 @@ impl WaglaylaService {
             .expect("Failed to open log file");
     
         Self {
+            connect_on_startup: settings.initialized.then(|| settings.node.clone()),
             service_events: Channel::unbounded(),
             task_ctl: Channel::oneshot(),
             network: Mutex::new(Network::Mainnet),
@@ -137,6 +152,17 @@ impl WaglaylaService {
         // } else {
         //     self.wallet().disconnect().await?;
         // }
+
+        // below is necessary to stop the daemon for now since wallet isn't implemented
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let waglaylad = self.waglaylad.lock().unwrap().take();
+            if let Some(waglaylad) = waglaylad {
+                if let Err(err) = waglaylad.stop().await {
+                    println!("error shutting down waglaylad: {}", err);
+                }
+            }
+        }
         Ok(())
     }
 
@@ -184,6 +210,39 @@ impl WaglaylaService {
         //     Ok(())
         // }
         Ok(()) // placeholder
+    }
+
+    pub async fn apply_node_settings(&self, node_settings: &NodeSettings) -> Result<()> {
+        match WaglayladServiceEvents::from_node_settings(node_settings, None) {
+            Ok(event) => {
+                self.service_events
+                    .sender
+                    .try_send(event)
+                    .unwrap_or_else(|err| {
+                        log_error!("WaglayladService error: {}", err);
+                    });
+            }
+            Err(err) => {
+                log_error!("WaglayladServiceEvents::try_from() error: {}", err);
+            }
+        }
+        Ok(())
+    }
+
+    pub fn update_services(&self, node_settings: &NodeSettings, options: Option<RpcOptions>) {
+        match WaglayladServiceEvents::from_node_settings(node_settings, options) {
+            Ok(event) => {
+                self.service_events
+                    .sender
+                    .try_send(event)
+                    .unwrap_or_else(|err| {
+                        println!("WaglayladService error: {}", err);
+                    });
+            }
+            Err(err) => {
+                println!("WaglayladServiceEvents::try_from() error: {}", err);
+            }
+        }
     }
 
     #[cfg(not(target_arch = "wasm32"))]
@@ -234,6 +293,51 @@ impl WaglaylaService {
 
                 self.update_storage();
             }
+            WaglayladServiceEvents::StartRemoteConnection {
+                rpc_config,
+                network,
+            } => {
+                if runtime::is_chrome_extension() {
+                    self.stop_all_services().await?;
+
+                    // self.handle_network_change(network).await?;
+                    // self.wallet().change_network_id(network.into()).await.ok();
+
+                    self.start_all_services(None, network).await?;
+                    self.connect_rpc_client().await?;
+                } else {
+                    self.stop_all_services().await?;
+
+                    // self.handle_network_change(network).await?;
+
+                    let rpc = Self::create_rpc_client(rpc_config.url(), None)
+                        .expect("Waglaylad Service - unable to create wRPC client");
+                    self.start_all_services(Some(rpc), network).await?;
+                    self.connect_rpc_client().await?;
+                }
+            }
+            WaglayladServiceEvents::Disable { network } => {
+              self.stop_all_services().await?;
+              // if let Some(wallet) = self.core_wallet() {
+              //     self.stop_all_services().await?;
+
+              //     // self.handle_network_change(network).await?;
+
+              //     if wallet.is_open() {
+              //         wallet.close().await.ok();
+              //     }
+
+              //     // re-apply network id to allow wallet
+              //     // to be opened offline in disconnected
+              //     // mode by changing network id in settings
+              //     wallet.set_network_id(&network.into()).ok();
+              // } else if runtime::is_chrome_extension() {
+              //     self.stop_all_services().await?;
+              //     self.wallet().wallet_close().await.ok();
+              //     self.handle_network_change(network).await?;
+              //     self.wallet().change_network_id(network.into()).await.ok();
+              // }
+          }
             WaglayladServiceEvents::Exit => {
                 return Ok(true);
             }
@@ -304,6 +408,9 @@ impl WaglaylaService {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+pub struct Context {}
+
 #[async_trait]
 impl Service for WaglaylaService {
     fn name(&self) -> &'static str {
@@ -339,7 +446,7 @@ impl Service for WaglaylaService {
             } = status;
 
             if let Some(context) = context {
-                // let _context = Context::try_from_slice(&context)?;
+                let _context = Context::try_from_slice(&context)?;
 
                 if is_connected {
                     let network_id = network_id.unwrap_or_else(|| Network::Mainnet.into());
@@ -410,33 +517,22 @@ impl Service for WaglaylaService {
                 // ^ MOVE THIS FUNCTION TO "bootstrap()"
                 // ^ MOVE THIS FUNCTION TO "bootstrap()"
             } else {
-                let mut node_settings = NodeSettings::default();
-                node_settings.enable_wrpc_borsh = true;
-                node_settings.enable_grpc = true;
-
                 // new instance - emit startup event
-                self.start_daemon(Config::from(node_settings.clone()), Network::Mainnet);
+                if let Some(node_settings) = self.connect_on_startup.as_ref() {
+                  self.apply_node_settings(node_settings).await?;
+                }
 
                 // new instance - setup new context
                 // let context = Context {};
                 // self.wallet()
-                //     .retain_context("waglayla-ng", Some(borsh::to_vec(&context)?))
+                //     .retain_context("kaspa-ng", Some(borsh::to_vec(&context)?))
                 //     .await?;
-            }
+              }
         } else {
-            // new instance - emit startup event
-            // if let Some(node_settings) = self.connect_on_startup.as_ref() {
-            //     self.apply_node_settings(node_settings).await?;
-            // }
-            let mut node_settings = NodeSettings::default();
-            node_settings.enable_wrpc_borsh = true;
-            node_settings.enable_grpc = true;
-            self.start_daemon(Config::from(node_settings.clone()), Network::Mainnet);
+            if let Some(node_settings) = self.connect_on_startup.as_ref() {
+                self.apply_node_settings(node_settings).await?;
+            }
         }
-        // else if let Some(node_settings) = self.connect_on_startup.as_ref() {
-        //     // self.update_services(node_settings, None);
-        //     self.apply_node_settings(node_settings).await?;
-        // }
 
         // if let Some(wallet) = self.core_wallet() {
         //     // wallet.multiplexer().channel()
@@ -491,29 +587,29 @@ impl Service for WaglaylaService {
         //     }
         // };
 
-            loop {
-                select! {
-                    // msg = wallet_events.recv().fuse() => {
-                    // // msg = wallet.multiplexer().channel().recv().fuse() => {
-                    //     if let Ok(event) = msg {
-                    //         self.handle_multiplexer(event).await?;
-                    //     } else {
-                    //         break;
-                    //     }
-                    // }
+        loop {
+            select! {
+                // msg = wallet_events.recv().fuse() => {
+                // // msg = wallet.multiplexer().channel().recv().fuse() => {
+                //     if let Ok(event) = msg {
+                //         self.handle_multiplexer(event).await?;
+                //     } else {
+                //         break;
+                //     }
+                // }
 
-                    msg = self.as_ref().service_events.receiver.recv().fuse() => {
-                        if let Ok(event) = msg {
-                            if self.handle_event(event).await? {
-                                break;
-                            }
-
-                        } else {
+                msg = self.as_ref().service_events.receiver.recv().fuse() => {
+                    if let Ok(event) = msg {
+                        if self.handle_event(event).await? {
                             break;
                         }
+
+                    } else {
+                        break;
                     }
                 }
             }
+        }
 
         self.stop_all_services().await?;
         self.task_ctl.send(()).await.unwrap();
@@ -531,5 +627,35 @@ impl Service for WaglaylaService {
     async fn join(self: Arc<Self>) -> Result<()> {
         self.task_ctl.recv().await.unwrap();
         Ok(())
+    }
+}
+
+impl WaglayladServiceEvents {
+    pub fn from_node_settings(
+        node_settings: &NodeSettings,
+        options: Option<RpcOptions>,
+    ) -> Result<Self> {
+        cfg_if! {
+            if #[cfg(not(target_arch = "wasm32"))] {
+
+                match &node_settings.node_kind {
+                    WaglayladNodeKind::Disabled => {
+                        Ok(WaglayladServiceEvents::Disable { network : Network::Mainnet })
+                    }
+                    WaglayladNodeKind::IntegratedAsDaemon => {
+                        Ok(WaglayladServiceEvents::StartInternalAsDaemon { config : Config::from(node_settings.clone()), network : Network::Mainnet })
+                    }
+                    WaglayladNodeKind::Remote => {
+                        Ok(WaglayladServiceEvents::StartRemoteConnection { rpc_config : RpcConfig::from_node_settings(node_settings,options), network : Network::Mainnet })
+                    }
+                }
+            } else {
+                match &node_settings.node_kind {
+                    WaglayladNodeKind::Remote => {
+                        Ok(WaglayladServiceEvents::StartRemoteConnection { rpc_config : RpcConfig::from_node_settings(node_settings,options), network : Network::Mainnet })
+                    }
+                }
+            }
+        }
     }
 }

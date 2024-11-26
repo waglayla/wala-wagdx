@@ -6,6 +6,7 @@ use crate::components::outline::Outline;
 use crate::components::hello::Hello;
 use crate::components::blank::Blank;
 use crate::components::console::DaemonConsole;
+use crate::components::welcome::Welcome;
 
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
@@ -66,7 +67,7 @@ pub struct Core {
   // callback_map: CallbackMap,
   // pub network_pressure: NetworkPressure,
   // notifications: Notifications,
-  // pub storage: Storage,
+  pub storage: Storage,
   // pub feerate : Option<Arc<RpcFeeEstimate>>,
   // pub feerate: Option<FeerateEstimate>, TODO maybe
   pub node_info: Option<Box<String>>,
@@ -95,16 +96,24 @@ impl Core {
     );
 
     let mut components = HashMap::new();
+    components.insert_typeid(Welcome::new(manager()));
     components.insert_typeid(Outline::default());
     components.insert_typeid(Hello::default());
     components.insert_typeid(Blank::default());
+    components.insert_typeid(components::settings::Settings::new(manager()));
 
     let daemon_console = DaemonConsole::new(daemon_receiver);
     components.insert_typeid(daemon_console);
 
     let hello_component = components.get(&TypeId::of::<Hello>()).unwrap().clone();
 
-    Self {
+    let storage = Storage::default();
+    #[cfg(not(target_arch = "wasm32"))]
+    if settings.node.waglaylad_daemon_storage_folder_enable {
+        storage.track_storage_root(Some(settings.node.waglaylad_daemon_storage_folder.as_str()));
+    }
+
+    let mut this = Self {
       is_shutdown_pending: false,
       settings_storage_requested: false,
       last_settings_storage_request: Instant::now(),
@@ -123,9 +132,44 @@ impl Core {
       // account_collection: None,
       // release: None,
       window_frame,
+      storage,
       node_info: None,
-      daemon_console: components.get(&TypeId::of::<DaemonConsole>()).unwrap().clone()
+      daemon_console: components.get(&TypeId::of::<DaemonConsole>()).unwrap().clone(),
+    };
+
+    components.values().for_each(|component| {
+      component.init(&mut this);
+    });
+
+    // this.wallet_update_list();
+
+    cfg_if! {
+        if #[cfg(target_arch = "wasm32")] {
+        //     this.register_visibility_handler();
+        } else {
+            let storage = this.storage.clone();
+            tokio::spawn(async move {
+                loop {
+                    storage.update();
+                    tokio::time::sleep(Duration::from_secs(60)).await;
+                }
+            });
+        }
     }
+
+    this
+  }
+
+  pub fn get_mut<T>(&mut self) -> RefMut<'_, T>
+  where
+    T: ComponentT + 'static,
+  {
+    let cell = self.components.get_mut(&TypeId::of::<T>()).unwrap();
+    RefMut::map(cell.inner.module.borrow_mut(), |r| {
+      (r).as_any_mut()
+        .downcast_mut::<T>()
+        .expect("unable to downcast_mut module")
+    })
   }
 }
 
@@ -151,6 +195,18 @@ impl eframe::App for Core {
 impl Core {
   pub fn render_frame(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
     window_frame(self.window_frame, ctx, "Waglayla Wag-DX", |ui| {
+      if !self.settings.initialized {
+        egui::CentralPanel::default().show_inside(ui, |ui| {
+          self.components
+            .get(&TypeId::of::<Welcome>())
+            .unwrap()
+            .clone()
+            .render(self, ctx, frame, ui);
+        });
+
+        return;
+      }
+
       // Render sidebar
       let outline_type_id = TypeId::of::<Outline>();
       let outline = self.components.get(&outline_type_id).cloned();
@@ -194,5 +250,29 @@ impl Core {
   // Method to get a mutable reference to a component
   pub fn get_component_mut<T: ComponentT + 'static>(&mut self) -> Option<&mut Component> {
       self.components.get_mut(&TypeId::of::<T>())
+  }
+
+  pub fn handle_events(
+      &mut self,
+      event: Events,
+      _ctx: &egui::Context,
+      _frame: &mut eframe::Frame,
+  ) -> Result<()> {
+    match event {
+        Events::Exit => {
+            cfg_if! {
+                if #[cfg(not(target_arch = "wasm32"))] {
+                    self.is_shutdown_pending = true;
+                    _ctx.send_viewport_cmd(ViewportCommand::Close);
+                }
+            }
+        },
+        _ => {}
+      // Events::Error(error) => {
+      //     manager().notify(UserNotification::error(error.as_str()));
+      // }
+    }
+
+    Ok(())
   }
 }
