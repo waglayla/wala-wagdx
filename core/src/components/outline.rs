@@ -99,56 +99,67 @@ impl ComponentT for Outline {
 }
 
 impl Outline {
-    fn tab_button(&self, ui: &mut Ui, ctx: &Context, tab: Tab) -> bool {
-        let panel_fill = ctx.style().visuals.panel_fill;
-        let selected = self.selected_tab == tab;
-        
-        let mut visuals = ui.style_mut().visuals.clone();
-        let bg_color = if selected {
-            panel_fill
-        } else {
-            Color32::TRANSPARENT
-        };
-        
-        visuals.widgets.inactive.weak_bg_fill = bg_color;
-        visuals.widgets.active.weak_bg_fill = bg_color;
-        ui.style_mut().visuals = visuals;
-    
-        let button_size = vec2(ui.available_width(), 55.0);
-        let (rect, mut response) = ui.allocate_exact_size(button_size, egui::Sense::click());
-        if !selected {          
-          response = response.on_hover_cursor(egui::CursorIcon::PointingHand);
-        }
-    
-        if ui.is_rect_visible(rect) {
-            ui.spacing_mut().item_spacing = Vec2::ZERO;
-            
-            ui.painter().rect_filled(
-                rect,
-                Rounding::ZERO,
-                bg_color,
-            );
-    
-            let text_padding = 12.0;
-            let text_rect = rect.shrink2(vec2(text_padding, 0.0));
-            
-            let text_color = if selected {
-                Color32::WHITE
-            } else if response.hovered() {
-                Color32::LIGHT_GRAY
-            } else {
-                ctx.style().visuals.widgets.inactive.text_color().linear_multiply_rgb(0.66)
-            };
+  fn tab_button(&self, ui: &mut Ui, ctx: &Context, tab: Tab) -> bool {
+      let panel_fill = ctx.style().visuals.panel_fill;
+      let selected = self.selected_tab == tab;
+      
+      let mut visuals = ui.style_mut().visuals.clone();
+      let bg_color = if selected {
+          panel_fill
+      } else {
+          Color32::TRANSPARENT
+      };
+      
+      visuals.widgets.inactive.weak_bg_fill = bg_color;
+      visuals.widgets.active.weak_bg_fill = bg_color;
+      ui.style_mut().visuals = visuals;
 
-            ui.painter().text(
-                text_rect.left_top(),
-                egui::Align2::LEFT_TOP,
-                tab.label(),
-                ui.style().text_styles[&egui::TextStyle::Button].clone(),
-                text_color,
-            );
-        }
-    
-        response.clicked()
-    }
+      let button_size = vec2(ui.available_width(), 55.0);
+      let (rect, mut response) = ui.allocate_exact_size(button_size, egui::Sense::click());
+      if !selected {          
+          response = response.on_hover_cursor(egui::CursorIcon::PointingHand);
+      }
+
+      if ui.is_rect_visible(rect) {
+          ui.spacing_mut().item_spacing = Vec2::ZERO;
+          
+          ui.painter().rect_filled(
+              rect,
+              Rounding::ZERO,
+              bg_color,
+          );
+
+          // Animate the text size
+          let size_factor = ctx.animate_value_with_time(
+              response.id.with("text_size"),
+              if response.hovered() { 1.05 } else { 1.0 },
+              0.075, // Animation duration in seconds
+          );
+
+          let text_padding = 12.0;
+          let text_rect = rect.shrink2(vec2(text_padding, 0.0));
+          
+          let text_color = if selected {
+              Color32::WHITE
+          } else if response.hovered() {
+              Color32::LIGHT_GRAY
+          } else {
+              ctx.style().visuals.widgets.inactive.text_color().linear_multiply_rgb(0.66)
+          };
+
+          // Apply the size animation to the font
+          let mut font_id = ui.style().text_styles[&egui::TextStyle::Button].clone();
+          font_id.size *= size_factor;
+
+          ui.painter().text(
+              text_rect.left_top(),
+              egui::Align2::LEFT_TOP,
+              tab.label(),
+              font_id,
+              text_color,
+          );
+      }
+
+      response.clicked()
+  }
 }

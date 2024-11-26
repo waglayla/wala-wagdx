@@ -7,6 +7,7 @@ use crate::components::hello::Hello;
 use crate::components::blank::Blank;
 use crate::components::console::DaemonConsole;
 use crate::components::welcome::Welcome;
+use crate::components::footer::Footer;
 
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
@@ -32,6 +33,7 @@ pub enum Exception {
   UtxoIndexNotEnabled { url: Option<String> },
 }
 
+#[derive(Clone)]
 pub struct Core {
   is_shutdown_pending: bool,
   settings_storage_requested: bool,
@@ -72,6 +74,7 @@ pub struct Core {
   // pub feerate: Option<FeerateEstimate>, TODO maybe
   pub node_info: Option<Box<String>>,
   daemon_console: Component,
+  footer: Component,
 }
 
 impl Core {
@@ -105,6 +108,9 @@ impl Core {
     let daemon_console = DaemonConsole::new(daemon_receiver);
     components.insert_typeid(daemon_console);
 
+    components.insert_typeid(Footer::default());
+    let footer = components.get(&TypeId::of::<Footer>()).unwrap().clone();
+
     let hello_component = components.get(&TypeId::of::<Hello>()).unwrap().clone();
 
     let storage = Storage::default();
@@ -134,6 +140,7 @@ impl Core {
       window_frame,
       storage,
       node_info: None,
+      footer,
       daemon_console: components.get(&TypeId::of::<DaemonConsole>()).unwrap().clone(),
     };
 
@@ -207,25 +214,42 @@ impl Core {
         return;
       }
 
-      // Render sidebar
-      let outline_type_id = TypeId::of::<Outline>();
-      let outline = self.components.get(&outline_type_id).cloned();
-      if let Some(outline) = self.components.get(&TypeId::of::<Outline>()) {
-        let mut components_clone = self.components.clone();
-        let outline_component = components_clone.get_mut(&outline_type_id).unwrap();
-        outline_component.render(self, ctx, frame, ui);
-      }
+      let available_rect = ui.available_rect_before_wrap();
+      let footer_height = 28.0;
+            
+      let main_rect = available_rect.shrink2(egui::vec2(0.0, footer_height));
+      let footer_rect = egui::Rect::from_min_max(
+          egui::pos2(available_rect.left(), available_rect.bottom() - footer_height),
+          available_rect.max,
+      );
 
-      // Render active component with a persistent state
-      let active_component = self.component.clone();
-      let content_rect = ui.available_rect_before_wrap();
-      ui.allocate_ui_at_rect(content_rect, |ui| {
-          // We clone components to avoid the borrow checker issue
+      ui.allocate_ui_at_rect(main_rect, |ui| {
+          // Render sidebar
+          let outline_type_id = TypeId::of::<Outline>();
+          let outline = self.components.get(&outline_type_id).cloned();
+          if let Some(outline) = self.components.get(&TypeId::of::<Outline>()) {
+            let mut components_clone = self.components.clone();
+            let outline_component = components_clone.get_mut(&outline_type_id).unwrap();
+            outline_component.render(self, ctx, frame, ui);
+          }
+
+          // Render active component with a persistent state
+          let active_component = self.component.clone();
+          let content_rect = ui.available_rect_before_wrap();
+          ui.allocate_ui_at_rect(content_rect, |ui| {
+              // We clone components to avoid the borrow checker issue
+              let mut components_clone = self.components.clone();
+              let component_type_id = active_component.type_id();
+              let active_component_mut = components_clone.get_mut(&component_type_id).unwrap();
+              
+              active_component_mut.render(self, ctx, frame, ui);
+          });
+      });
+
+      ui.allocate_ui_at_rect(footer_rect, |ui| {
           let mut components_clone = self.components.clone();
-          let component_type_id = active_component.type_id();
-          let active_component_mut = components_clone.get_mut(&component_type_id).unwrap();
-          
-          active_component_mut.render(self, ctx, frame, ui);
+          let footer_component = components_clone.get_mut(&TypeId::of::<Footer>()).unwrap();
+          footer_component.render(self, ctx, frame, ui);
       });
     });
   }

@@ -8,3 +8,7 @@ mod color;
 pub use color::*;
 mod arglist;
 pub use arglist::*;
+
+pub fn lerp_dx(start: f32, end: f32, t: f32) -> f32 {
+  start + t * (end - start)
+}

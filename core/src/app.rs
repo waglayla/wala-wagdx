@@ -4,9 +4,13 @@ use crate::events::ApplicationEventsChannel;
 use crate::result::Result;
 use cfg_if::cfg_if;
 
+use eframe::HardwareAcceleration;
+
 use wala_wagdx_core::dx_manager;
 use wala_wagdx_core::settings::Settings;
 use waglayla_wallet_core::api::WalletApi;
+
+use eframe::Renderer;
 
 use std::sync::Arc;
 use workflow_i18n::*;
@@ -240,13 +244,14 @@ cfg_if! {
             // .with_icon(svg_to_icon_data(WAGLAYLA_NG_ICON_SVG, Some(SizeHint::Size(256,256))));
             .with_decorations(false) // For window frame
             .with_transparent(true) // For window frame
-            .with_resizable(true);
+            .with_resizable(true)
             ;
   
           let native_options = eframe::NativeOptions {
             // persist_window : true,
             viewport,
             follow_system_theme: false,
+            hardware_acceleration: HardwareAcceleration::Preferred,
             ..Default::default()
           };
 

@@ -4,6 +4,9 @@ pub mod icon;
 pub mod network;
 pub mod widgets;
 
+pub mod animation;
+pub use animation::*;
+
 pub use icon::IconSize;
 pub use theme::*;
 
