@@ -262,7 +262,14 @@ cfg_if! {
             "WagDX",
             native_options,
             Box::new(move |cc| {
-              let manager = dx_manager::DXManager::new(&cc.egui_ctx, Some(application_events), &settings, daemon_channel.clone());
+              let manager = dx_manager::DXManager::new(
+                &cc.egui_ctx, 
+                Some(application_events), 
+                wallet_api, 
+                &settings, 
+                daemon_channel.clone()
+              );
+              
               delegate.lock().unwrap().replace(manager.clone());
               dx_manager::signal_handler::Signals::bind(&manager);
               manager.start();

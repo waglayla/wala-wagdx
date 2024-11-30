@@ -64,7 +64,7 @@ pub use egui::epaint::{
 pub use egui::*;
 pub use egui_plot::{PlotPoint, PlotPoints};
 
-// pub use crate::collection::Collection;
+pub use crate::collection::Collection;
 pub use crate::core::Core;
 pub use crate::core::MAINNET_EXPLORER;
 pub use crate::core::TESTNET10_EXPLORER;
@@ -90,6 +90,7 @@ pub use crate::gui::widgets::*;
 //     Account, AccountCollection, AccountSelectorButtonExtension, BlockDagGraphSettings, DaaBucket,
 //     DagBlock, Transaction, TransactionCollection,
 // };
+pub use crate::dx_wallet::*;
 pub use crate::result::Result;
 // pub use crate::runtime::{runtime, spawn, spawn_with_result, Payload, Runtime, Service};
 pub use crate::dx_manager::{manager, DXManager, Service};

@@ -1,0 +1,140 @@
+use modules::wallet_create::WalletCreate;
+
+use crate::imports::*;
+use waglayla_wallet_core::storage::AssocPrvKeyDataIds;
+use waglayla_wallet_core::deterministic::bip32::BIP32_ACCOUNT_KIND;
+
+#[derive(Clone)]
+pub enum CreateAccountKind {
+    Bip44,
+    Bip32,
+    Legacy,
+    MultiSig,
+    Keypair,
+    // Keypair,
+    // MultiSig,
+}
+
+#[derive(Clone)]
+pub enum State {
+    Start,
+    KeySelection,
+    StartImport,
+    ImportMnemonic,
+    ImportMnemonicWithEditor,
+    PrivateKeyCreate,
+    PrivateKeyConfirm,
+    AccountName,
+    WalletSecret,
+    PaymentSecret,
+    AddAccount,
+    //CreateAccount,
+    //ImportAccount,
+    AccountError(Arc<Error>),
+    PresentMnemonic(Arc<CreationData>),
+    ConfirmMnemonic(Arc<CreationData>),
+    Finish(Arc<dyn CoreAccount>),
+}
+
+#[derive(Clone)]
+pub enum CreationData {
+    Bip44 {
+        name : Option<String>,
+    },
+    Bip32 {
+        mnemonic: Option<Mnemonic>,
+    },
+    Keypair {
+        private_key: Secret,
+    },
+    MultiSig {
+        mnemonics: Vec<Mnemonic>,
+    },
+}
+
+#[derive(Default, Debug, Clone, Copy, Eq, PartialEq)]
+enum Focus {
+    #[default]
+    None,
+    AccountName,
+    WalletSecret,
+    PaymentSecret,
+    WalletMnemonic,
+}
+
+#[derive(Clone, Default)]
+struct Context {
+    prv_key_data_info : Option<Arc<PrvKeyDataInfo>>,
+    account_kind: Option<CreateAccountKind>,
+    _create_private_key: bool,
+    account_name: String,
+    wallet_secret : String,
+    payment_secret: String,
+    word_count: WordCount,
+    import_mnemonic: bool,
+    import_legacy: bool,
+    import_with_bip39_passphrase: bool,
+    import_private_key_mnemonic: String,
+    prv_keys: Vec<Arc<PrvKeyDataInfo>>,
+}
+
+pub struct WalletCreate {
+  #[allow(dead_code)]
+  manager: DXManager,
+  // secret: String,
+  context: Context,
+  pub state: State,
+  focus : FocusManager<Focus>,
+}
+
+impl WalletCreate {
+  pub fn new(manager: DXManager) -> Self {
+      Self {
+          manager,
+          // secret: String::new(),
+          state: State::Start,
+          focus: FocusManager::default(),
+          context: Default::default(),
+      }
+  }
+}
+
+impl ComponentT for WalletCreate {
+
+  fn modal(&self) -> bool { true }
+
+  fn style(&self) -> ModuleStyle {
+      ModuleStyle::Mobile
+  }
+
+  fn render(
+      &mut self,
+      core: &mut Core,
+      _ctx: &egui::Context,
+      _frame: &mut eframe::Frame,
+      ui: &mut egui::Ui,
+  ) {
+    match self.state.clone() {
+      State::Start => {
+        let account_list = core.user_accounts().iter();
+        let mut prv_keys = HashMap::new();
+        if let Some(prv_key_data_map) = core.prv_key_data_map.clone(){
+          account_list
+          .flat_map(|a|a.iter())
+          .for_each(|account|{
+              if account.account_kind() != &BIP32_ACCOUNT_KIND {
+                  return;
+              }
+              if let AssocPrvKeyDataIds::Single(key_id) = account.descriptor().prv_key_data_ids {
+                  if let Some(prv_key) = prv_key_data_map.get(&key_id){
+                      prv_keys.insert(*prv_key.id(), prv_key.clone());
+                  }
+              }
+          });
+        }
+        self.context.prv_keys = prv_keys.into_values().collect();
+        
+      }
+    }
+  }
+}

@@ -36,16 +36,22 @@ impl DXManager {
   pub fn new(
     ctx: &egui::Context,
     application_events: Option<ApplicationEventsChannel>,
+    wallet_api: Option<Arc<dyn WalletApi>>,
     settings: &Settings,
     daemon_channel: Channel<DaemonMessage>
   ) -> Self {
-    let waglayla = Arc::new(WaglaylaService::new(&settings, daemon_channel.sender.clone()));
+    let application_events =
+      application_events.unwrap_or_else(ApplicationEventsChannel::unbounded);
+
+    let waglayla = Arc::new(WaglaylaService::new(
+      application_events.clone(),
+      &settings, 
+      daemon_channel.sender.clone(),
+      wallet_api
+    ));
     let services: Mutex<Vec<Arc<dyn Service>>> = Mutex::new(vec![
         waglayla.clone(),
     ]);
-
-    let application_events =
-      application_events.unwrap_or_else(ApplicationEventsChannel::unbounded);
 
     let manager = Self {
       inner: Arc::new(Inner {
@@ -135,6 +141,14 @@ impl DXManager {
 
   pub fn waglayla_service(&self) -> &Arc<WaglaylaService> {
     &self.inner.waglayla
+  }
+
+  pub fn wallet(&self) -> Arc<dyn WalletApi> {
+    self.inner.waglayla.wallet()
+  }
+
+  pub fn application_events(&self) -> &ApplicationEventsChannel {
+    &self.inner.application_events
   }
 
   // SETTER/SENDERS

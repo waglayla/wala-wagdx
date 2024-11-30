@@ -43,13 +43,7 @@ impl Welcome {
                     .default_open(true)
                     .show(ui, |ui| {
                         ui.horizontal_wrapped(|ui| {
-                            // WaglayladNodeKind::iter().for_each(|node| {
-                            [
-                                WaglayladNodeKind::Disabled,
-                                WaglayladNodeKind::Remote,
-                                #[cfg(not(target_arch = "wasm32"))]
-                                WaglayladNodeKind::IntegratedAsDaemon,
-                            ].iter().for_each(|node_kind| {
+                            WaglayladNodeKind::iter().for_each(|node_kind| {
                                 let mut is_selected = self.settings.node.node_kind == *node_kind;
                                 let response = ui.add(toggle(&mut is_selected));
                                 
@@ -59,6 +53,8 @@ impl Welcome {
                 
                                 ui.label(node_kind.to_string());
                                 response.on_hover_text_at_pointer(node_kind.describe());
+
+                                ui.separator();
                             });
                         });
 

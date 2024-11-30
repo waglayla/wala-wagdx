@@ -272,6 +272,8 @@ pub struct NodeSettings {
   pub grpc_network_interface: NetworkInterfaceConfig,
   pub enable_upnp: bool,
 
+  pub enable_bridge: bool,
+
   // pub network: Network,
   pub node_kind: WaglayladNodeKind,
   pub waglaylad_daemon_binary: String,
@@ -296,6 +298,8 @@ impl Default for NodeSettings {
       enable_grpc: true,
       grpc_network_interface: NetworkInterfaceConfig::default(),
       enable_upnp: true,
+
+      enable_bridge: false,
       // network: Network::default(),
       node_kind: WaglayladNodeKind::default(),
       waglaylad_daemon_binary: String::default(),
@@ -328,6 +332,7 @@ impl NodeSettings {
           || self.enable_wrpc_json != other.enable_wrpc_json
           || self.wrpc_json_network_interface != other.wrpc_json_network_interface
           || self.enable_upnp != other.enable_upnp
+          || self.enable_bridge != other.enable_bridge
         {
           Some(true)
         } else if self.waglaylad_daemon_args != other.waglaylad_daemon_args
@@ -489,6 +494,7 @@ impl Settings {
   pub async fn store(&self) -> Result<()> {
     let storage = storage()?;
     storage.ensure_dir().await?;
+    println!("{}", storage.filename().display());
     workflow_store::fs::write_json(storage.filename(), self).await?;
     Ok(())
   }
@@ -525,7 +531,7 @@ impl Settings {
               NodeConnectionConfigKind::PublicServerCustom
             ) {
               settings.node.connection_config_kind =
-                NodeConnectionConfigKind::PublicServerRandom;
+              NodeConnectionConfigKind::PublicServerRandom;
             }
 
             Ok(settings)

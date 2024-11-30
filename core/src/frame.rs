@@ -10,7 +10,7 @@ const WIN32: bool = false;
 
 // const WINDOW_ROUNDING: f32 = 0.0;
 // #[cfg(not(target_os = "windows"))]
-const WINDOW_ROUNDING: f32 = 10.0;
+pub const WINDOW_ROUNDING: f32 = 10.0;
 
 pub fn window_frame(
   enable: bool,

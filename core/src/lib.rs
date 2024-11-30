@@ -22,3 +22,5 @@ pub mod events;
 pub mod storage;
 pub mod fonts;
 pub mod network;
+pub mod dx_wallet;
+pub mod collection;

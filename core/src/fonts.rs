@@ -98,6 +98,16 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
             font_data.tweak.y_offset = 9.0;
         }
     }
+
+    load_font_family!(fonts, "DINish", Regular, Bold, Italic, BoldItalic);
+    let variants = ["", "-Bold", "-Italic", "-BoldItalic"];
+    for variant in variants {
+        let font_name = format!("{}{}", "DINish", variant);
+        if let Some(font_data) = fonts.font_data.get_mut(&font_name) {
+            font_data.tweak.y_offset_factor = 0.0;
+            font_data.tweak.y_offset = 9.0;
+        }
+    }
     // ---
 
     fonts

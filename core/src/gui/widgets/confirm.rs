@@ -17,11 +17,11 @@ pub fn confirm_ui(
       ui.vertical(|ui| {
           ui.horizontal(|ui| {
               // Render "Yes" button
-              if ui.button(i18n("Yes")).clicked() {
+              if ui.medium_button(i18n("Yes")).clicked() {
                   *confirm = Some(Confirm::Yes);
               }
               // Render "No" button
-              if ui.button(i18n("No")).clicked() {
+              if ui.medium_button(i18n("No")).clicked() {
                   *confirm = Some(Confirm::No);
               }
           });
@@ -45,11 +45,11 @@ pub fn confirm_labels_ui(
       ui.vertical(|ui| {
           ui.horizontal(|ui| {
               // Render "Yes" button
-              if ui.button(yes_label).clicked() {
+              if ui.medium_button(yes_label).clicked() {
                   *confirm = Some(Confirm::Yes);
               }
               // Render "No" button
-              if ui.button(no_label).clicked() {
+              if ui.medium_button(no_label).clicked() {
                   *confirm = Some(Confirm::No);
               }
           });

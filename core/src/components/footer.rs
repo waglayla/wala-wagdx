@@ -54,7 +54,7 @@ impl ComponentT for Footer {
         if self.show_settings {
             egui::Window::new("Settings")
                 .open(&mut self.show_settings)
-                .default_size([400.0, 300.0])
+                .default_size([400.0, 400.0])
                 .show(ctx, |ui| {
                     let mut binding = core.clone();
                     let mut settings = binding.get_mut::<components::settings::Settings>();
@@ -75,7 +75,7 @@ impl Footer {
 
       // Animate color
       let default_color = ui.visuals().text_color();
-      let target_color = if response.hovered() { Color32::WHITE } else { default_color };
+      let target_color = if response.hovered() { theme_color().text_on_color_1 } else { default_color };
 
       let color = ctx.animate_color_with_time(
           response.id.with("gear_color"),

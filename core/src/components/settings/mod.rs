@@ -38,6 +38,19 @@ impl Settings {
       let mut node_settings_error = None;
       
       #[cfg(not(target_arch = "wasm32"))]
+      {
+          // TODO
+          // CollapsingHeader::new(i18n("Stratum Bridge"))
+          //   .default_open(true)
+          //   .show(ui, |ui| {
+          //     ui.horizontal(|ui| {
+          //       let response = ui.add(toggle(&mut settings.enable_bridge));
+          //       ui.label(i18n("Enabled"));
+          //     });
+          //   });
+      }
+
+      #[cfg(not(target_arch = "wasm32"))]
       if settings.node_kind.is_config_capable() {
           CollapsingHeader::new(i18n("Data Storage"))
               .default_open(true)
@@ -199,13 +212,35 @@ impl Settings {
                     .show(ui, |ui| {
                         ui.horizontal_wrapped(|ui|{
                             WaglayladNodeKind::iter().for_each(|node_kind| {
-                                ui.radio_value(&mut self.settings.node.node_kind, *node_kind, node_kind.to_string()).on_hover_text_at_pointer(node_kind.describe());
+                              let mut is_selected = self.settings.node.node_kind == *node_kind;
+                              let response = ui.add(toggle(&mut is_selected));
+
+                              if response.changed() {
+                                  self.settings.node.node_kind = *node_kind;
+                              }
+              
+                              ui.label(node_kind.to_string());
+                              response.on_hover_text_at_pointer(node_kind.describe());
+                                // ui.toggle(&mut self.settings.node.node_kind, *node_kind, node_kind.to_string()).on_hover_text_at_pointer(node_kind.describe());
+
+                              ui.separator();
                             });
                         });
 
                         match self.settings.node.node_kind {
                             WaglayladNodeKind::Remote => {
 
+                            },
+                            WaglayladNodeKind::IntegratedAsDaemon => {
+                                // TODO
+                                // CollapsingHeader::new(i18n("Stratum Bridge"))
+                                //     .default_open(true)
+                                //     .show(ui, |ui| {
+                                //       ui.horizontal(|ui| {
+                                //         let response = ui.add(toggle(&mut self.settings.node.enable_bridge));
+                                //         ui.label(i18n("Enabled:"));
+                                //       });
+                                //     });
                             },
                             _ => { }
                         }
@@ -315,8 +350,6 @@ impl Settings {
                 ui.add_space(4.);
                 ui.label(i18n("Unable to change node settings until the problem is resolved"));
 
-                ui.add_space(8.);
-
                 if ui.button(i18n("Ok")).clicked() {
                     self.settings.node = core.settings.node.clone();
                     self.grpc_network_interface =
@@ -328,7 +361,6 @@ impl Settings {
             } else if node_settings_error.is_none() {
                 if let Some(restart) = self.settings.node.compare(&core.settings.node) {
 
-                    ui.add_space(16.);
                     if let Some(response) = ui.confirm_widget_labels("Apply", "Cancel") {
                         match response {
                             Confirm::Yes => {

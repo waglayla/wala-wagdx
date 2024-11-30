@@ -60,6 +60,11 @@ pub struct ThemeColor {
     pub bandwidth_graph_color: Color32,
     pub network_graph_color: Color32,
 
+    pub text_off_color_1: Color32,
+    pub text_off_color_2: Color32,
+    pub text_on_color_1: Color32,
+    pub text_on_color_2: Color32,
+
     pub block_dag_separator_color: Color32,
     pub block_dag_new_block_fill_color: Color32,
     pub block_dag_block_fill_color: Color32,
@@ -129,6 +134,11 @@ impl ThemeColor {
             bandwidth_graph_color: Color32::from_rgb(196, 255, 199),
             network_graph_color: Color32::from_rgb(186, 255, 241),
 
+            text_off_color_1: Color32::from_rgb(96, 96, 96),
+            text_off_color_2: Color32::from_rgb(27, 27, 27),
+            text_on_color_1: Color32::WHITE,
+            text_on_color_2: Color32::from_rgb(137, 137, 137),
+
             block_dag_separator_color: Color32::from_rgb(220, 220, 220),
             block_dag_new_block_fill_color: Color32::from_rgb(220, 220, 220),
             block_dag_block_fill_color: Color32::from_rgb(173, 216, 230),
@@ -197,6 +207,11 @@ impl ThemeColor {
             connections_graph_color: Color32::from_rgb(72, 77, 56),
             bandwidth_graph_color: Color32::from_rgb(59, 77, 60),
             network_graph_color: Color32::from_rgb(56, 77, 72),
+
+            text_off_color_1: Color32::GRAY,
+            text_off_color_2: Color32::LIGHT_GRAY,
+            text_on_color_1: Color32::BLACK,
+            text_on_color_2: Color32::DARK_GRAY,
 
             block_dag_separator_color: Color32::from_rgb(120, 120, 120),
             block_dag_new_block_fill_color: Color32::from_rgb(220, 220, 220),

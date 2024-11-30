@@ -59,9 +59,11 @@ cfg_if! {
 }
 
 pub struct WaglaylaService {
+    pub application_events: ApplicationEventsChannel,
     pub service_events: Channel<WaglayladServiceEvents>,
     pub task_ctl: Channel<()>,
     pub network: Mutex<Network>,
+    pub wallet: Arc<dyn WalletApi>,
     pub services_start_instant: Mutex<Option<Instant>>,
     #[cfg(not(target_arch = "wasm32"))]
     pub waglaylad: Mutex<Option<Arc<dyn Waglaylad + Send + Sync + 'static>>>,
@@ -71,7 +73,12 @@ pub struct WaglaylaService {
 }
 
 impl WaglaylaService {
-    pub fn new(settings: &Settings, daemon_sender: Sender<DaemonMessage>) -> Self {
+    pub fn new(
+      application_events: ApplicationEventsChannel,
+      settings: &Settings, 
+      daemon_sender: Sender<DaemonMessage>,
+      wallet: Option<Arc<dyn WalletApi>>,
+    ) -> Self {
 
         let log_file = OpenOptions::new()
             .create(true)
@@ -80,16 +87,35 @@ impl WaglaylaService {
             .open("waglayla_service.log")
             .expect("Failed to open log file");
     
+        let storage = CoreWallet::local_store().unwrap_or_else(|e| {
+            panic!("Failed to open local store: {}", e);
+        });
+
+        let wallet = wallet.unwrap_or_else(|| {
+            Arc::new(
+                CoreWallet::try_with_rpc(None, storage, Some(Network::Mainnet.into()))
+                    .unwrap_or_else(|e| {
+                        panic!("Failed to create wallet instance: {}", e);
+                    }),
+            )
+        });
+
+        if !settings.initialized {
+            log_warn!("WaglaylaService::new(): Settings are not initialized");
+        }
+
         Self {
-            connect_on_startup: settings.initialized.then(|| settings.node.clone()),
+            application_events,
             service_events: Channel::unbounded(),
             task_ctl: Channel::oneshot(),
             network: Mutex::new(Network::Mainnet),
+            wallet,
             services_start_instant: Mutex::new(None),
             #[cfg(not(target_arch = "wasm32"))]
             waglaylad: Mutex::new(None),
             log_file: Mutex::new(log_file),
             daemon_sender,
+            connect_on_startup: settings.initialized.then(|| settings.node.clone()),
         }
     }
 
@@ -107,62 +133,81 @@ impl WaglaylaService {
             });
     }
 
+    async fn stop_daemon(&self) -> Result<()> {
+      #[cfg(not(target_arch = "wasm32"))]
+      {
+        let waglaylad = self.waglaylad.lock().unwrap().take();
+        if let Some(waglaylad) = waglaylad {
+          if let Err(err) = waglaylad.stop().await {
+            println!("error shutting down waglaylad: {}", err);
+          }
+        }
+      }
+      Ok(())
+    }
+
+    async fn disconnect_rpc(&self) -> Result<()> {
+        if let Some(wallet) = self.core_wallet() {
+            if let Ok(wrpc_client) = wallet.rpc_api().clone().downcast_arc::<WaglaylaRpcClient>() {
+                wrpc_client.disconnect().await?;
+            } else {
+                wallet.rpc_ctl().signal_close().await?;
+            }
+        }
+        Ok(())
+    }
+
+    fn is_wrpc_client(&self) -> bool {
+        if let Some(wallet) = self.core_wallet() {
+            wallet.has_rpc()
+                && wallet
+                    .rpc_api()
+                    .clone()
+                    .downcast_arc::<WaglaylaRpcClient>()
+                    .is_ok()
+        } else {
+            false
+        }
+    }
+
     pub async fn stop_all_services(&self) -> Result<()> {
         self.services_start_instant.lock().unwrap().take();
 
-        // if let Some(wallet) = self.core_wallet() {
-        //     if !wallet.has_rpc() {
-        //         return Ok(());
-        //     }
+        if let Some(wallet) = self.core_wallet() {
+            if !wallet.has_rpc() {
+                self.stop_daemon().await?;
+                return Ok(());
+            }
 
-        //     let preemptive_disconnect = ENABLE_PREEMPTIVE_DISCONNECT && self.is_wrpc_client();
+            let preemptive_disconnect = ENABLE_PREEMPTIVE_DISCONNECT && self.is_wrpc_client();
 
-        //     if preemptive_disconnect {
-        //         self.disconnect_rpc().await?;
-        //     }
+            if preemptive_disconnect {
+                self.disconnect_rpc().await?;
+            }
 
-        //     for service in crate::dx_manager::manager().services().into_iter() {
-        //         let instant = Instant::now();
-        //         service.clone().detach_rpc().await?;
-        //         if instant.elapsed().as_millis() > 1_000 {
-        //             log_warn!(
-        //                 "WARNING: detach_rpc() for '{}' took {} msec",
-        //                 service.name(),
-        //                 instant.elapsed().as_millis()
-        //             );
-        //         }
-        //     }
-
-        //     if !preemptive_disconnect {
-        //         self.disconnect_rpc().await?;
-        //     }
-
-        //     wallet.stop().await.expect("Unable to stop wallet");
-        //     wallet.bind_rpc(None).await?;
-
-        //     #[cfg(not(target_arch = "wasm32"))]
-        //     {
-        //         let waglaylad = self.waglaylad.lock().unwrap().take();
-        //         if let Some(waglaylad) = waglaylad {
-        //             if let Err(err) = waglaylad.stop().await {
-        //                 println!("error shutting down waglaylad: {}", err);
-        //             }
-        //         }
-        //     }
-        // } else {
-        //     self.wallet().disconnect().await?;
-        // }
-
-        // below is necessary to stop the daemon for now since wallet isn't implemented
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            let waglaylad = self.waglaylad.lock().unwrap().take();
-            if let Some(waglaylad) = waglaylad {
-                if let Err(err) = waglaylad.stop().await {
-                    println!("error shutting down waglaylad: {}", err);
+            for service in crate::dx_manager::manager().services().into_iter() {
+                let instant = Instant::now();
+                service.clone().rpc_detach().await?;
+                if instant.elapsed().as_millis() > 1_000 {
+                    log_warn!(
+                        "WARNING: rpc_detach() for '{}' took {} msec",
+                        service.name(),
+                        instant.elapsed().as_millis()
+                    );
                 }
             }
+
+            if !preemptive_disconnect {
+                self.disconnect_rpc().await?;
+            }
+
+            wallet.stop().await.expect("Unable to stop wallet");
+            wallet.bind_rpc(None).await?;
+        } else {
+            self.wallet().disconnect().await?;
         }
+
+        self.stop_daemon().await?;
         Ok(())
     }
 
@@ -245,6 +290,22 @@ impl WaglaylaService {
         }
     }
 
+    pub async fn connect_all_services(&self) -> Result<()> {
+        for service in crate::dx_manager::manager().services().into_iter() {
+            service.rpc_connect().await?;
+        }
+
+        Ok(())
+    }
+
+    pub async fn disconnect_all_services(&self) -> Result<()> {
+        for service in crate::dx_manager::manager().services().into_iter() {
+            service.rpc_disconnect().await?;
+        }
+
+        Ok(())
+    }
+
     #[cfg(not(target_arch = "wasm32"))]
     fn update_storage(&self) {
         const STORAGE_UPDATE_DELAY: Duration = Duration::from_millis(3000);
@@ -260,14 +321,15 @@ impl WaglaylaService {
         match event {
             #[cfg(not(target_arch = "wasm32"))]
             WaglayladServiceEvents::Stdout { line } => {
-                // let wallet = self.core_wallet().ok_or(Error::WalletIsNotLocal)?;
-                // if !wallet.utxo_processor().is_synced() {
-                //     wallet
-                //         .utxo_processor()
-                //         .sync_proc()
-                //         .handle_stdout(&line)
-                //         .await?;
-                // }
+                let wallet = self.core_wallet().ok_or(Error::WalletIsNotLocal)?;
+                if !wallet.utxo_processor().is_synced() {
+                    wallet
+                        .utxo_processor()
+                        .sync_proc()
+                        .handle_stdout(&line)
+                        .await?;
+                }
+
                 let log_message = format!("{}\n", line);
         
                 let mut file = self.log_file.lock().unwrap();
@@ -300,15 +362,11 @@ impl WaglaylaService {
                 if runtime::is_chrome_extension() {
                     self.stop_all_services().await?;
 
-                    // self.handle_network_change(network).await?;
-                    // self.wallet().change_network_id(network.into()).await.ok();
-
                     self.start_all_services(None, network).await?;
                     self.connect_rpc_client().await?;
                 } else {
                     self.stop_all_services().await?;
 
-                    // self.handle_network_change(network).await?;
 
                     let rpc = Self::create_rpc_client(rpc_config.url(), None)
                         .expect("Waglaylad Service - unable to create wRPC client");
@@ -318,31 +376,71 @@ impl WaglaylaService {
             }
             WaglayladServiceEvents::Disable { network } => {
               self.stop_all_services().await?;
-              // if let Some(wallet) = self.core_wallet() {
-              //     self.stop_all_services().await?;
+              if let Some(wallet) = self.core_wallet() {
+                self.stop_all_services().await?;
 
-              //     // self.handle_network_change(network).await?;
 
-              //     if wallet.is_open() {
-              //         wallet.close().await.ok();
-              //     }
+                if wallet.is_open() {
+                    wallet.close().await.ok();
+                }
 
-              //     // re-apply network id to allow wallet
-              //     // to be opened offline in disconnected
-              //     // mode by changing network id in settings
-              //     wallet.set_network_id(&network.into()).ok();
-              // } else if runtime::is_chrome_extension() {
-              //     self.stop_all_services().await?;
-              //     self.wallet().wallet_close().await.ok();
-              //     self.handle_network_change(network).await?;
-              //     self.wallet().change_network_id(network.into()).await.ok();
-              // }
-          }
+                wallet.set_network_id(&network.into()).ok();
+              } else if runtime::is_chrome_extension() {
+                self.stop_all_services().await?;
+                self.wallet().wallet_close().await.ok();
+                self.wallet().change_network_id(network.into()).await.ok();
+              }
+            }
             WaglayladServiceEvents::Exit => {
                 return Ok(true);
             }
         }
         Ok(false)
+    }
+
+    async fn handle_multiplexer(
+        &self,
+        event: Box<waglayla_wallet_core::events::Events>,
+    ) -> Result<()> {
+        // use waglayla_wallet_core::events::Events as CoreWalletEvents;
+
+        match *event {
+            CoreWalletEvents::DaaScoreChange { .. } => {}
+            CoreWalletEvents::Connect { .. } => {
+                self.connect_all_services().await?;
+
+                // self.wallet().
+            }
+            CoreWalletEvents::Disconnect { .. } => {
+                self.disconnect_all_services().await?;
+            }
+            _ => {
+                // println!("wallet event: {:?}", event);
+            }
+        }
+        self.application_events
+            .sender
+            .send(crate::events::Events::Wallet { event })
+            .await
+            .unwrap();
+        // }
+
+        Ok(())
+    }
+
+    fn core_wallet_notify(&self, event: waglayla_wallet_core::events::Events) -> Result<()> {
+        self.application_events
+            .sender
+            .try_send(crate::events::Events::Wallet {
+                event: Box::new(event),
+            })?;
+        // .try_send(Box::new(event))?;
+        Ok(())
+    }
+
+    fn notify(&self, event: crate::events::Events) -> Result<()> {
+        self.application_events.sender.try_send(event)?;
+        Ok(())
     }
 
     pub fn create_rpc_client(url: Option<String>, resolver_urls: Option<Vec<Arc<String>>>) -> Result<Rpc> {
@@ -375,6 +473,14 @@ impl WaglaylaService {
         let rpc_ctl = wrpc_client.ctl().clone();
         let rpc_api: Arc<DynRpcApi> = wrpc_client;
         Ok(Rpc::new(rpc_api, rpc_ctl))
+    }
+
+    pub fn wallet(&self) -> Arc<dyn WalletApi> {
+        self.wallet.clone()
+    }
+
+    pub fn core_wallet(&self) -> Option<Arc<CoreWallet>> {
+        self.wallet.clone().downcast_arc::<CoreWallet>().ok()
     }
 
     pub async fn connect_rpc_client(&self) -> Result<()> {

@@ -8,6 +8,7 @@ use crate::components::blank::Blank;
 use crate::components::console::DaemonConsole;
 use crate::components::welcome::Welcome;
 use crate::components::footer::Footer;
+use crate::components::wallet_ui::*;
 
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
@@ -39,12 +40,13 @@ pub struct Core {
   settings_storage_requested: bool,
   last_settings_storage_request: Instant,
   manager: DXManager,
-  // wallet: Arc<dyn WalletApi>,
-  // application_events_channel: ApplicationEventsChannel,
+  wallet: Arc<dyn WalletApi>,
+  application_events_channel: ApplicationEventsChannel,
   // deactivation: Option<Module>,
+  prev_components: Option<Vec<TypeId>>,
   component: Component,
   components: HashMap<TypeId, Component>,
-  // pub stack: VecDeque<Module>,
+  pub stack: VecDeque<Component>,
   pub settings: Settings,
   // pub toasts: Toasts,
   pub mobile_style: egui::Style,
@@ -59,7 +61,7 @@ pub struct Core {
   pub wallet_descriptor: Option<WalletDescriptor>,
   pub wallet_list: Vec<WalletDescriptor>,
   pub prv_key_data_map: Option<HashMap<PrvKeyDataId, Arc<PrvKeyDataInfo>>>,
-  // pub account_collection: Option<AccountCollection>,
+  // pub user_accounts: Option<UserWallet>,
   // pub release: Option<Release>,
 
   // pub device: Device,
@@ -90,6 +92,8 @@ impl Core {
     // Create default styles
     let mut default_style = (*cc.egui_ctx.style()).clone();
     let mut mobile_style = (*cc.egui_ctx.style()).clone();
+
+    let manager = manager();
     
     // Apply your theme
     apply_theme_by_name(
@@ -99,11 +103,12 @@ impl Core {
     );
 
     let mut components = HashMap::new();
-    components.insert_typeid(Welcome::new(manager()));
+    components.insert_typeid(Welcome::new(manager.clone()));
     components.insert_typeid(Outline::default());
     components.insert_typeid(Hello::default());
     components.insert_typeid(Blank::default());
-    components.insert_typeid(components::settings::Settings::new(manager()));
+    components.insert_typeid(components::settings::Settings::new(manager.clone()));
+    components.insert_typeid(components::wallet_ui::OpenWallet::new(manager.clone()));
 
     let daemon_console = DaemonConsole::new(daemon_receiver);
     components.insert_typeid(daemon_console);
@@ -123,10 +128,11 @@ impl Core {
       is_shutdown_pending: false,
       settings_storage_requested: false,
       last_settings_storage_request: Instant::now(),
-      manager: manager(),
-      // wallet: runtime.wallet().clone(),  // Assuming runtime has a wallet() method
-      // application_events_channel: runtime.application_events().clone(),  // Assuming this method exists
-      // stack: VecDeque::new(),
+      manager: manager.clone(),
+      wallet: manager.wallet().clone(),  // Assuming runtime has a wallet() method
+      application_events_channel: manager.application_events().clone(),  // Assuming this method exists
+      stack: VecDeque::new(),
+      prev_components: None,
       component: hello_component,
       components: components.clone(),
       settings,
@@ -135,7 +141,7 @@ impl Core {
       wallet_descriptor: None,
       wallet_list: Vec::new(),
       prv_key_data_map: None,
-      // account_collection: None,
+      // user_accounts: None,
       // release: None,
       window_frame,
       storage,
@@ -148,7 +154,7 @@ impl Core {
       component.init(&mut this);
     });
 
-    // this.wallet_update_list();
+    this.wallet_update_list();
 
     cfg_if! {
         if #[cfg(target_arch = "wasm32")] {
@@ -186,9 +192,12 @@ impl eframe::App for Core {
   }
 
   fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-    // Update device screen size if needed
-    // self.device_mut().set_screen_size(&ctx.screen_rect());
-    // Call your render_frame method
+    for event in self.application_events_channel.iter() {
+      if let Err(err) = self.handle_events(event.clone(), ctx, frame) {
+        log_error!("error processing wallet runtime event: {}", err);
+      }
+    }
+
     self.render_frame(ctx, frame);
   }
 
@@ -217,7 +226,11 @@ impl Core {
       let available_rect = ui.available_rect_before_wrap();
       let footer_height = 28.0;
             
-      let main_rect = available_rect.shrink2(egui::vec2(0.0, footer_height));
+      let main_rect = egui::Rect::from_min_max(
+          available_rect.min,
+          egui::pos2(available_rect.right(), available_rect.bottom() - footer_height)
+      );
+    
       let footer_rect = egui::Rect::from_min_max(
           egui::pos2(available_rect.left(), available_rect.bottom() - footer_height),
           available_rect.max,
@@ -266,14 +279,16 @@ impl Core {
       }
   }
 
-  // Method to get a component
   pub fn get_component<T: ComponentT + 'static>(&self) -> Option<&Component> {
       self.components.get(&TypeId::of::<T>())
   }
 
-  // Method to get a mutable reference to a component
   pub fn get_component_mut<T: ComponentT + 'static>(&mut self) -> Option<&mut Component> {
       self.components.get_mut(&TypeId::of::<T>())
+  }
+  
+  pub fn wallet(&self) -> Arc<dyn WalletApi> {
+      self.wallet.clone()
   }
 
   pub fn handle_events(
@@ -290,13 +305,31 @@ impl Core {
                     _ctx.send_viewport_cmd(ViewportCommand::Close);
                 }
             }
-        },
+        }
+
+        Events::WalletList { wallet_list } => {
+          self.wallet_list.clone_from(&*wallet_list);
+          self.wallet_list.sort();
+        }
+        // Events::Error(error) => {
+        //     manager().notify(UserNotification::error(error.as_str()));
+        // }
         _ => {}
-      // Events::Error(error) => {
-      //     manager().notify(UserNotification::error(error.as_str()));
-      // }
     }
 
     Ok(())
+  }
+
+  pub fn wallet_update_list(&self) {
+      let manager = self.manager.clone();
+      tokio::spawn(async move {
+          let wallet_list = manager.wallet().wallet_enumerate().await?;
+          manager
+              .send(Events::WalletList {
+                  wallet_list: Arc::new(wallet_list),
+              })
+              .await?;
+          Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
+      });
   }
 }

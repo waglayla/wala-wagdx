@@ -9,6 +9,7 @@ pub mod console;
 pub mod welcome;
 pub mod settings;
 pub mod footer;
+pub mod wallet_ui;
 
 // waglayla_ng_macros::register_modules!(
 //     register_generic_modules,

@@ -15,11 +15,13 @@ impl ColorAnimation for Context {
         let r_factor = self.animate_value_with_time(id.with("r"), target.r() as f32, animation_time);
         let g_factor = self.animate_value_with_time(id.with("g"), target.g() as f32, animation_time);
         let b_factor = self.animate_value_with_time(id.with("b"), target.b() as f32, animation_time);
+        let a_factor = self.animate_value_with_time(id.with("a"), target.a() as f32, animation_time);
 
-        let animated_color = Color32::from_rgb(
+        let animated_color = Color32::from_rgba_premultiplied(
             r_factor as u8,
             g_factor as u8,
             b_factor as u8,
+            a_factor as u8,
         );
 
         self.data_mut(|data| {
