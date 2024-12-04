@@ -50,6 +50,12 @@ pub enum ComponentCaps {
   Extension,
 }
 
+pub trait WizardActionTrait {
+  fn is_no_action(&self) -> bool;
+  fn is_back(&self) -> bool;
+  fn from_back() -> Self;
+}
+
 pub trait ComponentT: Downcast {
   fn name(&self) -> Option<&'static str> {
     None

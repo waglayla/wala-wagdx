@@ -89,19 +89,19 @@ epaint.workspace = true
 egui_plot.workspace = true
 egui_extras.workspace = true
 chrono.workspace = true
-egui-phosphor = { workspace = true, features = ["light"] }
-# egui-phosphor = { workspace = true, features = ["thin","light","regular","bold"] }
+egui-phosphor.workspace = true
 egui-notify.workspace = true
 
 sys-locale.workspace = true
+num-format.workspace = true
 
 [dependencies.web-sys]
 workspace = true
 features = [
-    'Document',
-    'VisibilityState',
-    'Window',
-    'Element',
+  'Document',
+  'VisibilityState',
+  'Window',
+  'Element',
 ]
 
 

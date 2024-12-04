@@ -25,7 +25,9 @@ fn medium_button_ui(ui: &mut Ui, text: String) -> Response {
     ui.style_mut().spacing.button_padding = egui::vec2(10.0, 4.0);
 
     let button = egui::Button::new(text).min_size(min_size);
-    ui.add(button)
+    let mut resp = ui.add(button);
+    resp = resp.on_hover_cursor(egui::CursorIcon::PointingHand);
+    resp
 }
 
 fn large_button_ui(ui: &mut Ui, text: String) -> Response {
@@ -34,7 +36,9 @@ fn large_button_ui(ui: &mut Ui, text: String) -> Response {
     let font_id = egui::FontId::proportional(16.0);
 
     let button = egui::Button::new(egui::RichText::new(text).font(font_id)).min_size(min_size);
-    ui.add(button)
+    let mut resp = ui.add(button);
+    resp = resp.on_hover_cursor(egui::CursorIcon::PointingHand);
+    resp
 }
 
 fn medium_button_ui_enabled(ui: &mut Ui, enabled: bool, text: String) -> Response {
@@ -42,7 +46,9 @@ fn medium_button_ui_enabled(ui: &mut Ui, enabled: bool, text: String) -> Respons
     ui.style_mut().spacing.button_padding = egui::vec2(10.0, 4.0);
 
     let button = egui::Button::new(text).min_size(min_size);
-    ui.add_enabled(enabled, button)
+    let mut resp = ui.add_enabled(enabled, button);
+    resp = resp.on_hover_cursor(egui::CursorIcon::PointingHand);
+    resp
 }
 
 fn large_button_ui_enabled(ui: &mut Ui, enabled: bool, text: String) -> Response {
@@ -51,7 +57,9 @@ fn large_button_ui_enabled(ui: &mut Ui, enabled: bool, text: String) -> Response
     let font_id = egui::FontId::proportional(16.0);
 
     let button = egui::Button::new(egui::RichText::new(text).font(font_id)).min_size(min_size);
-    ui.add_enabled(enabled, button)
+    let mut resp = ui.add_enabled(enabled, button);
+    resp = resp.on_hover_cursor(egui::CursorIcon::PointingHand);
+    resp
 }
 
 // Optional: Convenience methods for Ui

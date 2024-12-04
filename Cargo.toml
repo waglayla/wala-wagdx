@@ -33,7 +33,7 @@ eframe = { git = "https://github.com/aspectron/egui", branch = "gamma",  default
     "glow",          # Use the glow rendering backend. Alternative: "wgpu".
     "persistence",   # Enable restoring app state when restarting the app.
 ] }
-egui-phosphor = { git = "https://github.com/aspectron/egui-phosphor", branch = "gamma",  version = "=0.6.0", features = ["thin","light","regular","bold"] }
+egui-phosphor = { git = "https://github.com/aspectron/egui-phosphor", branch = "gamma",  version = "=0.6.0", features = ["thin","light","regular","bold","fill"] }
 egui-notify = { git = "https://github.com/aspectron/egui-notify",  branch = "gamma"}
 
 # WAGLAYLA-RUSTY
@@ -93,7 +93,7 @@ num_cpus = "1.16.0"
 open = "5.0.1"
 pad = "0.1.6"
 passwords = "3.1.16"
-qrcode = "0.12.0"
+qrcode = { version = "0.12", features = ["svg"] }
 rand = "0.8.5"
 rfd = "0.14.1"
 ritehash = "0.2.0"
@@ -120,6 +120,7 @@ zeroize = { version = "1.6.0", default-features = false, features = ["alloc"] }
 strum = "0.24"
 strum_macros = "0.24"
 sys-locale = "0.3"
+num-format = "0.4"
 
 [profile.release]
 opt-level = 2

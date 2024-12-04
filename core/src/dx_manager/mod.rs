@@ -28,11 +28,11 @@ pub struct Inner {
 }
 
 #[derive(Clone)]
-pub struct DXManager {
+pub struct DX_Manager {
   inner: Arc<Inner>,
 }
 
-impl DXManager {
+impl DX_Manager {
   pub fn new(
     ctx: &egui::Context,
     application_events: Option<ApplicationEventsChannel>,
@@ -172,14 +172,14 @@ impl DXManager {
   }
 }
 
-static MANAGER_MUTEX: Mutex<Option<DXManager>> = Mutex::new(None);
+static MANAGER_MUTEX: Mutex<Option<DX_Manager>> = Mutex::new(None);
 
-fn assign_manager(runtime: Option<DXManager>) {
+fn assign_manager(runtime: Option<DX_Manager>) {
   match runtime {
     Some(runtime) => {
       let mut global = MANAGER_MUTEX.lock().unwrap();
       if global.is_some() {
-        panic!("DXManager already initialized");
+        panic!("DX_Manager already initialized");
       }
       global.replace(runtime);
     }
@@ -189,16 +189,16 @@ fn assign_manager(runtime: Option<DXManager>) {
   };
 }
 
-pub fn try_manager() -> Option<DXManager> {
+pub fn try_manager() -> Option<DX_Manager> {
   MANAGER_MUTEX.lock().unwrap().clone()
 }
 
-pub fn manager() -> DXManager {
+pub fn manager() -> DX_Manager {
   MANAGER_MUTEX
     .lock()
     .unwrap()
     .clone()
-    .expect("DXManager not initialized")
+    .expect("DX_Manager not initialized")
 }
 
 #[cfg(not(target_arch = "wasm32"))]

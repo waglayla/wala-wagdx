@@ -12,6 +12,64 @@ const WIN32: bool = false;
 // #[cfg(not(target_os = "windows"))]
 pub const WINDOW_ROUNDING: f32 = 10.0;
 
+fn style_setup(ctx: &egui::Context) {
+  ctx.style_mut(|style| {
+    style.visuals.widgets.noninteractive.bg_stroke = egui::Stroke {
+      color: theme_color().separator_color,
+      width: 1.0,
+    };
+    style.visuals.override_text_color = Some(theme_color().default_color);
+    style.visuals.widgets.inactive.weak_bg_fill = theme_color().button_color;
+    style.visuals.widgets.hovered.weak_bg_fill = theme_color().button_color;
+    style.visuals.widgets.inactive.bg_fill = theme_color().button_color; 
+  });
+}
+
+pub fn create_custom_frame(
+  ctx: &egui::Context,
+) -> egui::Frame {
+  let mut stroke = ctx.style().visuals.widgets.noninteractive.fg_stroke;
+  stroke.width = 0.0;
+  stroke.color = theme_color().separator_color;
+
+  style_setup(ctx);
+
+  egui::Frame {
+    fill: theme_color().fg_color,
+    rounding: 0.0.into(),
+    stroke,
+    ..Default::default()
+  }
+}
+
+pub fn dx_shadow() -> egui::epaint::Shadow {
+  egui::epaint::Shadow {
+    offset: (2.0, 2.0).into(),
+    color: egui::Color32::from_black_alpha(60),
+    spread: 1.0,
+    blur: 6.0,
+    ..Default::default()
+  }
+}
+
+pub fn create_custom_popup(
+  ctx: &egui::Context,
+) -> egui::Frame {
+  let mut stroke = ctx.style().visuals.widgets.noninteractive.fg_stroke;
+  stroke.width = 0.5;
+
+  style_setup(ctx);
+
+  egui::Frame {
+    fill: theme_color().fg_color,
+    shadow: dx_shadow(),
+    inner_margin: egui::Margin::same(8.0),
+    rounding: 10.0.into(),
+    stroke,
+    ..Default::default()
+  }
+}
+
 pub fn window_frame(
   enable: bool,
   ctx: &egui::Context,
@@ -48,7 +106,7 @@ pub fn window_frame(
     stroke.width = stroke_width;
 
     let panel_frame = egui::Frame {
-      fill: ctx.style().visuals.window_fill(),
+      fill: theme_color().fg_color,
       rounding,
       stroke,
       // stroke: ctx.style().visuals.widgets.noninteractive.fg_stroke,
@@ -58,13 +116,15 @@ pub fn window_frame(
     };
 
     let outline_frame = egui::Frame {
-      // fill: ctx.style().visuals.window_fill(),
+      // fill: theme_color().fg_color,
       rounding,
       stroke,
       // stroke: ctx.style().visuals.widgets.noninteractive.fg_stroke,
       outer_margin: 0.5.into(), // so the stroke is within the bounds
       ..Default::default()
     };
+
+    style_setup(ctx);
 
     CentralPanel::default().frame(panel_frame).show(ctx, |ui| {
       let app_rect = ui.max_rect();
@@ -93,7 +153,7 @@ pub fn window_frame(
     });
 } else {
     let panel_frame = egui::Frame {
-      fill: ctx.style().visuals.window_fill(),
+      fill: theme_color().fg_color,
       inner_margin: 0.0.into(),
       outer_margin: 0.0.into(),
       ..Default::default()

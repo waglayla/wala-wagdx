@@ -6,3 +6,9 @@ pub use alt_buttons::*;
 
 mod confirm;
 pub use confirm::*;
+
+mod dx_spinner;
+pub use dx_spinner::*;
+
+mod qr;
+pub use qr::*;

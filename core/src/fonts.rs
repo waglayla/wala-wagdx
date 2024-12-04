@@ -20,20 +20,30 @@ impl RegisterStaticFont for FontDefinitions {
 
 use egui_phosphor::Variant;
 pub fn add_to_fonts(fonts: &mut egui::FontDefinitions, variant: Variant) {
-    fonts
-        .font_data
-        .insert("phosphor".into(), variant.font_data());
+  let variant_name = match variant {
+      Variant::Thin => "phosphor-thin",
+      Variant::Light => "phosphor-light",
+      Variant::Regular => "phosphor",
+      Variant::Bold => "phosphor-bold",
+      Variant::Fill => "phosphor-fill",
+  };
 
-    if let Some(font_keys) = fonts.families.get_mut(&egui::FontFamily::Proportional) {
-        // font_keys.insert(0, "phosphor".into());
-        font_keys.push("phosphor".into());
-    }
+  let mut font_data = variant.font_data();
+  
+  font_data.tweak.y_offset_factor = 0.0;
+  font_data.tweak.y_offset = 0.0;
 
-    fonts
-        .families
-        .entry(egui::FontFamily::Name("phosphor".into()))
-        .or_default()
-        .insert(0, "phosphor".to_owned());
+  fonts.font_data.insert(variant_name.to_string(), font_data);
+
+  fonts
+      .families
+      .entry(egui::FontFamily::Name(variant_name.into()))
+      .or_default()
+      .insert(0, variant_name.to_owned());
+
+  if let Some(font_keys) = fonts.families.get_mut(&egui::FontFamily::Proportional) {
+      font_keys.push(variant_name.to_owned());
+  }
 }
 
 pub fn get_font_family(base_name: &str, bold: bool, italic: bool) -> egui::FontFamily {
@@ -84,8 +94,9 @@ macro_rules! load_font_family {
 
 pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
     let mut fonts = FontDefinitions::default();
-    // add_to_fonts(&mut fonts, egui_phosphor::Variant::Bold);
-    // add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
+    add_to_fonts(&mut fonts, egui_phosphor::Variant::Bold);
+    add_to_fonts(&mut fonts, egui_phosphor::Variant::Regular);
+    add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
     add_to_fonts(&mut fonts, egui_phosphor::Variant::Light);
 
     // ---

@@ -8,6 +8,8 @@ use workflow_core::{runtime, task::spawn};
 use sys_locale::get_locale;
 use serde_json::Value;
 
+use std::net::IpAddr;
+
 const SETTINGS_REVISION: &str = "0.0.0";
 
 // Node endpoint location settings
@@ -291,9 +293,9 @@ impl Default for NodeSettings {
       connection_config_kind: NodeConnectionConfigKind::default(),
       wrpc_url: "127.0.0.1".to_string(),
       wrpc_encoding: WrpcEncoding::Borsh,
-      enable_wrpc_borsh: false,
+      enable_wrpc_borsh: true,
       wrpc_borsh_network_interface: NetworkInterfaceConfig::default(),
-      enable_wrpc_json: false,
+      enable_wrpc_json: true,
       wrpc_json_network_interface: NetworkInterfaceConfig::default(),
       enable_grpc: true,
       grpc_network_interface: NetworkInterfaceConfig::default(),
@@ -368,10 +370,23 @@ impl NodeSettings {
 // Complete settings suite/section for the RPC setup
 impl RpcConfig {
   pub fn from_node_settings(settings: &NodeSettings, _options: Option<RpcOptions>) -> Self {
-    RpcConfig::Wrpc {
-      url: Some(settings.wrpc_url.clone()),
-      encoding: settings.wrpc_encoding,
-      resolver_urls: None,
+    match settings.connection_config_kind {
+      NodeConnectionConfigKind::PublicServerRandom => {
+        RpcConfig::Wrpc {
+          url: Some(get_public_node(10, 13110)
+            .unwrap_or(IpAddr::from_str("127.0.0.1").unwrap())
+            .to_string()),
+          encoding: settings.wrpc_encoding,
+          resolver_urls: None,
+        }
+      }
+      _ => {
+        RpcConfig::Wrpc {
+          url: Some(settings.wrpc_url.clone()),
+          encoding: settings.wrpc_encoding,
+          resolver_urls: None,
+        }
+      }
     }
   }
 }
@@ -442,7 +457,7 @@ impl Default for UserInterfaceSettings {
     // }
 
     Self {
-      theme_color: "Dark".to_string(),
+      theme_color: "Waglayla".to_string(),
       theme_style: "Rounded".to_string(),
       scale: 1.0,
       metrics: MetricsSettings::default(),
@@ -494,7 +509,7 @@ impl Settings {
   pub async fn store(&self) -> Result<()> {
     let storage = storage()?;
     storage.ensure_dir().await?;
-    println!("{}", storage.filename().display());
+    // println!("{}", storage.filename().display());
     workflow_store::fs::write_json(storage.filename(), self).await?;
     Ok(())
   }
@@ -511,6 +526,7 @@ impl Settings {
       });
     } else {
       storage.ensure_dir_sync()?;
+      // println!("{}", storage.filename().display());
       workflow_store::fs::write_json_sync(storage.filename(), self)?;
     }
     Ok(self)

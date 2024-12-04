@@ -107,7 +107,7 @@ pub fn apply_theme_by_name(
             ThemeStyle::default()
         });
 
-    apply_theme(ctx, AppTheme::new(theme_color, theme_style));
+    apply_theme(ctx, AppTheme::new(theme_color.clone(), theme_style));
 }
 
 pub fn apply_theme_color_by_name(ctx: &Context, theme_color_name: impl Into<String>) {

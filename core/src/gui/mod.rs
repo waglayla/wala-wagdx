@@ -7,6 +7,12 @@ pub mod widgets;
 pub mod animation;
 pub use animation::*;
 
+pub mod mnemonic;
+pub use mnemonic::*;
+
+pub mod pane;
+pub use pane::*;
+
 pub use icon::IconSize;
 pub use theme::*;
 

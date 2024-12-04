@@ -38,3 +38,9 @@ impl Color32Extension for Color32 {
     Color32::from_rgba_premultiplied(darken(self.r()),darken(self.g()),darken(self.b()),self.a())
   }
 }
+
+pub fn get_luminance(base_color: Color32) -> f32 {
+  ((base_color.r() as f32) * 0.299 
+  + (base_color.g() as f32) * 0.587 
+  + (base_color.b() as f32) * 0.114) / 255.0
+}

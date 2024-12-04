@@ -234,7 +234,7 @@ cfg_if! {
             })
             .try_init()?;
 
-          let manager: Arc<Mutex<Option<dx_manager::DXManager>>> = Arc::new(Mutex::new(None));
+          let manager: Arc<Mutex<Option<dx_manager::DX_Manager>>> = Arc::new(Mutex::new(None));
           let delegate = manager.clone();
 
           let mut viewport = egui::ViewportBuilder::default()
@@ -262,7 +262,7 @@ cfg_if! {
             "WagDX",
             native_options,
             Box::new(move |cc| {
-              let manager = dx_manager::DXManager::new(
+              let manager = dx_manager::DX_Manager::new(
                 &cc.egui_ctx, 
                 Some(application_events), 
                 wallet_api, 

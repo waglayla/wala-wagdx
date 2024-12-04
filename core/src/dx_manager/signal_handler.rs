@@ -1,15 +1,15 @@
 use crate::events::Events;
-use crate::dx_manager::DXManager;
+use crate::dx_manager::DX_Manager;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
 pub struct Signals {
-  manager: DXManager,
+  manager: DX_Manager,
   iterations: AtomicU64,
 }
 
 impl Signals {
-  pub fn bind(manager: &DXManager) {
+  pub fn bind(manager: &DX_Manager) {
       let signals = Arc::new(Signals {
           manager: manager.clone(),
           iterations: AtomicU64::new(0),

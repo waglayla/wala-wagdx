@@ -81,10 +81,12 @@ pub use crate::events::{ApplicationEventsChannel, Events};
 // pub use crate::market::MarketData;
 // pub use crate::menu::Menu;
 pub use crate::components;
-pub use crate::components::{Component, ComponentCaps, ComponentStyle, ComponentT};
+pub use crate::components::*;
 pub use crate::network::BASIC_TRANSACTION_MASS;
 pub use crate::network::{Network, NetworkPressure};
 pub use crate::gui::widgets::*;
+
+pub use crate::frame::*;
 // pub use crate::notifications::{Notifications, UserNotification, UserNotifyKind};
 // pub use crate::primitives::{
 //     Account, AccountCollection, AccountSelectorButtonExtension, BlockDagGraphSettings, DaaBucket,
@@ -93,7 +95,7 @@ pub use crate::gui::widgets::*;
 pub use crate::dx_wallet::*;
 pub use crate::result::Result;
 // pub use crate::runtime::{runtime, spawn, spawn_with_result, Payload, Runtime, Service};
-pub use crate::dx_manager::{manager, DXManager, Service};
+pub use crate::dx_manager::{manager, DX_Manager, Service};
 pub use crate::dx_manager::channel::{ DaemonMessage };
 
 pub use crate::settings::{
@@ -101,7 +103,7 @@ pub use crate::settings::{
   NodeConnectionConfigKind, NodeSettings, RpcConfig, RpcOptions, Settings,
   UserInterfaceSettings,
 };
-// pub use crate::state::State;
+pub use crate::node_state::NodeState;
 // pub use crate::status::Status;
 pub use crate::storage::{Storage, StorageUpdateOptions};
 pub use crate::utils::*;

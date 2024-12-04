@@ -3,12 +3,12 @@ use crate::components::hello::Hello;
 
 pub struct Welcome {
     #[allow(dead_code)]
-    manager: DXManager,
+    manager: DX_Manager,
     settings : Settings,
 }
 
 impl Welcome {
-    pub fn new(manager: DXManager) -> Self {
+    pub fn new(manager: DX_Manager) -> Self {
 
         #[allow(unused_mut)]
         let mut settings = Settings::default();

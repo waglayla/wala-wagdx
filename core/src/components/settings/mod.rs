@@ -2,7 +2,7 @@ use crate::imports::*;
 
 pub struct Settings {
     #[allow(dead_code)]
-    manager: DXManager,
+    manager: DX_Manager,
     settings : crate::settings::Settings,
     wrpc_borsh_network_interface : NetworkInterfaceEditor,
     wrpc_json_network_interface : NetworkInterfaceEditor,
@@ -11,7 +11,7 @@ pub struct Settings {
 }
 
 impl Settings {
-    pub fn new(manager: DXManager) -> Self {
+    pub fn new(manager: DX_Manager) -> Self {
         Self { 
             manager,
             settings : crate::settings::Settings::default(),
@@ -425,7 +425,7 @@ impl Settings {
                                                     .settings
                                                     .user_interface
                                                     .theme_color = name.to_string();
-                                                // core.store_settings();
+                                                core.store_settings();
                                                 ui.close_menu();
                                             }
                                         });
@@ -437,63 +437,36 @@ impl Settings {
                         ui.add_space(1.);
                     });
 
-                    CollapsingHeader::new(i18n("Theme Style"))
-                        .default_open(true)
-                        .show(ui, |ui| {
-                            ui.horizontal(|ui| {
-                                let current_theme_style_name = theme_style().name();
-                                ui.menu_button(
-                                    format!("{} ⏷", current_theme_style_name),
-                                    |ui| {
-                                        theme_styles().keys().for_each(|name| {
-                                            if name.as_str() != current_theme_style_name
-                                                && ui.button(name).clicked()
-                                            {
-                                                apply_theme_style_by_name(ui.ctx(), name);
-                                                core
-                                                    .settings
-                                                    .user_interface
-                                                    .theme_style = name.to_string();
-                                                // core.store_settings();
-                                                ui.close_menu();
-                                            }
-                                        });
-                                    },
-                                );
-                            });
-                            ui.add_space(1.);
-                        });
-
-                        if workflow_core::runtime::is_native() {
-                            CollapsingHeader::new(i18n("Zoom"))
-                                .default_open(true)
-                                .show(ui, |ui| {
-                                    ui.horizontal(|ui| {
-                                        let zoom_factor = ui.ctx().zoom_factor();
-                                        if ui
-                                            .add_sized(
-                                                Vec2::splat(24.),
-                                                Button::new(RichText::new("-").size(18.)),
-                                            )
-                                            .clicked()
-                                        {
-                                            ui.ctx().set_zoom_factor(zoom_factor - 0.1);
-                                        }
-                                        ui.label(format!("{:.0}%", zoom_factor * 100.0));
-                                        if ui
-                                            .add_sized(
-                                                Vec2::splat(24.),
-                                                Button::new(RichText::new("+").size(18.)),
-                                            )
-                                            .clicked()
-                                        {
-                                            ui.ctx().set_zoom_factor(zoom_factor + 0.1);
-                                        }
-                                    });
-
-                                    ui.add_space(1.);
+                    if workflow_core::runtime::is_native() {
+                        CollapsingHeader::new(i18n("Zoom"))
+                            .default_open(true)
+                            .show(ui, |ui| {
+                                ui.horizontal(|ui| {
+                                    let zoom_factor = ui.ctx().zoom_factor();
+                                    if ui
+                                        .add_sized(
+                                            Vec2::splat(24.),
+                                            Button::new(RichText::new("-").size(18.)),
+                                        )
+                                        .clicked()
+                                    {
+                                        ui.ctx().set_zoom_factor(zoom_factor - 0.1);
+                                    }
+                                    ui.label(format!("{:.0}%", zoom_factor * 100.0));
+                                    if ui
+                                        .add_sized(
+                                            Vec2::splat(24.),
+                                            Button::new(RichText::new("+").size(18.)),
+                                        )
+                                        .clicked()
+                                    {
+                                        ui.ctx().set_zoom_factor(zoom_factor + 0.1);
+                                    }
                                 });
-                        }
+
+                                ui.add_space(1.);
+                            });
+                    }
             });
 
     }

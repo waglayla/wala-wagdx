@@ -124,15 +124,6 @@ impl WaglaylaService {
         self.waglaylad.lock().unwrap().replace(waglaylad);
     }
 
-    pub fn start_daemon(&self, config: Config, network: Network) {
-        self.service_events
-            .sender
-            .try_send(WaglayladServiceEvents::StartInternalAsDaemon { config, network })
-            .unwrap_or_else(|err| {
-                println!("WaglayladService error: {}", err);
-            });
-    }
-
     async fn stop_daemon(&self) -> Result<()> {
       #[cfg(not(target_arch = "wasm32"))]
       {
@@ -223,38 +214,37 @@ impl WaglaylaService {
 
         *self.network.lock().unwrap() = network;
 
-        // if let (Some(rpc), Some(wallet)) = (rpc, self.core_wallet()) {
-        //     let rpc_api = rpc.rpc_api().clone();
+        if let (Some(rpc), Some(wallet)) = (rpc, self.core_wallet()) {
+            let rpc_api = rpc.rpc_api().clone();
 
-        //     wallet
-        //         .set_network_id(&network.into())
-        //         .expect("Can not change network id while the wallet is connected");
+            wallet
+                .set_network_id(&network.into())
+                .expect("Can not change network id while the wallet is connected");
 
-        //     wallet.bind_rpc(Some(rpc)).await.unwrap();
-        //     wallet
-        //         .start()
-        //         .await
-        //         .expect("Unable to start wallet service");
+            wallet.bind_rpc(Some(rpc)).await.unwrap();
+            wallet
+                .start()
+                .await
+                .expect("Unable to start wallet service");
 
-        //     for service in crate::dx_manager::manager().services().into_iter() {
-        //         service.attach_rpc(&rpc_api).await?;
-        //     }
+            for service in crate::dx_manager::manager().services().into_iter() {
+                service.rpc_attach(&rpc_api).await?;
+            }
 
-        //     Ok(())
-        // } else {
-        //     self.wallet()
-        //         .connect_call(ConnectRequest {
-        //             url: None,
-        //             network_id: network.into(),
-        //             // retry_on_error: true,
-        //             // block_async_connect: false,
-        //             // require_sync: false,
-        //         })
-        //         .await?;
+            Ok(())
+        } else {
+            self.wallet()
+                .connect_call(ConnectRequest {
+                    url: None,
+                    network_id: network.into(),
+                    // retry_on_error: true,
+                    // block_async_connect: false,
+                    // require_sync: false,
+                })
+                .await?;
 
-        //     Ok(())
-        // }
-        Ok(()) // placeholder
+            Ok(())
+        }
     }
 
     pub async fn apply_node_settings(&self, node_settings: &NodeSettings) -> Result<()> {
@@ -351,7 +341,7 @@ impl WaglaylaService {
                 let rpc = Self::create_rpc_client(Some("127.0.0.1".to_string()), None)
                     .expect("Waglaylad Service - unable to create wRPC client");
                 self.start_all_services(Some(rpc), network).await?;
-                // self.connect_rpc_client().await?;
+                self.connect_rpc_client().await?;
 
                 self.update_storage();
             }
@@ -366,7 +356,6 @@ impl WaglaylaService {
                     self.connect_rpc_client().await?;
                 } else {
                     self.stop_all_services().await?;
-
 
                     let rpc = Self::create_rpc_client(rpc_config.url(), None)
                         .expect("Waglaylad Service - unable to create wRPC client");
@@ -455,9 +444,12 @@ impl WaglaylaService {
             }
         };
 
-        let url = url.clone().unwrap_or_else(|| "127.0.0.1".to_string());
+        let url = url.clone().unwrap_or_else(|| "127.0.0.1".to_string()
+        );
         let url =
             WaglaylaRpcClient::parse_url(url, WrpcEncoding::Borsh, NetworkId::from(Network::Mainnet).into())?;
+
+        println!("using url {}", url);
 
         let wrpc_client = Arc::new(WaglaylaRpcClient::new_with_args(
             WrpcEncoding::Borsh,
@@ -484,32 +476,32 @@ impl WaglaylaService {
     }
 
     pub async fn connect_rpc_client(&self) -> Result<()> {
-        // if let Some(wallet) = self.core_wallet() {
-        //     if let Ok(wrpc_client) = wallet.rpc_api().clone().downcast_arc::<WaglaylaRpcClient>() {
-        //         let options = ConnectOptions {
-        //             block_async_connect: false,
-        //             strategy: ConnectStrategy::Retry,
-        //             url: None,
-        //             connect_timeout: None,
-        //             retry_interval: Some(Duration::from_millis(3000)),
-        //         };
-        //         wrpc_client.connect(Some(options)).await?;
-        //     } else {
-        //         #[cfg(not(target_arch = "wasm32"))]
-        //         {
-        //             if wallet
-        //                 .rpc_api()
-        //                 .clone()
-        //                 .downcast_arc::<RpcCoreService>()
-        //                 .is_ok()
-        //             {
-        //                 wallet.rpc_ctl().signal_open().await?;
-        //             } else {
-        //                 unimplemented!("connect_rpc_client(): RPC client is not supported")
-        //             }
-        //         }
-        //     }
-        // }
+        if let Some(wallet) = self.core_wallet() {
+            if let Ok(wrpc_client) = wallet.rpc_api().clone().downcast_arc::<WaglaylaRpcClient>() {
+                let options = ConnectOptions {
+                    block_async_connect: false,
+                    strategy: ConnectStrategy::Retry,
+                    url: None,
+                    connect_timeout: None,
+                    retry_interval: Some(Duration::from_millis(3000)),
+                };
+                wrpc_client.connect(Some(options)).await?;
+            } else {
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    if wallet
+                        .rpc_api()
+                        .clone()
+                        .downcast_arc::<RpcCoreService>()
+                        .is_ok()
+                    {
+                        wallet.rpc_ctl().signal_open().await?;
+                    } else {
+                        unimplemented!("connect_rpc_client(): RPC client is not supported")
+                    }
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -567,14 +559,14 @@ impl Service for WaglaylaService {
                     //     // .await
                     //     .unwrap();
 
-                    // self.core_wallet_notify(CoreWalletEvents::Connect {
-                    //     network_id,
-                    //     url: url.clone(),
-                    // })
-                    // .unwrap();
+                    self.core_wallet_notify(CoreWalletEvents::Connect {
+                        network_id,
+                        url: url.clone(),
+                    })
+                    .unwrap();
 
                     // ^ TODO - Get appropriate `server_version`
-                    // let server_version = Default::default();
+                    let server_version = Default::default();
                     // let event = Box::new(CoreWalletEvents::ServerStatus {
                     //     is_synced,
                     //     network_id,
@@ -587,41 +579,37 @@ impl Service for WaglaylaService {
                     //     // .await
                     //     .unwrap();
 
-                    // self.core_wallet_notify(CoreWalletEvents::ServerStatus {
-                    //     is_synced,
-                    //     network_id,
-                    //     url,
-                    //     server_version,
-                    // })
-                    // .unwrap();
+                    self.core_wallet_notify(CoreWalletEvents::ServerStatus {
+                        is_synced,
+                        network_id,
+                        url,
+                        server_version,
+                    })
+                    .unwrap();
                 }
 
-                // if let (Some(wallet_descriptor), Some(account_descriptors)) =
-                //     (wallet_descriptor, account_descriptors)
-                // {
-                //     self.core_wallet_notify(CoreWalletEvents::WalletOpen {
-                //         wallet_descriptor: Some(wallet_descriptor),
-                //         account_descriptors: Some(account_descriptors),
-                //     })
-                //     .unwrap();
-                // }
+                if let (Some(wallet_descriptor), Some(account_descriptors)) =
+                    (wallet_descriptor, account_descriptors)
+                {
+                    self.core_wallet_notify(CoreWalletEvents::WalletOpen {
+                        wallet_descriptor: Some(wallet_descriptor),
+                        account_descriptors: Some(account_descriptors),
+                    })
+                    .unwrap();
+                }
 
-                // if let Some(selected_account_id) = selected_account_id {
-                //     self.core_wallet_notify(CoreWalletEvents::AccountSelection {
-                //         id: Some(selected_account_id),
-                //     })
-                //     .unwrap();
+                if let Some(selected_account_id) = selected_account_id {
+                    self.core_wallet_notify(CoreWalletEvents::AccountSelection {
+                        id: Some(selected_account_id),
+                    })
+                    .unwrap();
 
-                //     self.notify(crate::events::Events::ChangeSection(TypeId::of::<
-                //         crate::modules::account_manager::AccountManager,
-                //     >(
-                //     )))
-                //     .unwrap();
-                // }
-
-                // ^ MOVE THIS FUNCTION TO "bootstrap()"
-                // ^ MOVE THIS FUNCTION TO "bootstrap()"
-                // ^ MOVE THIS FUNCTION TO "bootstrap()"
+                    // self.notify(crate::events::Events::ChangeSection(TypeId::of::<
+                    //     crate::modules::account_manager::AccountManager,
+                    // >(
+                    // )))
+                    // .unwrap();
+                }
             } else {
                 // new instance - emit startup event
                 if let Some(node_settings) = self.connect_on_startup.as_ref() {
@@ -640,82 +628,58 @@ impl Service for WaglaylaService {
             }
         }
 
-        // if let Some(wallet) = self.core_wallet() {
-        //     // wallet.multiplexer().channel()
-        //     let wallet_events = wallet.multiplexer().channel();
+        if let Some(wallet) = self.core_wallet() {
+            // wallet.multiplexer().channel()
+            let wallet_events = wallet.multiplexer().channel();
 
-        //     loop {
-        //         select! {
-        //             msg = wallet_events.recv().fuse() => {
-        //             // msg = wallet.multiplexer().channel().recv().fuse() => {
-        //                 if let Ok(event) = msg {
-        //                     self.handle_multiplexer(event).await?;
-        //                 } else {
-        //                     break;
-        //                 }
-        //             }
-
-        //             msg = self.as_ref().service_events.receiver.recv().fuse() => {
-        //                 if let Ok(event) = msg {
-        //                     if self.handle_event(event).await? {
-        //                         break;
-        //                     }
-
-        //                 } else {
-        //                     break;
-        //                 }
-        //             }
-        //         }
-        //     }
-        // } else {
-        //     loop {
-        //         select! {
-        //             // msg = wallet_events.recv().fuse() => {
-        //             // // msg = wallet.multiplexer().channel().recv().fuse() => {
-        //             //     if let Ok(event) = msg {
-        //             //         self.handle_multiplexer(event).await?;
-        //             //     } else {
-        //             //         break;
-        //             //     }
-        //             // }
-
-        //             msg = self.as_ref().service_events.receiver.recv().fuse() => {
-        //                 if let Ok(event) = msg {
-        //                     if self.handle_event(event).await? {
-        //                         break;
-        //                     }
-
-        //                 } else {
-        //                     break;
-        //                 }
-        //             }
-        //         }
-        //     }
-        // };
-
-        loop {
-            select! {
-                // msg = wallet_events.recv().fuse() => {
-                // // msg = wallet.multiplexer().channel().recv().fuse() => {
-                //     if let Ok(event) = msg {
-                //         self.handle_multiplexer(event).await?;
-                //     } else {
-                //         break;
-                //     }
-                // }
-
-                msg = self.as_ref().service_events.receiver.recv().fuse() => {
-                    if let Ok(event) = msg {
-                        if self.handle_event(event).await? {
+            loop {
+                select! {
+                    msg = wallet_events.recv().fuse() => {
+                    // msg = wallet.multiplexer().channel().recv().fuse() => {
+                        if let Ok(event) = msg {
+                            self.handle_multiplexer(event).await?;
+                        } else {
                             break;
                         }
+                    }
 
-                    } else {
-                        break;
+                    msg = self.as_ref().service_events.receiver.recv().fuse() => {
+                        if let Ok(event) = msg {
+                            if self.handle_event(event).await? {
+                                break;
+                            }
+
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
-        }
+        } else {
+            loop {
+                select! {
+                    // msg = wallet_events.recv().fuse() => {
+                    // // msg = wallet.multiplexer().channel().recv().fuse() => {
+                    //     if let Ok(event) = msg {
+                    //         self.handle_multiplexer(event).await?;
+                    //     } else {
+                    //         break;
+                    //     }
+                    // }
+
+                    msg = self.as_ref().service_events.receiver.recv().fuse() => {
+                        if let Ok(event) = msg {
+                            if self.handle_event(event).await? {
+                                break;
+                            }
+
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        };
 
         self.stop_all_services().await?;
         self.task_ctl.send(()).await.unwrap();
