@@ -1,6 +1,12 @@
 use crate::imports::*;
 use waglayla_bip32::{Language, Mnemonic, WordCount};
-use waglayla_wallet_core::{wallet::{AccountCreateArgs, PrvKeyDataCreateArgs, WalletCreateArgs}, encryption::EncryptionKind, api::{AccountsDiscoveryRequest, AccountsDiscoveryKind}};
+use waglayla_wallet_core::{
+  wallet::{AccountCreateArgs, PrvKeyDataCreateArgs, WalletCreateArgs}, 
+  encryption::EncryptionKind, 
+  api::{AccountsDiscoveryRequest, AccountsDiscoveryKind},
+  tx::{GeneratorSummary, PaymentDestination, Fees},
+  prelude::AccountsEstimateRequest
+};
 use egui::{ColorImage, TextureHandle};
 use slug::slugify;
 
@@ -79,6 +85,7 @@ struct Inner {
   descriptor: Mutex<AccountDescriptor>,
   context: Mutex<Option<Arc<AccountContext>>>,
   // transactions: Mutex<TransactionCollection>,
+  max_spend: AtomicU64,
   total_transaction_count: AtomicU64,
   is_loading: AtomicBool,
   network: Mutex<Network>,
@@ -94,6 +101,7 @@ impl Inner {
       descriptor: Mutex::new(descriptor),
       context: Mutex::new(context),
       // transactions: Mutex::new(TransactionCollection::default()),
+      max_spend: AtomicU64::new(0),
       total_transaction_count: AtomicU64::new(0),
       is_loading: AtomicBool::new(true),
       network: Mutex::new(Network::Mainnet),
@@ -244,8 +252,50 @@ impl Account {
     *self.inner.descriptor.lock().unwrap() = descriptor;
   }
 
+  fn calculate_max_spendable_amount(summary: &GeneratorSummary) -> Option<u64> {
+    // Use the GeneratorSummary fields to create a simulated transaction
+    let total_mass = estimate_tx_mass_from_summary(summary, 1, 0);
+
+    // Check if the transaction mass exceeds the max limit
+    if total_mass > 500000 {
+      return None;
+    }
+
+    // Calculate the max spendable amount based on remaining mass
+    let remaining_mass = 500000 - total_mass;
+    Some(remaining_mass) // Return the max spendable amount
+  }
+
   pub fn update_balance(&self, balance: Option<Balance>) -> Result<()> {
     *self.inner.balance.lock().unwrap() = balance;
+
+    let self_clone = self.clone();
+    tokio::spawn(async move {
+      let estimate_result = manager().wallet().accounts_estimate_call(AccountsEstimateRequest {
+        account_id: self_clone.inner.id,
+        destination: PaymentDestination::Change, // Use a Change destination
+        priority_fee_sompi: Fees::None,          // Replace with appropriate fees
+        payload: None,
+      }).await;
+
+      match estimate_result {
+        Ok(response) => {
+          let summary = response.generator_summary;
+
+          println!("Summary: {}", summary);
+
+          // Use the mass calculation function to determine max spend
+          if let Some(max_spend) = Self::calculate_max_spendable_amount(&summary) {
+            self_clone.inner.max_spend.store(max_spend, Ordering::SeqCst);
+
+            println!("Max spendable amount updated: {}", max_spend);
+          }
+        }
+        Err(err) => {
+          println!("Failed to estimate transaction: {}", err);
+        }
+      }
+    });
 
     Ok(())
   }

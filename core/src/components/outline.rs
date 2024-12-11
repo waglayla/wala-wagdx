@@ -383,11 +383,9 @@ impl Outline {
               i18n("Current Balance:"),
               format_balance(
                   account.balance().unwrap_or_default().mature,
-                  core.settings.language_code.clone(),
               ),
               format_balance(
                   account.balance().unwrap_or_default().pending,
-                  core.settings.language_code.clone(),
               ),
               i18n("Pending"),
           ));

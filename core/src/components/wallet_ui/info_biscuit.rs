@@ -4,12 +4,62 @@ use core::cmp::min;
 use egui_phosphor::fill::*;
 
 #[derive(Clone, Default)]
+pub enum WalletModal {
+  #[default]
+  Blank,
+  Send,
+  Request,
+  Compound,
+  Contacts,
+}
+
+// impl WalletModal {
+//   fn render(
+//     &mut self,
+//     core: &mut Core, 
+//     ctx: &egui::Context, 
+//     ui: &mut egui::Ui
+//   ) {
+//     match self {
+//       WalletModal::Blank => {}
+
+//       WalletModal::Send => {
+
+//       }
+
+//       WalletModal::Request => {
+//         WalletRequest::render(
+//           core,
+//           ctx,
+//           ui,
+//         );
+//       }
+
+//       WalletModal::Compound => {
+        
+//       }
+
+//       WalletModal::Contacts => {
+        
+//       }
+//     }
+//   }
+// }
+
+#[derive(Clone, Default)]
 pub struct WalletBiscuit {
   account_font_size: f32,
   account_text_width: f32,
   account_text: String,
 
-  show_request_modal: bool,
+  request: WalletRequest,
+  send: WalletSend,
+  sweep: WalletSweep,
+
+  show_send: bool,
+  show_request: bool,
+  show_compound: bool,
+  show_contacts: bool,
 }
 
 impl WalletBiscuit {
@@ -19,93 +69,8 @@ impl WalletBiscuit {
       account_text_width: 0.0,
       account_text: "".to_string(),
 
-      show_request_modal: false,
+      ..Default::default()
     }
-  }
-
-  pub fn biscuit_button(
-    &self,
-    ui: &mut egui::Ui,
-    text: &str,
-    font_size: f32,
-    padding: f32,
-    vertical_offset: f32,
-  ) -> egui::Response {
-    // Calculate the text width
-    let text_width = ui.fonts(|fonts| {
-      fonts.layout_no_wrap(
-        text.to_string(),
-        egui::FontId::new(font_size, get_font_family("DINishCondensed", true, false)),
-        theme_color().bg_color,
-      )
-      .rect
-      .width()
-    });
-
-    // Define button size based on text width and padding
-    let button_width = text_width + padding * 3.0;
-    let button_height = font_size + padding * 2.0;
-
-    // Create the button and get its response
-    let button_rect = ui.allocate_exact_size(
-      egui::vec2(button_width, button_height),
-      egui::Sense::click(),
-    ).1.on_hover_cursor(egui::CursorIcon::PointingHand);
-
-    // Handle hover animation for color
-    let default_bg_color = theme_color().fg_color;
-    let hover_bg_color = theme_color().text_on_color_1;
-    let bg_color = ui.ctx().animate_color_with_time(
-      ui.id().with(format!("biscuit_button_bg_color_{}", text)),
-      if button_rect.hovered() {
-        hover_bg_color
-      } else {
-        default_bg_color
-      },
-      0.125, // Animation duration
-    );
-
-    let view_padding = ui.ctx().animate_value_with_time(
-      ui.id().with(format!("biscuit_button_padding_{}", text)),
-      if button_rect.hovered() && button_rect.clicked() {
-        padding * 1.2
-      } else {
-        padding
-      },
-      0.125, // Animation duration
-    );
-
-    let center = button_rect.rect.center();
-    let adjusted_rect = egui::Rect::from_center_size(
-      center,
-      egui::vec2(
-        button_width - padding*3.0 + view_padding*3.0, 
-        button_height - padding*2.0 + view_padding*2.0
-      ),
-    );
-
-    // Draw the standard button frame
-    ui.painter().rect_filled(
-      adjusted_rect,
-      egui::Rounding::same(6.0), // Rounded corners
-      bg_color, // Background color
-    );
-
-    // Draw the text with a vertical offset
-    let text_pos = egui::Pos2 {
-      x: button_rect.rect.center().x - text_width / 2.0,
-      y: button_rect.rect.center().y - font_size / 2.0 + vertical_offset,
-    };
-
-    ui.painter().text(
-      text_pos,
-      egui::Align2::LEFT_TOP,
-      text,
-      egui::FontId::new(font_size, get_font_family("DINishCondensed", true, false)),
-      theme_color().bg_color, // Text color
-    );
-
-    button_rect
   }
 
   pub fn update_account_font_size(
@@ -161,50 +126,91 @@ impl WalletBiscuit {
     ctx: &egui::Context, 
     ui: &mut egui::Ui
   ) {
-    // Calculate the full width of the available space
-    let available_width = ui.available_width();
-    let rect_width = min(available_width as u32, 767);
+    
+    let rect_width = 750.0;
     let rect_height = 200.0;
-    let rounding = 7.0;
+    let content_size = egui::vec2(rect_width, rect_height);
 
-    let rect = ui.allocate_space(egui::vec2(rect_width as f32, rect_height)).1;
+    egui::ScrollArea::horizontal()
+      .max_width(ui.available_width())
+      .show(ui, |ui| {
+      let rounding = 7.0;
 
-    let painter = ui.painter();
-    painter.rect_filled(
-      rect,
-      egui::Rounding::same(rounding), // Apply rounding to all corners
-      theme_color().bg_color, // Background color
-    );
+      let available_width = ui.available_width();
+      let offset_x = if content_size.x > available_width {
+        (content_size.x - available_width) / 2.0
+      } else {
+        0.0
+      };
 
-    let has_account = core.current_account.is_some();
-    if !has_account { return; }
+      let rect = ui.allocate_space(content_size).1.translate(egui::vec2(offset_x, 0.0));;
+      let painter = ui.painter();
+      painter.rect_filled(
+        rect,
+        egui::Rounding::same(rounding), // Apply rounding to all corners
+        theme_color().bg_color, // Background color
+      );
 
-    self.render_balance_section(ui, core, &rect);
-    self.render_pending_section(ui, core, &rect);
-    self.render_utxo_section(ui, core, &rect);
+      let has_account = core.current_account.is_some();
+      if !has_account { return; }
 
-    self.render_account_section(ui, core, &rect);
-    self.render_base_qr(ui, core, &rect);
-    self.render_base_address(ui, core, &rect);
+      self.render_balance_section(ui, core, &rect);
+      self.render_pending_section(ui, core, &rect);
+      self.render_utxo_section(ui, core, &rect);
 
-    self.render_buttons(ui, core, &rect);
+      self.render_account_section(ui, core, &rect);
+      self.render_base_qr(ui, core, &rect);
+      self.render_base_address(ui, core, &rect);
+
+      self.render_buttons(ui, core, &rect);
+    });
 
     //
-    if self.show_request_modal {
-      self.render_request_model(ui, core);
+    if (self.show_request) {
+      self.request.render(
+        &mut self.show_request,
+        core,
+        ctx,
+        ui,
+        self.account_text.clone(),
+      );
+    } else {
+      self.request.reset();
+    }
+    
+    if self.show_send {
+      self.send.render(
+        &mut self.show_send,
+        core,
+        ctx,
+        ui,
+      );
+    } else {
+      self.send.reset();
+    }
+
+    if self.show_compound {
+      self.sweep.render(
+        &mut self.show_compound,
+        core,
+        ctx,
+        ui,
+      );
+    } else {
+      self.sweep.reset();
     }
   }
 
   fn render_base_qr(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
     let total_qr_size = rect.height() - 24.0;  // Size including background
-    let background_rect = egui::Rect::from_min_size(
+    let qr_background_rect = egui::Rect::from_min_size(
       egui::pos2(rect.max.x - total_qr_size - 12.0, rect.min.y + 12.0),
       egui::vec2(total_qr_size, total_qr_size)
     );
 
     let painter = ui.painter();
     painter.rect_filled(
-      background_rect,
+      qr_background_rect,
       egui::Rounding::same(6.0),
       egui::Color32::WHITE,
     );
@@ -212,7 +218,7 @@ impl WalletBiscuit {
     let quiet_zone = 6.25;
     let qr_size = total_qr_size - (quiet_zone * 2.0);
     let qr_rect = egui::Rect::from_min_size(
-      background_rect.min + egui::vec2(quiet_zone, quiet_zone),
+      qr_background_rect.min + egui::vec2(quiet_zone, quiet_zone),
       egui::vec2(qr_size, qr_size)
     );
 
@@ -368,7 +374,7 @@ impl WalletBiscuit {
     }
   }
 
-  fn render_utxo_section(&self, ui: &mut Ui, core: &Core, rect: &Rect) {
+  fn render_utxo_section(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
     let painter = ui.painter_at(*rect);
     
     let utxo_pos = egui::Pos2 {
@@ -380,7 +386,7 @@ impl WalletBiscuit {
 
     if let Some(ref account) = account_clone {
       let balance = account.balance().unwrap_or_default();
-      let utxo_count = format_number(balance.mature_utxo_count as u64, core.settings.language_code.clone());
+      let utxo_count = format_number(balance.mature_utxo_count as u64);
       let utxo_text = format!("UTXOs: {}", utxo_count);
 
       painter.text(
@@ -394,7 +400,7 @@ impl WalletBiscuit {
   }
 
 
-  fn render_balance_section(&self, ui: &mut Ui, core: &Core, rect: &Rect) {
+  fn render_balance_section(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
     let painter = ui.painter_at(*rect);
     
     let whole_pos = egui::Pos2 {
@@ -418,7 +424,7 @@ impl WalletBiscuit {
 
     if let Some(ref account) = account_clone {
       let balance = account.balance().unwrap_or_default();
-      let (whole, partial) = format_balance_split(balance.mature, core.settings.language_code.clone());
+      let (whole, partial) = format_balance_split(balance.mature);
       big_str = whole;
       small_str = partial;
     }
@@ -473,11 +479,12 @@ impl WalletBiscuit {
     );
 
     if response.clicked() {
+      let balance = account_clone.unwrap().balance().unwrap_or_default();
+      let (whole_raw, frac_raw) = format_balance_split_raw(balance.mature);
       ui.output_mut(|o| {
-        o.copied_text = format!("{}{}", big_str, small_str);
+        o.copied_text = format!("{}{}", whole_raw, frac_raw);
       });
     
-      
       // manager().notify_clipboard(i18n("Copied to clipboard"));
     }
 
@@ -485,7 +492,7 @@ impl WalletBiscuit {
     response = response.on_hover_text(i18n("Click to copy total balance"));
   }
 
-  fn render_pending_section(&self, ui: &mut Ui, core: &Core, rect: &Rect) {
+  fn render_pending_section(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
     let painter = ui.painter_at(*rect);
     
     let whole_pos = egui::Pos2 {
@@ -539,7 +546,7 @@ impl WalletBiscuit {
     );
   }
 
-  pub fn render_buttons(&self, ui: &mut egui::Ui, core: &Core, rect: &egui::Rect) {
+  pub fn render_buttons(&mut self, ui: &mut egui::Ui, core: &Core, rect: &egui::Rect) {
     let button_area = egui::Rect::from_min_size(
         egui::Pos2 {
             x: rect.min.x + 12.0,
@@ -553,31 +560,53 @@ impl WalletBiscuit {
     ui.allocate_ui_at_rect(button_area, |ui| {
       ui.horizontal(|ui| {
         // Add buttons in the bottom-left corner
-        if self.biscuit_button(ui, "Send", 22.0, 4.0, -12.0).clicked() {
-            println!("Button 1 clicked!");
-            // Handle Button 1 action
+        if ui.dx_button(i18n("Send"), 22.0, 4.0, -12.0, DX_Button::Biscuit).clicked() {
+          self.show_send = true;
         }
 
         ui.add_space(spacing);
 
-        if self.biscuit_button(ui, "Request", 22.0, 4.0, -12.0).clicked() {
-            println!("Button 2 clicked!");
-            // Handle Button 2 action
+        if ui.dx_button(i18n("Request"), 22.0, 4.0, -12.0, DX_Button::Biscuit).clicked() {
+          self.show_request = true;
         }
 
         ui.add_space(spacing);
 
-        if self.biscuit_button(ui, "Compound", 22.0, 4.0, -12.0).clicked() {
-            println!("Button 4 clicked!");
-            // Handle Button 2 action
+        if ui.dx_button(i18n("Compound"), 22.0, 4.0, -12.0, DX_Button::Biscuit).clicked() {
+          self.show_compound = true;
         }
 
         ui.add_space(spacing);
 
-        if self.biscuit_button(ui, "Contacts", 22.0, 4.0, -12.0).clicked() {
+        if ui.dx_button(i18n("Contacts"), 22.0, 4.0, -12.0, DX_Button::Biscuit).clicked() {
             println!("Button 3 clicked!");
-            // Handle Button 2 action
         }
+
+        // if self.biscuit_button(ui, i18n("Send"), 22.0, 4.0, -12.0).clicked() {
+        //     println!("Button 1 clicked!");
+        //     // Handle Button 1 action
+        // }
+
+        // ui.add_space(spacing);
+
+        // if self.biscuit_button(ui, i18n("Request"), 22.0, 4.0, -12.0).clicked() {
+        //     println!("Button 2 clicked!");
+        //     // Handle Button 2 action
+        // }
+
+        // ui.add_space(spacing);
+
+        // if self.biscuit_button(ui, i18n("Compound"), 22.0, 4.0, -12.0).clicked() {
+        //     println!("Button 4 clicked!");
+        //     // Handle Button 2 action
+        // }
+
+        // ui.add_space(spacing);
+
+        // if self.biscuit_button(ui, i18n("Contacts"), 22.0, 4.0, -12.0).clicked() {
+        //     println!("Button 3 clicked!");
+        //     // Handle Button 2 action
+        // }
       });
     });
   }

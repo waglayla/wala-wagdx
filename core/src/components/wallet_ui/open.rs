@@ -111,7 +111,7 @@ impl ComponentT for OpenWallet {
 
             ui.add_space(20.);
 
-            if ui.large_button_enabled(!self.wallet_secret.trim().is_empty(), i18n("Unlock")).clicked() {
+            if ui.dx_large_button_enabled(!self.wallet_secret.trim().is_empty(), i18n("Unlock")).clicked() {
               if !*self.is_pending.lock().unwrap() {      
                 *self.is_pending.lock().unwrap() = true;
                 let wallet_secret = Secret::new(self.wallet_secret.as_bytes().to_vec());

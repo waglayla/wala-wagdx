@@ -85,7 +85,7 @@ where
           // Content
           let available_height = ui.available_height();
           egui::ScrollArea::vertical()
-              .max_height(available_height - 56.) // Subtract footer height
+              .max_height(available_height - 60.) // Subtract footer height
               .show(ui, |ui| {
                   let content_height = ui.available_height();
                   ui.add_space((content_height - 200.) / 2.0); // Adjust 200 based on estimated content height
@@ -94,11 +94,10 @@ where
                       action = Some(content(ui));
                   });
               });
-
           // Footer
           ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
               ui.add_space(BOTTOM_SPACE);
-              if ui.large_button(i18n("Back")).clicked() {
+              if ui.dx_large_button(i18n("Back")).clicked() {
                   action = Some(A::from_back());
               }
               ui.add_space(4.);

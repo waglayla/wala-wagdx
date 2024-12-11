@@ -1,4 +1,5 @@
 use crate::imports::*;
+use sys_locale::get_locale;
 
 mod i18n;
 #[cfg(not(target_arch = "wasm32"))]
@@ -16,6 +17,10 @@ mod text;
 pub use text::*;
 mod dx_image;
 pub use dx_image::*;
+mod mass;
+pub use mass::*;
+mod sync;
+pub use sync::*;
 
 pub fn lerp_dx(start: f32, end: f32, t: f32) -> f32 {
   start + t * (end - start)
@@ -59,9 +64,13 @@ pub fn format_balance_with_precision(num: u64) -> (String, String, String) {
 
 use num_format::{Locale, ToFormattedString};
 
-pub fn format_number(num: u64, lang: String) -> String {
+pub fn get_sys_lang() -> String {
+  get_locale().unwrap_or_else(|| "en".to_string())
+}
+
+pub fn format_number(num: u64) -> String {
   let mut value = num as f64;
-  let locale = Locale::from_name(lang).unwrap_or(Locale::en);
+  let locale = Locale::from_name(get_sys_lang()).unwrap_or(Locale::en);
 
   let integer_part = value.trunc() as u64;
   let formatted_integer = integer_part.to_formatted_string(&locale);
@@ -69,11 +78,11 @@ pub fn format_number(num: u64, lang: String) -> String {
   format!("{}", formatted_integer)
 }
 
-pub fn format_balance(num: u64, lang: String) -> String {
+pub fn format_balance(num: u64) -> String {
   let mut value = num as f64;
   value /= 100000000.0;
 
-  let locale = Locale::from_name(lang).unwrap_or(Locale::en);
+  let locale = Locale::from_name(get_sys_lang()).unwrap_or(Locale::en);
 
   let integer_part = value.trunc() as u64;
   let formatted_integer = integer_part.to_formatted_string(&locale);
@@ -84,11 +93,11 @@ pub fn format_balance(num: u64, lang: String) -> String {
   format!("{}.{}", formatted_integer, formatted_fractional)
 }
 
-pub fn format_balance_split(num: u64, lang: String) -> (String, String) {
+pub fn format_balance_split(num: u64) -> (String, String) {
   let mut value = num as f64;
   value /= 100000000.0;
 
-  let locale = Locale::from_name(lang).unwrap_or(Locale::en);
+  let locale = Locale::from_name(get_sys_lang()).unwrap_or(Locale::en);
 
   let integer_part = value.trunc() as u64;
   let formatted_integer = integer_part.to_formatted_string(&locale);
@@ -97,6 +106,18 @@ pub fn format_balance_split(num: u64, lang: String) -> (String, String) {
   let formatted_fractional = format!("{:08}", fractional_part);
 
   (format!("{}", formatted_integer), format!(".{}", formatted_fractional))
+}
+
+pub fn format_balance_split_raw(num: u64) -> (String, String) {
+  let mut value = num as f64;
+  value /= 100000000.0;
+
+  let integer_part = value.trunc() as u64;
+
+  let fractional_part = (value.fract() * 100000000.0).round() as u64;
+  let formatted_fractional = format!("{:08}", fractional_part);
+
+  (format!("{}", integer_part), format!(".{}", formatted_fractional))
 }
 
 pub fn address_to_compact(input: &str) -> String {
@@ -108,4 +129,17 @@ pub fn address_to_compact(input: &str) -> String {
   }
 
   input.to_string()
+}
+
+pub fn validate_waglayla_input(input: &str) -> Result<f64> {
+  const SCALE_FACTOR: f64 = 100_000_000.0;
+  const MAX_INPUT: f64 = u64::MAX as f64 / SCALE_FACTOR;
+
+  let value = input.parse::<f64>().map_err(|_| Error::custom(i18n("Invalid numeric input").to_string()))?;
+
+  if value > MAX_INPUT {
+    Err(Error::custom(i18n("Input value is too large").to_string()))
+  } else {
+    Ok(value)
+  }
 }

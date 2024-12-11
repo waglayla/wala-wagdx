@@ -225,7 +225,15 @@ impl ComponentT for CreateWallet {
                       if !wallet_descriptor_list_is_empty {
                         wallet_descriptor_list.sort();
                         for wallet_descriptor in wallet_descriptor_list.into_iter() {
-                          let B = ui.large_button(wallet_descriptor.title.as_deref().unwrap_or_else(||i18n("NO NAME")));
+                          let B = ui.dx_button_sized(
+                            wallet_descriptor.title.as_deref().unwrap_or_else(||i18n("NO NAME")), 
+                            32.0,
+                            -14.0, 
+                            Default::default(), 
+                            vec2(220.0, 48.0)
+                          );
+                          ui.add_space(6.0);
+
                           if B.clicked() {
                             // println!("Opening Wallet {}", wallet_descriptor.title.as_deref().unwrap_or_else(||i18n("NO NAME")));
                             core.borrow_mut().get_mut::<components::wallet_ui::OpenWallet>()
@@ -242,7 +250,7 @@ impl ComponentT for CreateWallet {
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
               ui.add_space(BOTTOM_SPACE);
-              let B = ui.large_button(i18n("Add Wallet"));
+              let B = ui.dx_large_button(i18n("Add Wallet"));
               if B.clicked() {
                 self.args_create.zeroize();
                 println!("Creating new wallet");
@@ -260,28 +268,53 @@ impl ComponentT for CreateWallet {
             ui.heading(i18n("Select the number of words for your new seed phrase:"));
             ui.add_space(8.);
 
-            if ui.large_button(i18n("12 Words")).clicked() {
-                self.args_create.word_count = WordCount::Words12;
-                return WizardAction::Next(State::SetNames);
+            if ui.dx_button_sized(
+              i18n("12 Words"), 
+              26.0,
+              -13.0, 
+              Default::default(), 
+              vec2(180.0, 32.0)
+            ).clicked() {
+              self.args_create.word_count = WordCount::Words12;
+              return WizardAction::Next(State::SetNames);
             }
 
-            ui.add_space(4.);
+            ui.add_space(6.);
 
-            if ui.large_button(i18n("24 Words")).clicked() {
-                self.args_create.word_count = WordCount::Words24;
-                return WizardAction::Next(State::SetNames);
+            if ui.dx_button_sized(
+              i18n("24 Words"), 
+              26.0,
+              -13.0, 
+              Default::default(), 
+              vec2(180.0, 32.0)
+            ).clicked() {
+              self.args_create.word_count = WordCount::Words24;
+              return WizardAction::Next(State::SetNames);
             }
 
-            ui.add_space(24.);
+            ui.add_space(20.);
 
             ui.heading(i18n("OR import an existing wallet:"));
 
             ui.add_space(8.);
-            if ui.large_button(i18n("Import Seed")).clicked() {
+            if ui.dx_button_sized(
+              i18n("Import Seed"), 
+              26.0,
+              -13.0, 
+              Default::default(), 
+              vec2(180.0, 32.0)
+            ).clicked() {
                 // Handle import seed
             }
-            ui.add_space(4.);
-            if ui.large_button(i18n("Import File")).clicked() {
+
+            ui.add_space(6.);
+            if ui.dx_button_sized(
+              i18n("Import File"), 
+              26.0,
+              -13.0, 
+              Default::default(), 
+              vec2(180.0, 32.0)
+            ).clicked() {
                 // Handle import file
             }
 
@@ -318,7 +351,7 @@ impl ComponentT for CreateWallet {
             );
             ui.add_space(20.);
 
-            if ui.large_button_enabled(!self.args_create.wallet_name.trim().is_empty(), i18n("Next")).clicked() {
+            if ui.dx_large_button_enabled(!self.args_create.wallet_name.trim().is_empty(), i18n("Next")).clicked() {
               return WizardAction::Next(State::PhishingHint);
             }
             WizardAction::NoAction
@@ -364,7 +397,7 @@ impl ComponentT for CreateWallet {
 
             ui.add_space(20.);
 
-            if ui.large_button_enabled(
+            if ui.dx_large_button_enabled(
               !self.args_create.enable_phishing_hint || 
               !self.args_create.phishing_hint.trim().is_empty(), 
               i18n("Next")
@@ -459,7 +492,7 @@ impl ComponentT for CreateWallet {
               (!self.args_create.enable_payment_secret || 
               !self.args_create.payment_secret.trim().is_empty());
 
-            if ui.large_button_enabled(passwords_match && passwords_valid, i18n("Create Wallet")).clicked() {
+            if ui.dx_large_button_enabled(passwords_match && passwords_valid, i18n("Create Wallet")).clicked() {
               // return WizardAction::Next(State::Create { 
               //   is_pending: false, 
               //   result: Arc::new(Mutex::new(None)) 
@@ -471,6 +504,8 @@ impl ComponentT for CreateWallet {
               ui.label(egui::RichText::new(i18n("Passwords do not match"))
                 .color(egui::Color32::RED));
             }
+
+            ui.label("");
 
             WizardAction::NoAction
           }).inner
@@ -662,20 +697,30 @@ impl ComponentT for CreateWallet {
                       ui.horizontal(|ui| {
                           let button_width = 175.0;
                           ui.add_space((ui.available_width() - (button_width * 2.0 + 8.0)) / 2.0);
-                          
-                          let mut resp = ui.add_sized([button_width, 40.0], egui::Button::new(
-                              egui::RichText::new(i18n("Cancel")).size(font_size)
-                          ));
+
+                          let mut resp = ui.dx_button_sized(
+                            i18n("Cancel"), 
+                            24.0, 
+                            -12.0, 
+                            Default::default(), 
+                            vec2(button_width, 40.0),
+                          );
+
                           resp = resp.on_hover_cursor(egui::CursorIcon::PointingHand);
                           if resp.clicked() {
                               self.args_create.show_secrets_in_popup = false;
                               self.args_create.show_confirmation_popup = false;
                           }
                           ui.add_space(8.);
-                          let mut resp = ui.add_sized([button_width, 40.0], egui::Button::new(
-                              egui::RichText::new(i18n("Confirm and Create")).size(font_size)
-                          ));
-                          resp = resp.on_hover_cursor(egui::CursorIcon::PointingHand);
+
+                          let mut resp = ui.dx_button_sized(
+                            i18n("Confirm and Create"), 
+                            24.0, 
+                            -12.0, 
+                            Default::default(), 
+                            vec2(button_width, 40.0),
+                          );
+
                           if resp.clicked() {
                               self.args_create.show_secrets_in_popup = false;
                               self.args_create.show_confirmation_popup = false;
@@ -836,7 +881,7 @@ impl ComponentT for CreateWallet {
         let h_scale = max(450, (ui.available_width() / 1.5) as i32);
         let v_scale = max(450, (ui.available_height() / 1.33) as i32);
 
-        egui::Window::new("Mnemonic Seed Phrase")
+        egui::Window::new(i18n("Mnemonic Seed Phrase"))
           .collapsible(false)
           .resizable(false)
           .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
@@ -866,7 +911,7 @@ impl ComponentT for CreateWallet {
     
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                   ui.add_space(BOTTOM_SPACE);
-                  if ui.large_button(i18n("Continue")).clicked() {
+                  if ui.dx_large_button(i18n("Continue")).clicked() {
                     finish = true;
                   }
                   ui.add_space(4.);

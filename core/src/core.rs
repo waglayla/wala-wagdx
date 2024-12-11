@@ -120,8 +120,6 @@ impl Core {
     components.insert_typeid(Footer::default());
     let footer = components.get(&TypeId::of::<Footer>()).unwrap().clone();
 
-    let hello_component = components.get(&TypeId::of::<Hello>()).unwrap().clone();
-
     let storage = Storage::default();
     #[cfg(not(target_arch = "wasm32"))]
     if settings.node.waglaylad_daemon_storage_folder_enable {
@@ -138,7 +136,7 @@ impl Core {
       application_events_channel: manager.application_events().clone(),  // Assuming this method exists
       stack: VecDeque::new(),
       prev_components: None,
-      component: hello_component,
+      component: components.get(&TypeId::of::<CreateWallet>()).unwrap().clone(),
       components: components.clone(),
       settings,
       mobile_style,
@@ -373,6 +371,10 @@ impl Core {
     self.wallet.clone()
   }
 
+  pub fn node_state(&self) -> NodeState {
+    self.node_state.clone()
+  }
+
   pub fn purge_secure_stack(&mut self) {
     self.stack.retain(|module| !module.secure());
   }
@@ -435,7 +437,7 @@ impl Core {
         }
 
         Events::Wallet { event } => {
-          println!("wallet event: {:?}", event);
+          // println!("wallet event: {:?}", event);
           match *event {
             CoreWallet::WalletPing => {
                 // log_info!("received wallet ping event...");
@@ -445,38 +447,43 @@ impl Core {
               network_id: _,
               metrics,
             } => {
-                // log_info!("Waglayla NG - received metrics event {metrics:?}");
+              println!("Wagg-DX - received metrics event {metrics:?}");
 
-              // match metrics {
-              //   MetricsUpdate::WalletMetrics {
-              //     mempool_size,
-              //     node_peers: peers,
-              //     network_tps: tps,
-              //   } => {
-              //     self.sender().try_send(Events::MempoolSize {
-              //       mempool_size: mempool_size as usize,
-              //     })?;
+              match metrics {
+                MetricsUpdate::WalletMetrics {
+                  mempool_size,
+                  node_peers: peers,
+                  network_tps: tps,
+                } => {
+                  self.sender().try_send(Events::MempoolSize {
+                    mempool_size: mempool_size as usize,
+                  })?;
 
-              //     self.node_state.node_peers = Some(peers as usize);
-              //     self.node_state.node_mempool_size = Some(mempool_size as usize);
-              //     self.node_state.network_tps = Some(tps);
-              //   }
-              // }
+                  self.node_state.node_peers = Some(peers as usize);
+                  self.node_state.node_mempool_size = Some(mempool_size as usize);
+                  self.node_state.network_tps = Some(tps);
+                }
+              }
             }
             CoreWallet::Error { message } => {
               // runtime().notify(UserNotification::error(message.as_str()));
               println!("{message}");
             }
             CoreWallet::UtxoProcStart => {
-              // self.node_state.error = None;
+              self.node_state.error = None;
 
-              // if self.node_state().is_open() {
-              //   let wallet = self.wallet().clone();
-              //   spawn(async move {
-              //     wallet.wallet_reload(false).await?;
-              //     Ok(())
-              //   });
-              // }
+              if self.node_state().is_open() {
+                let wallet = self.wallet().clone();
+                tokio::spawn(async move {
+                  let result: Result<()> = async {
+                    wallet.wallet_reload(false).await?;
+                    Ok(())
+                  }
+                  .await;
+
+                  result
+                });
+              }
             }
             CoreWallet::UtxoProcStop => {}
             CoreWallet::UtxoProcError { message } => {
@@ -515,6 +522,7 @@ impl Core {
               // self.exception = Some(Exception::UtxoIndexNotEnabled { url });
             }
             CoreWallet::SyncState { sync_state } => {
+              println!("Sync State: {:?}", sync_state);
               self.node_state.sync_state = Some(sync_state);
             }
             CoreWallet::ServerStatus {

@@ -15,6 +15,7 @@ pub use waglayla_wallet_core::prelude::{
   PrvKeyDataInfo, Secret, SyncState, TransactionId, TransactionRecord, Wallet as CoreWallet,
   WalletApi, WalletCreateArgs, WalletDescriptor, WordCount, WrpcEncoding,
 };
+
 pub use waglayla_wallet_core::utils::*;
 
 pub use async_trait::async_trait;
