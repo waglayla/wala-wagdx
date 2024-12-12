@@ -404,7 +404,7 @@ impl Settings {
             .default_open(false)
             .show(ui, |ui| {
 
-                CollapsingHeader::new(i18n("Theme Color"))
+                CollapsingHeader::new(i18n("Theme"))
                     .default_open(true)
                     .show(ui, |ui| {
                         ui.vertical(|ui| {

@@ -53,7 +53,7 @@ impl WalletSweep {
         y: screen_rect.center().y - (v_scale as f32 / 2.0),
       };
 
-      egui::Window::new(i18n("Sweep UTXOs"))
+      egui::Window::new(i18n("Compound UTXOs"))
         .open(open)
         .collapsible(true)
         .resizable(false)
@@ -75,11 +75,23 @@ impl WalletSweep {
                     .stroke_width(12.0)
                   );
                 } else{
+                  let response = ui.add(
+                    egui::Label::new(
+                      egui::RichText::new(egui_phosphor::bold::ARROWS_MERGE)
+                        .font(egui::FontId::new(200.0, egui::FontFamily::Name("phosphor-fill".into())))
+                        .color(theme_color().strong_color),
+                    )
+                  )
+                  .on_hover_cursor(egui::CursorIcon::Help)
+                  .on_hover_text_at_pointer(i18n("Compounding or sweeping your wallet \
+                    allows you to combine several smaller UTXOs into larger ones. \
+                    This may allow you to send more WALA than you otherwise could, \
+                    due to transaction size limits."));
+
                   if let Some(result) = self.send_result.lock().unwrap().as_ref() {
                     match result {
                       Ok(response) => {
                         ui.heading(i18n("Success!"));
-                        ui.label("");
                         finish = true;
                       }
                       Err(err) => {
@@ -87,47 +99,48 @@ impl WalletSweep {
                         ui.colored_label(egui::Color32::RED, format!("{:?}", err));
                       }
                     }
-                  } else {
-                    ui.label(i18n("Compounding or sweeping your wallet \
-                    allows you to combine several smaller UTXOs into single larger ones. \
-                    This can allow you to send larger amounts of WALA than you could otherwise, \
-                    due to transaction size limitations."));
-                    ui.add_space(120.0);
                   }
                 }
 
-                // Input for Address
-                ui.label(i18n("Wallet Secret:"));
-                ui.add_sized(
-                  theme_style().panel_editor_size,
-                  egui::TextEdit::singleline(&mut self.wallet_secret)
-                    .vertical_align(Align::Center)
-                    .password(true),
-                );
-                ui.add_space(12.0);
+                if !finish {
+                  // Input for Address
+                  ui.label(i18n("Wallet Secret:"));
+                  ui.add_sized(
+                    [ui.available_width(), 30.0],
+                    egui::TextEdit::singleline(&mut self.wallet_secret)
+                      .vertical_align(Align::Center)
+                      .password(true),
+                  );
+                  ui.add_space(12.0);
 
-                // Input for Amount
-                ui.label(i18n("Payment Secret:"));
-                ui.add_sized(
-                  theme_style().panel_editor_size,
-                  egui::TextEdit::singleline(&mut self.payment_secret)
-                    .vertical_align(Align::Center)
-                    .password(true),
-                );
-                ui.add_space(16.0);
+                  // Input for Amount
+                  ui.label(i18n("Payment Secret:"));
+                  ui.add_sized(
+                    [ui.available_width(), 30.0],
+                    egui::TextEdit::singleline(&mut self.payment_secret)
+                      .vertical_align(Align::Center)
+                      .password(true),
+                  );
+                  ui.add_space(16.0);
 
-                if ui
-                  .dx_large_button_enabled(
-                    !self.wallet_secret.is_empty() && !finish,
-                    i18n("Confirm"),
-                  )
-                  .clicked()
-                {
-                  if !*self.is_pending.lock().unwrap() {
-                    let send_result_clone = Arc::clone(&self.send_result);
-                    *send_result_clone.lock().unwrap() = None;
+                  if ui
+                    .dx_large_button_enabled(
+                      !self.wallet_secret.is_empty() && !finish,
+                      i18n("Confirm"),
+                    )
+                    .clicked()
+                  {
+                    if !*self.is_pending.lock().unwrap() {
+                      let send_result_clone = Arc::clone(&self.send_result);
+                      *send_result_clone.lock().unwrap() = None;
 
-                    self.sweep(core);
+                      self.sweep(core);
+                    }
+                  }
+                } else {
+                  if ui.dx_large_button(i18n("Done")).clicked()
+                  {
+                    self.reset();
                   }
                 }
               });

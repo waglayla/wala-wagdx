@@ -94,6 +94,8 @@ egui-notify.workspace = true
 
 sys-locale.workspace = true
 num-format.workspace = true
+seq-macro.workspace = true
+once_cell.workspace = true
 
 [dependencies.web-sys]
 workspace = true

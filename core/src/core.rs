@@ -108,7 +108,7 @@ impl Core {
 
     let mut components = HashMap::new();
     components.insert_typeid(Welcome::new(manager.clone()));
-    components.insert_typeid(Outline::default());
+    components.insert_typeid(Outline::new(&cc.egui_ctx));
     components.insert_typeid(Hello::default());
     components.insert_typeid(Blank::default());
     components.insert_typeid(components::settings::Settings::new(manager.clone()));
@@ -116,6 +116,7 @@ impl Core {
     components.insert_typeid(OpenWallet::new(manager.clone()));
     components.insert_typeid(DaemonConsole::new(daemon_receiver));
     components.insert_typeid(ViewWallet::new(manager.clone()));
+    components.insert_typeid(WalletDelegator::default());
 
     components.insert_typeid(Footer::default());
     let footer = components.get(&TypeId::of::<Footer>()).unwrap().clone();
@@ -233,6 +234,8 @@ impl eframe::App for Core {
     }
 
     self.render_frame(ctx, frame);
+
+    ctx.request_repaint_after(std::time::Duration::from_secs_f32(1.0 / 60.0));
   }
 
   // Optionally, include a basic exit handler
@@ -419,6 +422,10 @@ impl Core {
         Events::WalletList { wallet_list } => {
           self.wallet_list.clone_from(&*wallet_list);
           self.wallet_list.sort();
+        }
+
+        Events::PeerCountUpdate(count) => {
+          self.node_state.node_peers = Some(count);
         }
 
         Events::WalletUpdate => {

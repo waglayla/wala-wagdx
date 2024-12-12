@@ -119,6 +119,9 @@ pub struct CreateWallet {
   pub seed_state: SeedState,
   pub seed_shuffle: Vec<usize>,
 
+  pub import_key: bool,
+  pub import_file: bool,
+
   confirm_1: String,
   confirm_2: String,
   confirm_3: String,
@@ -135,6 +138,10 @@ impl CreateWallet {
       state: State::Select,
       seed_state: Default::default(),
       seed_shuffle: Vec::new(),
+
+      import_key: false,
+      import_file: false,
+
       confirm_1: String::new(),
       confirm_2: String::new(),
       confirm_3: String::new(),
@@ -298,7 +305,7 @@ impl ComponentT for CreateWallet {
 
             ui.add_space(8.);
             if ui.dx_button_sized(
-              i18n("Import Seed"), 
+              i18n("Import Key"), 
               26.0,
               -13.0, 
               Default::default(), 

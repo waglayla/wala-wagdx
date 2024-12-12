@@ -5598,6 +5598,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f97841a747eef040fcd2e7b3b9a220a7205926e60488e673d9e4926d27772ce5"
 
 [[package]]
+name = "seq-macro"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3f0bf26fd526d2a95683cd0f87bf103b8539e2ca1ef48ce002d67aad59aa0b4"
+
+[[package]]
 name = "seqlock"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8126,6 +8132,7 @@ dependencies = [
  "nix 0.28.0",
  "num-format",
  "num_cpus",
+ "once_cell",
  "open",
  "pad",
  "passwords",
@@ -8135,6 +8142,7 @@ dependencies = [
  "ritehash",
  "rlimit",
  "separator",
+ "seq-macro",
  "serde",
  "serde_json",
  "slug",

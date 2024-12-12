@@ -262,6 +262,7 @@ cfg_if! {
             "WagDX",
             native_options,
             Box::new(move |cc| {
+              Assets::init(&cc.egui_ctx);
               let manager = dx_manager::DX_Manager::new(
                 &cc.egui_ctx, 
                 Some(application_events), 

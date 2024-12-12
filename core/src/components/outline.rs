@@ -1,102 +1,113 @@
 use super::*;
 use crate::components::*;
 
+define_animation_frames!(SONIC_RUN, 4, "/resources/animation/sonic");
+
 pub struct Outline {
-    selected_tab: Tab,
-    account_dropdown_open: bool,
+  selected_tab: Tab,
+  account_dropdown_open: bool,
+  sonic_animation: Option<SpriteAnimation>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
 pub enum Tab {
-    Wallet,
-    NetworkInfo,
-    WalaNode,
-    WalaBridge,
-    About,
+  Wallet,
+  NetworkInfo,
+  WalaNode,
+  WalaBridge,
+  About,
 }
 
 impl Tab {
-    fn label(&self) -> &'static str {
-        match self {
-            Tab::Wallet => i18n("Wallet"),
-            Tab::NetworkInfo => i18n("Network Info"),
-            Tab::WalaNode => i18n("WALA Node"),
-            Tab::WalaBridge => i18n("WALA Bridge"),
-            Tab::About => i18n("About"),
-        }
+  fn label(&self) -> &'static str {
+    match self {
+      Tab::Wallet => i18n("Wallet"),
+      Tab::NetworkInfo => i18n("Network Info"),
+      Tab::WalaNode => i18n("WALA Node"),
+      Tab::WalaBridge => i18n("WALA Bridge"),
+      Tab::About => i18n("About"),
     }
+  }
 
-    fn component(&self) -> TypeId {
-        match self {
-            Tab::Wallet => TypeId::of::<wallet_ui::CreateWallet>(),
-            Tab::NetworkInfo => TypeId::of::<blank::Blank>(),
-            Tab::WalaNode => TypeId::of::<console::DaemonConsole>(),
-            Tab::WalaBridge => TypeId::of::<blank::Blank>(),
-            Tab::About => TypeId::of::<wallet_ui::ViewWallet>(),
-        }
+  fn component(&self) -> TypeId {
+    match self {
+      Tab::Wallet => TypeId::of::<wallet_ui::WalletDelegator>(),
+      Tab::NetworkInfo => TypeId::of::<blank::Blank>(),
+      Tab::WalaNode => TypeId::of::<console::DaemonConsole>(),
+      Tab::WalaBridge => TypeId::of::<blank::Blank>(),
+      Tab::About => TypeId::of::<blank::Blank>(),
     }
-}
-
-impl Default for Outline {
-    fn default() -> Self {
-        Self {
-            selected_tab: Tab::iter().next().unwrap(),
-            account_dropdown_open: false,
-        }
-    }
+  }
 }
 
 impl ComponentT for Outline {
-    fn name(&self) -> Option<&'static str> {
-        Some("Outline")
-    }
+  fn name(&self) -> Option<&'static str> {
+    Some("Outline")
+  }
 
-    fn render(
-        &mut self,
-        core: &mut Core,
-        ctx: &egui::Context,
-        _frame: &mut eframe::Frame,
-        ui: &mut egui::Ui,
-    ) {
-        let panel_fill = theme_color().fg_color;
-        let darkened_fill = theme_color().bg_color;
+  fn render(
+    &mut self,
+    core: &mut Core,
+    ctx: &egui::Context,
+    _frame: &mut eframe::Frame,
+    ui: &mut egui::Ui,
+  ) {
+      let panel_fill = theme_color().fg_color;
+      let darkened_fill = theme_color().bg_color;
 
-        egui::SidePanel::left("sidebar")
-            .exact_width(225.0)
-            .resizable(false)
-            .show_separator_line(false)
-            .frame(egui::Frame {
-                fill: darkened_fill,
-                inner_margin: egui::Margin::ZERO,
-                outer_margin: egui::Margin::ZERO,
-                ..Default::default()
-            })
-            .show_inside(ui, |ui| {
-                ui.set_min_height(ui.available_height());
-                ui.spacing_mut().item_spacing = Vec2::ZERO;
+      egui::SidePanel::left("sidebar")
+        .exact_width(225.0)
+        .resizable(false)
+        .show_separator_line(false)
+        .frame(egui::Frame {
+          fill: darkened_fill, 
+          inner_margin: egui::Margin::ZERO,
+          outer_margin: egui::Margin::ZERO,
+          ..Default::default()
+        })
+        .show_inside(ui, |ui| {
+          ui.set_min_height(ui.available_height());
+          ui.spacing_mut().item_spacing = Vec2::ZERO;
 
-                let info_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), 132.0));
-                let info_rect = info_space.1;
-                
-                self.render_account_section(ui, core, &info_rect);
-                self.render_balance_section(ui, core, &info_rect);
+          let info_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), 132.0));
+          let info_rect = info_space.1;
+          
+          self.render_account_section(ui, core, &info_rect);
+          self.render_balance_section(ui, core, &info_rect);
 
-                ui.style_mut().text_styles.insert(
-                    egui::TextStyle::Button,
-                    egui::FontId::new(30.0, get_font_family("DINishCondensed", false, false))
-                );
+          ui.style_mut().text_styles.insert(
+            egui::TextStyle::Button,
+            egui::FontId::new(30.0, get_font_family("DINishCondensed", false, false))
+          );
 
-                for tab in self.available_tabs(core) {
-                    if self.tab_button(ui, ctx, tab) {
-                        self.selected_tab = tab;
-                        core.set_active_component_by_type(tab.component().clone());
-                    }
-                }
-            });
-    }
+          self.render_layla(ui, core, &info_rect);
+
+          for tab in self.available_tabs(core) {
+            if self.tab_button(ui, ctx, tab) {
+              self.selected_tab = tab;
+              core.set_active_component_by_type(tab.component().clone());
+            }
+          }
+        });
+  }
 }
 
 impl Outline {
+  pub fn new(ctx: &egui::Context) -> Self {
+    let sonic_animation = Some(
+      SpriteAnimationBuilder::new()
+        .fps(30.0)
+        .looping(true)
+        .build(ctx, &SONIC_RUN)
+    );
+
+    Self {
+      selected_tab: Tab::iter().next().unwrap(),
+      account_dropdown_open: false,
+      sonic_animation,
+    }
+  }
+
   fn account_button(
     &self,
     ui: &mut Ui,
@@ -229,6 +240,20 @@ impl Outline {
     });
   }
 
+  fn render_layla(&mut self, ui: &mut Ui, core: &Core, info_rect: &Rect) {
+    if let Some(animation) = &mut self.sonic_animation {
+      let animation_pos = egui::Pos2 {
+        x: info_rect.max.x - 87.0,
+        y: info_rect.min.y + 5.0,
+      };
+
+      if !animation.is_animating() {
+        animation.animate();
+      }
+
+      animation.paint(ui, animation_pos, 0.4);
+    }
+  }
 
   fn render_account_section(&mut self, ui: &mut Ui, core: &Core, info_rect: &Rect) {
     let painter = ui.painter_at(*info_rect);
@@ -299,97 +324,97 @@ impl Outline {
   }
 
   fn render_balance_section(&self, ui: &mut Ui, core: &Core, info_rect: &Rect) {
-      let painter = ui.painter_at(*info_rect);
-      
-      let whole_pos = egui::Pos2 {
-          x: info_rect.min.x + 127.,
-          y: info_rect.max.y + 4.,
-      };
-      let part_pos = egui::Pos2 {
-          x: info_rect.min.x + 127.5,
-          y: info_rect.max.y - 14.8,
-      };
-      let sym_pos = egui::Pos2 {
-          x: info_rect.max.x - 10.75,
-          y: info_rect.max.y - 18.,
-      };
+    let painter = ui.painter_at(*info_rect);
+    
+    let whole_pos = egui::Pos2 {
+      x: info_rect.min.x + 127.,
+      y: info_rect.max.y + 4.,
+    };
+    let part_pos = egui::Pos2 {
+      x: info_rect.min.x + 127.5,
+      y: info_rect.max.y - 14.8,
+    };
+    let sym_pos = egui::Pos2 {
+      x: info_rect.max.x - 10.75,
+      y: info_rect.max.y - 18.,
+    };
 
-      let account_clone = core.current_account.clone();
+    let account_clone = core.current_account.clone();
 
-      let mut pad_str = "".to_string();
-      let mut big_str = "000".to_string();
-      let mut small_str = ".000".to_string();
-      let symbol_color = theme_color().text_off_color_1;
-      let fade_color = theme_color().null_balance_color;
-      let mut balance_color = fade_color;
+    let mut pad_str = "".to_string();
+    let mut big_str = "000".to_string();
+    let mut small_str = ".000".to_string();
+    let symbol_color = theme_color().text_off_color_1;
+    let fade_color = theme_color().null_balance_color;
+    let mut balance_color = fade_color;
 
-      if let Some(ref account) = account_clone {
-          let balance = account.balance().unwrap_or_default();
-          let (padded, whole, partial) = format_balance_with_precision(balance.mature);
-          pad_str = padded;
-          big_str = whole;
-          small_str = partial;
-          balance_color = theme_color().strong_color;
-      }
+    if let Some(ref account) = account_clone {
+      let balance = account.balance().unwrap_or_default();
+      let (padded, whole, partial) = format_balance_with_precision(balance.mature);
+      pad_str = padded;
+      big_str = whole;
+      small_str = partial;
+      balance_color = theme_color().strong_color;
+    }
 
-      let balance_rect = egui::Rect::from_min_max(
-          egui::Pos2 {
-              x: whole_pos.x - 92.0,
-              y: whole_pos.y - 92.0,
-          },
-          egui::Pos2 {
-              x: whole_pos.x + 30.0,
-              y: whole_pos.y,
-          },
-      );
+    let balance_rect = egui::Rect::from_min_max(
+      egui::Pos2 {
+        x: whole_pos.x - 92.0,
+        y: whole_pos.y - 92.0,
+      },
+      egui::Pos2 {
+        x: whole_pos.x + 30.0,
+        y: whole_pos.y,
+      },
+    );
 
-      let response = ui.interact(balance_rect, egui::Id::new("balance_area"), egui::Sense::hover());
+    let response = ui.interact(balance_rect, egui::Id::new("balance_area"), egui::Sense::hover());
 
-      painter.text(
-          whole_pos,
-          egui::Align2::RIGHT_BOTTOM,
-          pad_str,
-          egui::FontId::new(92.0, get_font_family("DINishCondensed", true, false)),
-          fade_color,
-      );
+    painter.text(
+      whole_pos,
+      egui::Align2::RIGHT_BOTTOM,
+      pad_str,
+      egui::FontId::new(92.0, get_font_family("DINishCondensed", true, false)),
+      fade_color,
+    );
 
-      painter.text(
-          whole_pos,
-          egui::Align2::RIGHT_BOTTOM,
-          big_str,
-          egui::FontId::new(92.0, get_font_family("DINishCondensed", true, false)),
-          balance_color,
-      );
+    painter.text(
+      whole_pos,
+      egui::Align2::RIGHT_BOTTOM,
+      big_str,
+      egui::FontId::new(92.0, get_font_family("DINishCondensed", true, false)),
+      balance_color,
+    );
 
-      painter.text(
-          part_pos,
-          egui::Align2::LEFT_BOTTOM,
-          small_str,
-          egui::FontId::new(25.0, get_font_family("DINishCondensed", true, false)),
-          balance_color,
-      );
+    painter.text(
+      part_pos,
+      egui::Align2::LEFT_BOTTOM,
+      small_str,
+      egui::FontId::new(25.0, get_font_family("DINishCondensed", true, false)),
+      balance_color,
+    );
 
-      painter.text(
-          sym_pos,
-          egui::Align2::RIGHT_BOTTOM,
-          "WALA",
-          egui::FontId::new(16.0, get_font_family("DINish", false, false)),
-          symbol_color,
-      );
+    painter.text(
+      sym_pos,
+      egui::Align2::RIGHT_BOTTOM,
+      "WALA",
+      egui::FontId::new(16.0, get_font_family("DINish", false, false)),
+      symbol_color,
+    );
 
-      if let Some(ref account) = account_clone {
-          response.on_hover_text(format!(
-              "{} {} WALA ({} {})",
-              i18n("Current Balance:"),
-              format_balance(
-                  account.balance().unwrap_or_default().mature,
-              ),
-              format_balance(
-                  account.balance().unwrap_or_default().pending,
-              ),
-              i18n("Pending"),
-          ));
-      }
+    if let Some(ref account) = account_clone {
+      response.on_hover_text_at_pointer(format!(
+        "{} {} WALA ({} {})",
+        i18n("Current Balance:"),
+        format_balance(
+          account.balance().unwrap_or_default().mature,
+        ),
+        format_balance(
+          account.balance().unwrap_or_default().pending,
+        ),
+        i18n("Pending"),
+      ));
+    }
   }
 
   fn tab_button(&self, ui: &mut Ui, ctx: &Context, tab: Tab) -> bool {

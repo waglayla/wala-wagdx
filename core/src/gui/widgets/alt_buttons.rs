@@ -409,6 +409,125 @@ pub fn dx_button_sized_ui(
   button_rect
 }
 
+pub fn dx_button_sized_enabled_ui(
+  ui: &mut egui::Ui,
+  enabled: bool,
+  text: String,
+  font_size: f32,
+  vertical_offset: f32,
+  kind: DX_Button,
+  size: Vec2,
+) -> egui::Response {
+  // Calculate the text width
+  let text_width = ui.fonts(|fonts| {
+    fonts.layout_no_wrap(
+      text.to_string(),
+      egui::FontId::new(font_size, get_font_family("DINishCondensed", true, false)),
+      theme_color().bg_color,
+    )
+    .rect
+    .width()
+  });
+
+  // Define button size based on text width and padding
+  let button_width = size.x;
+  let button_height = size.y;
+
+  
+  let sense = if enabled { egui::Sense::click() } else { egui::Sense::hover() };
+
+  // Create the button and get its response
+  let mut button_rect = ui.allocate_exact_size(
+    egui::vec2(button_width, button_height),
+    sense,
+  ).1;
+
+  if enabled {
+    button_rect = button_rect.on_hover_cursor(egui::CursorIcon::PointingHand);
+  }
+
+  // Handle hover animation for color
+  let bg_color = ui.ctx().animate_color_with_time(
+    ui.id().with(format!("dx_button_bg_color_{}_{}_{}", text, button_rect.rect.center().x, button_rect.rect.center().y)),
+    if enabled && button_rect.hovered() {
+      kind.hover_color()
+    } else {
+      kind.bg_color()
+    },
+    0.125, // Animation duration
+  );
+
+  let text_color = ui.ctx().animate_color_with_time(
+    ui.id().with(format!("dx_button_text_color_{}_{}_{}", text, button_rect.rect.center().x, button_rect.rect.center().y)),
+    if enabled && button_rect.hovered() {
+      kind.hover_text_color()
+    } else {
+      kind.text_color()
+    },
+    0.125, // Animation duration
+  );
+
+  let view_padding = ui.ctx().animate_value_with_time(
+    ui.id().with(format!("dx_button_padding_{}_{}_{}", text, button_rect.rect.center().x, button_rect.rect.center().y)),
+    if enabled && button_rect.hovered() && !button_rect.clicked() {
+      8.0
+    } else if button_rect.clicked() {
+      -6.0
+    } else {
+      0.0
+    },
+    0.125, // Animation duration
+  );
+
+  let center = button_rect.rect.center();
+  let adjusted_rect = egui::Rect::from_center_size(
+    center,
+    egui::vec2(
+      button_width + view_padding, 
+      button_height + view_padding
+    ),
+  );
+
+  // Draw the standard button frame
+  ui.painter().rect_filled(
+    adjusted_rect,
+    egui::Rounding::same(6.0), // Rounded corners
+    bg_color, // Background color
+  );
+
+  // Draw the text with a vertical offset
+  let text_pos = egui::Pos2 {
+    x: button_rect.rect.center().x - text_width / 2.0,
+    y: button_rect.rect.center().y - font_size / 2.0 + vertical_offset,
+  };
+
+  ui.painter().text(
+    text_pos,
+    egui::Align2::LEFT_TOP,
+    text,
+    egui::FontId::new(font_size, get_font_family("DINishCondensed", true, false)),
+    text_color,
+  );
+
+  // Draw the disabled color
+  let over_color = Color32::from_rgba_premultiplied(
+    theme_color().fg_color.r(),
+    theme_color().fg_color.g(),
+    theme_color().fg_color.b(),
+    210
+  );
+
+  if !enabled {
+    ui.painter().rect_filled(
+      adjusted_rect,
+      egui::Rounding::same(6.0), // Rounded corners
+      over_color, // Background color
+    );
+  }
+
+  button_rect
+}
+
 pub fn dx_button(      
   text: impl Into<String>,
   font_size: f32,
@@ -440,6 +559,17 @@ pub fn dx_button_sized(
   move |ui: &mut Ui| dx_button_sized_ui(ui, text.into(), font_size, vertical_offset, kind, size)
 }
 
+pub fn dx_button_sized_enabled(      
+  enabled: bool,
+  text: impl Into<String>,
+  font_size: f32,
+  vertical_offset: f32,
+  kind: DX_Button,
+  size: Vec2,
+) -> impl Widget {
+  move |ui: &mut Ui| dx_button_sized_enabled_ui(ui, enabled, text.into(), font_size, vertical_offset, kind, size)
+}
+
 // Optional: Convenience methods for Ui
 pub trait ButtonExt {
     fn medium_button(&mut self, text: impl Into<String>) -> Response;
@@ -458,6 +588,16 @@ pub trait ButtonExt {
 
     fn dx_button_sized(
       &mut self, 
+      text: impl Into<String>,
+      font_size: f32,
+      vertical_offset: f32,
+      kind: DX_Button,
+      size: Vec2,
+    ) -> Response;
+
+    fn dx_button_sized_enabled(      
+      &mut self, 
+      enabled: bool,
       text: impl Into<String>,
       font_size: f32,
       vertical_offset: f32,
@@ -506,6 +646,18 @@ impl ButtonExt for Ui {
       size: Vec2,
     ) -> Response {
       self.add(dx_button_sized(text, font_size, vertical_offset, kind, size))
+    }
+
+    fn dx_button_sized_enabled(
+      &mut self, 
+      enabled: bool,
+      text: impl Into<String>,
+      font_size: f32,
+      vertical_offset: f32,
+      kind: DX_Button,
+      size: Vec2,
+    ) -> Response {
+      self.add(dx_button_sized_enabled(enabled, text, font_size, vertical_offset, kind, size))
     }
 
     fn dx_large_button(&mut self, text: impl Into<String>) -> Response {

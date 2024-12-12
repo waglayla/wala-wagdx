@@ -4,7 +4,7 @@ use waglayla_bip32::{WordCount, Mnemonic, Language};
 use std::sync::{Arc, Mutex};
 use core::cmp::max;
 
-use crate::components::wallet_ui::BOTTOM_SPACE; // wtf rust why do I need this
+use components::wallet_ui::BOTTOM_SPACE; // wtf rust why do I need this
 
 pub type UnlockResult = std::result::Result<Option<Vec<AccountDescriptor>>, waglayla_wallet_core::error::Error>;
 
@@ -146,7 +146,7 @@ impl ComponentT for OpenWallet {
         }
         WizardAction::Back => {
           self.wallet_secret = "".to_string();
-          core.set_active_component::<crate::components::wallet_ui::CreateWallet>();
+          core.set_active_component::<components::wallet_ui::CreateWallet>();
         }
         _ => {}
       }
@@ -214,7 +214,7 @@ impl ComponentT for OpenWallet {
               self.is_pending = Arc::new(Mutex::new(false));
               match result {
                 Ok(_) => {
-                  core.set_active_component::<crate::components::hello::Hello>();
+                  core.set_active_component::<components::wallet_ui::ViewWallet>();
                   self.state = Default::default();
                 }
                 Err(err) => {

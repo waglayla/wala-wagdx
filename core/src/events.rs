@@ -13,6 +13,7 @@ pub enum Events {
     NetworkChange(Network),
     UpdateStorage(StorageUpdateOptions),
     VisibilityChange(VisibilityState),
+    PeerCountUpdate(usize),
     // VersionUpdate(Release),
     ThemeChange,
     StoreSettings,

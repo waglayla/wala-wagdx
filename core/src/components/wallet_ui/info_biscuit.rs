@@ -294,11 +294,11 @@ impl WalletBiscuit {
       }
 
       response = response.on_hover_cursor(egui::CursorIcon::PointingHand);
-      response = response.on_hover_text(i18n("Click to copy complete address"));
+      response = response.on_hover_text_at_pointer(i18n("Click to copy complete address"));
     }
   }
 
-  fn render_account_section(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
+  fn render_account_section(&mut self, ui: &mut Ui, core: &mut Core, rect: &Rect) {
     let painter = ui.painter_at(*rect);
     let account_pos = egui::Pos2 {
       x: rect.min.x + 12.0,
@@ -363,9 +363,10 @@ impl WalletBiscuit {
     painter.line_segment([start, end], stroke);
 
     if has_account {
-      account_response.clone().on_hover_text(i18n("Change active wallet or account"));
+      account_response.clone().on_hover_text_at_pointer(i18n("Select a different wallet"));
       if account_response.clicked() {
         // self.account_dropdown_open = !self.account_dropdown_open;
+        core.set_active_component::<wallet_ui::CreateWallet>();
       }
 
       // if self.account_dropdown_open {
@@ -489,7 +490,7 @@ impl WalletBiscuit {
     }
 
     response = response.on_hover_cursor(egui::CursorIcon::PointingHand);
-    response = response.on_hover_text(i18n("Click to copy total balance"));
+    response = response.on_hover_text_at_pointer(i18n("Click to copy total balance"));
   }
 
   fn render_pending_section(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {

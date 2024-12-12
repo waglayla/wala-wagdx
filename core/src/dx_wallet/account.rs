@@ -288,11 +288,11 @@ impl Account {
           if let Some(max_spend) = Self::calculate_max_spendable_amount(&summary) {
             self_clone.inner.max_spend.store(max_spend, Ordering::SeqCst);
 
-            println!("Max spendable amount updated: {}", max_spend);
+            // println!("Max spendable amount updated: {}", max_spend);
           }
         }
         Err(err) => {
-          println!("Failed to estimate transaction: {}", err);
+          // println!("Failed to estimate transaction: {}", err);
         }
       }
     });

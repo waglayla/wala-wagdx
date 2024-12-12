@@ -27,3 +27,5 @@ pub mod network;
 pub mod dx_wallet;
 pub mod collection;
 pub mod node_state;
+
+pub mod assets;

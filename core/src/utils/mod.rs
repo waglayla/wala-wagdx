@@ -21,6 +21,8 @@ mod mass;
 pub use mass::*;
 mod sync;
 pub use sync::*;
+mod animation;
+pub use animation::*;
 
 pub fn lerp_dx(start: f32, end: f32, t: f32) -> f32 {
   start + t * (end - start)
