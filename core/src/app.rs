@@ -1,6 +1,5 @@
 use crate::imports::*;
 use crate::events::ApplicationEventsChannel;
-// use crate::interop::Adaptor;
 use crate::result::Result;
 use cfg_if::cfg_if;
 
@@ -16,11 +15,8 @@ use std::sync::Arc;
 use workflow_i18n::*;
 use workflow_log::*;
 
-// pub const WAGLAYLA_NG_ICON_SVG: &[u8] = include_bytes!("../../resources/images/waglayla.svg");
-pub const WAGLAYLA_NG_ICON_SVG: &[u8] = include_bytes!("../resources/images/waglayla-node-dark.svg");
-pub const WAGLAYLA_NG_ICON_TRANSPARENT_SVG: &[u8] =
-    include_bytes!("../resources/images/waglayla-node-transparent.svg");
-pub const WAGLAYLA_NG_LOGO_SVG: &[u8] = include_bytes!("../resources/images/waglayla-ng.svg");
+pub const WALA_WAGDX_ICON_PNG: &[u8] = include_bytes!("../resources/icons/icon-256.png");
+
 pub const I18N_EMBEDDED: &str = include_str!("../resources/i18n/i18n.json");
 pub const BUILD_TIMESTAMP: &str = env!("VERGEN_BUILD_TIMESTAMP");
 pub const GIT_DESCRIBE: &str = env!("VERGEN_GIT_DESCRIBE");
@@ -33,25 +29,18 @@ pub const RUSTC_LLVM_VERSION: &str = env!("VERGEN_RUSTC_LLVM_VERSION");
 pub const RUSTC_SEMVER: &str = env!("VERGEN_RUSTC_SEMVER");
 pub const CARGO_TARGET_TRIPLE: &str = env!("VERGEN_CARGO_TARGET_TRIPLE");
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
-pub const CODENAME: &str = "DNA";
 
 #[derive(Default, Clone)]
 pub struct ApplicationContext {
   pub wallet_api: Option<Arc<dyn WalletApi>>,
-  // pub application_events: Option<ApplicationEventsChannel>,
-  // pub adaptor: Option<Arc<Adaptor>>,
 }
 
 impl ApplicationContext {
   pub fn new(
     wallet_api: Option<Arc<dyn WalletApi>>,
-    // application_events: Option<ApplicationEventsChannel>,
-    // adaptor: Option<Arc<Adaptor>>,
   ) -> Self {
     Self {
       wallet_api,
-      // application_events,
-      // adaptor,
     }
   }
 }
@@ -60,15 +49,12 @@ cfg_if! {
   if #[cfg(not(target_arch = "wasm32"))] {
     use waglaylad_lib::daemon::{
       create_core,
-      // DESIRED_DAEMON_SOFT_FD_LIMIT,
-      // MINIMUM_DAEMON_SOFT_FD_LIMIT
     };
     use waglaylad_lib::args::Args as NodeArgs;
     use waglayla_utils::fd_budget;
     use waglayla_core::signals::Signals;
     use clap::ArgAction;
     use crate::utils::*;
-    // use runtime::panic::*;
     use std::fs;
 
     const DESIRED_DAEMON_SOFT_FD_LIMIT: u64 = 4 * 1024;
@@ -87,6 +73,13 @@ cfg_if! {
         reset_settings : bool,
       },
       Waglaylad { args : Box<NodeArgs> },
+    }
+
+    fn include_icon(png_bytes: &[u8]) -> std::result::Result<IconData, Box<dyn std::error::Error>> {  
+      let image = image::load_from_memory(png_bytes)?;
+      let rgba = image.into_rgba8().into_raw();
+  
+      Ok(IconData { rgba, height: 256, width: 256 })
     }
 
     // TODO: re-engineer from scratch based on determined needs
@@ -110,7 +103,6 @@ cfg_if! {
           .about(format!("wala-wagdx v{VERSION}-{GIT_DESCRIBE} (rusty-waglayla {})",  waglayla_wallet_core::version()))
           .arg(arg!(--version "Display software version"))
           .arg(arg!(--daemon "Run as Rusty Waglayla p2p daemon"))
-          .arg(arg!(--cli "Run as Rusty Waglayla Cli Wallet"))
           .arg(
             Arg::new("reset-settings")
             .long("reset-settings")
@@ -137,20 +129,19 @@ cfg_if! {
         let matches = cmd.get_matches();
 
         if matches.get_one::<bool>("version").cloned().unwrap_or(false) {
-          // println!("v{VERSION}-{GIT_DESCRIBE}");
           std::process::exit(0);
         } else if let Some(matches) = matches.subcommand_matches("i18n") {
-            if let Some(_matches) = matches.subcommand_matches("import") {
-              Args::I18n { op : I18n::Import }
-            } else if let Some(_matches) = matches.subcommand_matches("export") {
-              Args::I18n { op : I18n::Export }
-            } else if let Some(_matches) = matches.subcommand_matches("reset") {
-              Args::I18n { op : I18n::Reset }
-            } else {
-              println!();
-              println!("please specify a valid i18n subcommand");
-              std::process::exit(1);
-            }
+          if let Some(_matches) = matches.subcommand_matches("import") {
+            Args::I18n { op : I18n::Import }
+          } else if let Some(_matches) = matches.subcommand_matches("export") {
+            Args::I18n { op : I18n::Export }
+          } else if let Some(_matches) = matches.subcommand_matches("reset") {
+            Args::I18n { op : I18n::Reset }
+          } else {
+            println!();
+            println!("please specify a valid i18n subcommand");
+            std::process::exit(1);
+          }
         } else {
           let reset_settings = matches.get_one::<bool>("reset-settings").cloned().unwrap_or(false);
 
@@ -159,11 +150,9 @@ cfg_if! {
       }
     }
 
-    // pub async fn wagdx_main(wallet_api : Option<Arc<dyn WalletApi>>, application_events : Option<ApplicationEventsChannel>, _adaptor: Option<Arc<Adaptor>>) -> Result<()> {
     pub async fn wagdx_main(application_context : ApplicationContext) -> Result<()> {
       use std::sync::Mutex;
 
-      // let ApplicationContext { wallet_api, application_events, adaptor: _ } = application_context;
       let ApplicationContext { wallet_api } = application_context;
 
       match try_set_fd_limit(DESIRED_DAEMON_SOFT_FD_LIMIT) {
@@ -203,8 +192,7 @@ cfg_if! {
 
         Args::Wdx { reset_settings } => {
           workflow_log::set_colors_enabled(true);
-
-          // println!("wala-wagdx v{VERSION}-{GIT_DESCRIBE} (waglaylad-rusty {})", waglayla_version());
+          println!("wala-wagdx v{VERSION}-{GIT_DESCRIBE} (rusty-waglayla {})", waglayla_wallet_core::version());
 
           env_logger::init();
 
@@ -237,21 +225,24 @@ cfg_if! {
           let manager: Arc<Mutex<Option<dx_manager::DX_Manager>>> = Arc::new(Mutex::new(None));
           let delegate = manager.clone();
 
+          let icon_data = include_icon(WALA_WAGDX_ICON_PNG).expect("Failed to load embedded icon");
+
           let mut viewport = egui::ViewportBuilder::default()
             .with_title(i18n("Waglayla Wag-DX"))
-            .with_min_inner_size([400.0,320.0])
-            .with_inner_size([1000.0,600.0])
-            // .with_icon(svg_to_icon_data(WAGLAYLA_NG_ICON_SVG, Some(SizeHint::Size(256,256))));
+            .with_min_inner_size([1030.0, 600.0])
+            .with_inner_size([1030.0,600.0])
+            .with_icon(icon_data)
             .with_decorations(false) // For window frame
             .with_transparent(true) // For window frame
             .with_resizable(true)
-            ;
+          ;
   
           let native_options = eframe::NativeOptions {
-            // persist_window : true,
+            persist_window : true,
             viewport,
             follow_system_theme: false,
             hardware_acceleration: HardwareAcceleration::Preferred,
+            vsync: true,
             ..Default::default()
           };
 
@@ -275,7 +266,6 @@ cfg_if! {
               dx_manager::signal_handler::Signals::bind(&manager);
               manager.start();
   
-              // Ok(Box::new(wala_wagdx_core::Core::new(cc, runtime, settings, window_frame)))
               Ok(Box::new(wala_wagdx_core::Core::new(cc, settings, true, daemon_channel.receiver.clone())))
             }),
           )?;
@@ -284,179 +274,12 @@ cfg_if! {
         }
       }
 
-      // match parse_args() {
-      //   Args::Cli => {
-      //     use waglayla_cli_lib::*;
-      //     // cli instantiates a custom panic handler
-      //     let result = waglayla_cli(TerminalOptions::new().with_prompt("$ "), None).await;
-      //     if let Err(err) = result {
-      //       println!("{err}");
-      //     }
-      //   }
-      //   Args::Waglaylad{ args } => {
-      //     init_ungraceful_panic_handler();
-      //     let fd_total_budget = fd_budget::limit() - args.rpc_max_clients as i32 - args.inbound_limit as i32 - args.outbound_target as i32;
-      //     let (core, _) = create_core(*args, fd_total_budget);
-      //     Arc::new(Signals::new(&core)).init();
-      //     core.run();
-      //   }
-
-      //   Args::I18n {
-      //     op
-      //   } => {
-      //     init_ungraceful_panic_handler();
-      //     manage_i18n(op)?;
-      //   }
-
-      //   Args::Kng { reset_settings, disable } => {
-      //     init_graceful_panic_handler();
-
-      //     workflow_log::set_colors_enabled(true);
-
-      //     println!("wala-wagdx v{VERSION}-{GIT_DESCRIBE} (rusty-waglayla {})", waglayla_version());
-
-      //     // Log to stderr (if you run with `RUST_LOG=debug`).
-      //     env_logger::init();
-
-      //     set_log_level(LevelFilter::Info);
-
-      //     let mut settings = if reset_settings {
-      //       println!("Resetting wala-wagdx settings on user request...");
-      //       Settings::default().store_sync()?.clone()
-      //     } else {
-      //       Settings::load().await.unwrap_or_else(|err| {
-      //         log_error!("Unable to load settings: {err}");
-      //         Settings::default()
-      //       })
-      //     };
-
-      //     // println!("settings: {:#?}", settings);
-
-      //     let i18n_json_file = i18n_storage_file()?;
-      //     let i18n_json_file_load = i18n_json_file.clone();
-      //     let i18n_json_file_store = i18n_json_file.clone();
-      //     i18n::Builder::new(settings.language_code.as_str(), "en")
-      //       .with_static_json_data(I18N_EMBEDDED)
-      //       .with_string_json_data(i18n_json_file.exists().then(move ||{
-      //           fs::read_to_string(i18n_json_file_load)
-      //       }).transpose()?)
-      //       .with_store(move |json_data: &str| {
-      //           Ok(fs::write(&i18n_json_file_store, json_data)?)
-      //       })
-      //       .try_init()?;
-
-      //     if disable {
-      //       settings.node.node_kind = wala_wagdx_core::settings::WaglayladNodeKind::Disable;
-      //     }
-
-      //     let runtime: Arc<Mutex<Option<runtime::Runtime>>> = Arc::new(Mutex::new(None));
-      //     let delegate = runtime.clone();
-
-      //     let window_frame = !settings.user_interface.disable_frame;
-
-      //     let mut viewport = egui::ViewportBuilder::default()
-      //       .with_resizable(true)
-      //       .with_title(i18n("Waglayla NG"))
-      //       .with_min_inner_size([400.0,320.0])
-      //       .with_inner_size([1000.0,600.0])
-      //       .with_icon(svg_to_icon_data(WAGLAYLA_NG_ICON_SVG, Some(SizeHint::Size(256,256))));
-
-      //     if window_frame {
-      //       viewport = viewport
-      //         .with_decorations(false)
-      //         .with_transparent(true);
-      //     }
-
-      //     let native_options = eframe::NativeOptions {
-      //       persist_window : true,
-      //       viewport,
-      //       follow_system_theme: false,
-      //       ..Default::default()
-      //     };
-
-      //     // let application_events = ApplicationEventsChannel::unbounded();
-
-      //     eframe::run_native(
-      //       "Waglayla NG",
-      //       native_options,
-      //       Box::new(move |cc| {
-      //         let runtime = runtime::Runtime::new(&cc.egui_ctx, &settings, wallet_api, application_events, None);
-      //         delegate.lock().unwrap().replace(runtime.clone());
-      //         runtime::signals::Signals::bind(&runtime);
-      //         runtime.start();
-
-      //         Ok(Box::new(wala_wagdx_core::Core::new(cc, runtime, settings, window_frame)))
-      //       }),
-      //     )?;
-      //   }
-      // }
-
       Ok(())
     }
   } else {
-
-    // use crate::result::Result;
-    // use crate::adaptor::Adaptor;
-    // use wasm_bindgen::JsCast;
-
-    // pub async fn wagdx_main(wallet_api : Option<Arc<dyn WalletApi>>, application_events : Option<ApplicationEventsChannel>, adaptor: Option<Arc<Adaptor>>) -> Result<()> {
     pub async fn wagdx_main(application_context : ApplicationContext) -> Result<()> {
-      use workflow_dom::utils::document;
-
-      // let ApplicationContext { wallet_api, application_events, adaptor } = application_context;
-      let ApplicationContext { wallet_api } = application_context;
-
-      eframe::WebLogger::init(log::LevelFilter::Debug).ok();
-      let web_options = eframe::WebOptions{
-        follow_system_theme: false,
-        ..eframe::WebOptions::default()
-      };
-
-      waglayla_core::log::set_log_level(waglayla_core::log::LevelFilter::Info);
-
-      let settings = Settings::load().await.unwrap_or_else(|err| {
-        log_error!("Unable to load settings: {err}");
-        Settings::default()
-      });
-
-      i18n::Builder::new(settings.language_code.as_str(), "en")
-        .with_static_json_data(I18N_EMBEDDED)
-        .try_init()?;
-
-      use workflow_log::*;
-      log_info!("Welcome to Waglayla Wag-DX! Have a great day!");
-
-      if let Some(element) = document().get_element_by_id("loading") {
-        element.remove();
-      }
-
-      eframe::WebRunner::new()
-      .start(
-        "wala-wagdx",
-        web_options,
-        Box::new(move |cc| {
-          // wallet_api.ping()
-
-          // let adaptor = wala_wagdx_core::adaptor::Adaptor::new(runtime.clone());
-          // let window = web_sys::window().expect("no global `window` exists");
-          // js_sys::Reflect::set(
-          //     &window,
-          //     &JsValue::from_str("adaptor"),
-          //     &JsValue::from(adaptor),
-          // ).expect("failed to set adaptor");
-
-          // let runtime = runtime::Runtime::new(&cc.egui_ctx, &settings, wallet_api, application_events, adaptor);
-          // runtime.start();
-
-          Ok(Box::new(wala_wagdx_core::Core::new(cc, runtime, settings, false)))
-        }),
-      )
-      .await
-      .expect("failed to start eframe");
-
-      //log_info!("shutting down...");
-
-      Ok(())
+      println("WASM target is not implemented");
+      std::process::exit(1);
     }
   }
 }

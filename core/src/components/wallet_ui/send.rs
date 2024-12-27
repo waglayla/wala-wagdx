@@ -5,8 +5,6 @@ use egui_extras::RetainedImage;
 use std::sync::{Arc, Mutex};
 use core::cmp::max;
 
-pub type SendResult = std::result::Result<AccountsSendResponse, waglayla_wallet_core::error::Error>;
-
 #[derive(Default, Clone, PartialEq)]
 enum SendState {
   #[default]
@@ -14,6 +12,14 @@ enum SendState {
   Confirm,
   Success,
 }
+
+define_indexed_enum!(
+  Focus,
+  Address,
+  Amount,
+  WalletSecret,
+  PaymentSecret
+);
 
 #[derive(Clone, Default)]
 pub struct WalletSend {
@@ -26,7 +32,10 @@ pub struct WalletSend {
   pub is_pending: Arc<Mutex<bool>>,
   pub error: Option<String>,
   state: SendState,
+  focus_context: FocusContext,
 }
+
+impl_has_focus_context!(WalletSend);
 
 impl WalletSend {
   pub fn new() -> Self {
@@ -40,6 +49,7 @@ impl WalletSend {
       is_pending: Arc::new(Mutex::new(false)),
       error: None,
       state: SendState::Details,
+      focus_context: FocusContext { focus: FOCUS_NONE },
     }
   }
 
@@ -54,6 +64,7 @@ impl WalletSend {
     self.amount_sompi = None;
     self.error = None;
     self.state = SendState::Details;
+    self.assign_focus(Focus::Address);
   }
 
   fn validate_amount(&mut self) {
@@ -88,26 +99,32 @@ impl WalletSend {
   
   fn render_details_state(&mut self, ui: &mut egui::Ui) {
     ui.label(i18n("Recipient Address:"));
-    ui.horizontal(|ui| {
-      ui.add_sized(
-        [ui.available_width(), 30.0],
-        egui::TextEdit::singleline(&mut self.address)
-          .vertical_align(Align::Center)
-          .frame(true)
-      );
-    });
+    let address_response = ui.add_sized(
+      [ui.available_width(), 30.0],
+      egui::TextEdit::singleline(
+        &mut self.address,
+      )
+        .vertical_align(Align::Center)
+        .frame(true)
+    );
+    self.next_focus(ui, Focus::Address, address_response.clone());
     ui.add_space(8.0);
+
+    if address_response.lost_focus() && handle_enter_key(ui) {
+      self.assign_focus(Focus::Amount);
+    }
 
     let amount_before = self.amount.clone();
     ui.label(i18n("Amount:"));
-    ui.horizontal(|ui| {
-      ui.add_sized(
-        [ui.available_width(), 30.0],
-        egui::TextEdit::singleline(&mut self.amount)
-          .vertical_align(Align::Center)
-          .frame(true)
-      );
-    });
+    let amount_response = ui.add_sized(
+      [ui.available_width(), 30.0],
+      egui::TextEdit::singleline(
+        &mut self.amount,
+      )
+        .vertical_align(Align::Center)
+        .frame(true)
+    );
+    self.next_focus(ui, Focus::Amount, amount_response.clone());
 
     if amount_before != self.amount {
       self.validate_amount();
@@ -116,40 +133,100 @@ impl WalletSend {
     ui.add_space(16.0);
 
     let enabled = !self.address.trim().is_empty() 
-      && self.amount_sompi.is_some() 
+      && self.address.chars().all(char::is_alphanumeric)
+      && self.amount_sompi.is_some()
       && self.error.is_none();
+
+    if amount_response.lost_focus() && handle_enter_key(ui) {
+      if enabled {
+        self.state = SendState::Confirm;
+        self.assign_focus(Focus::WalletSecret);
+      } else {
+        self.assign_focus(Focus::Amount);
+      }
+    }
 
     if ui.dx_large_button_enabled(
       enabled,
       i18n("Next"),
     ).clicked() {
       self.state = SendState::Confirm;
+      self.assign_focus(Focus::WalletSecret);
     }
-}
+  }
 
-fn render_confirm_state(&mut self, ui: &mut egui::Ui, core: &mut Core) {
-    ui.label(i18n("Wallet Secret:"));
-    ui.horizontal(|ui| {
-      ui.add_sized(
-        [ui.available_width(), 30.0],
-        egui::TextEdit::singleline(&mut self.wallet_secret)
-          .vertical_align(Align::Center)
-          .password(true)
-          .frame(true)
-      );
-    });
+  fn render_confirm_state(&mut self, ui: &mut egui::Ui, core: &mut Core) {
+    let requires_bip39_passphrase = core.current_account.clone().unwrap()
+      .requires_bip39_passphrase(&core.clone());
+
+    ui.label(i18n("Wallet Password:"));
+    let wallet_response = ui.add_sized(
+      [ui.available_width(), 30.0],
+      egui::TextEdit::singleline(
+        &mut self.wallet_secret,
+      )
+        .vertical_align(Align::Center)
+        .password(true)
+        .frame(true)
+    );
+    self.next_focus(ui, Focus::WalletSecret, wallet_response.clone());
     ui.add_space(8.0);
 
-    ui.label(i18n("Payment Secret:"));
-    ui.horizontal(|ui| {
-      ui.add_sized(
+    let mut enabled = true;
+    if let Some(error) = &self.error {
+      enabled = false;
+    }
+
+    enabled &= !self.address.trim().is_empty() && 
+      !self.amount_sompi.is_none() && 
+      !self.wallet_secret.trim().is_empty() &&
+      (self.payment_secret.trim().is_empty() ^ requires_bip39_passphrase)
+    ;
+
+    if wallet_response.lost_focus() && handle_enter_key(ui) {
+      if requires_bip39_passphrase {
+        self.assign_focus(Focus::PaymentSecret);
+      } else {
+        if !*self.is_pending.lock().unwrap() {
+          if enabled {
+            let send_result_clone = Arc::clone(&self.send_result);
+            *send_result_clone.lock().unwrap() = None;
+            self.send_funds(core, self.amount_sompi.unwrap());
+          } else {
+            self.assign_focus(Focus::Amount);
+          }
+        }
+      }
+    }
+
+    if requires_bip39_passphrase {
+      ui.label(i18n("Payment Secret:"));
+      let payment_response = ui.add_sized(
         [ui.available_width(), 30.0],
-        egui::TextEdit::singleline(&mut self.payment_secret)
+        egui::TextEdit::singleline(
+          &mut self.payment_secret,
+        )
           .vertical_align(Align::Center)
           .password(true)
           .frame(true)
       );
-    });
+      self.next_focus(ui, Focus::WalletSecret, payment_response.clone());
+
+      if payment_response.lost_focus() && handle_enter_key(ui) {
+        if enabled {
+          if !*self.is_pending.lock().unwrap() {
+            let send_result_clone = Arc::clone(&self.send_result);
+            *send_result_clone.lock().unwrap() = None;
+            self.send_funds(core, self.amount_sompi.unwrap());
+          }
+        } else {
+          self.assign_focus(Focus::WalletSecret);
+        }
+      }
+    } else {
+      ui.add_space(30.0);
+    }
+
     ui.add_space(16.0);
 
     ui.horizontal(|ui| {
@@ -159,7 +236,6 @@ fn render_confirm_state(&mut self, ui: &mut egui::Ui, core: &mut Core) {
       if ui.dx_button_sized(
         i18n("Back"),
         24.0,
-        -12.0,
         Default::default(),
         vec2(button_width, 40.0),
       ).clicked() {
@@ -167,20 +243,10 @@ fn render_confirm_state(&mut self, ui: &mut egui::Ui, core: &mut Core) {
       }
       ui.add_space(8.0);
 
-      let mut enabled = true;
-      if let Some(error) = &self.error {
-        enabled = false;
-      }
-
-      enabled &= !self.address.trim().is_empty() && 
-        !self.amount_sompi.is_none() && 
-        !self.wallet_secret.trim().is_empty();
-
       if ui.dx_button_sized_enabled(
         enabled,
         i18n("Send"),
         24.0,
-        -12.0,
         Default::default(),
         vec2(button_width, 40.0),
       ).clicked() {
@@ -194,18 +260,15 @@ fn render_confirm_state(&mut self, ui: &mut egui::Ui, core: &mut Core) {
   }
 
   fn render_success_state(&mut self, ui: &mut egui::Ui) {
-    // Show the coin image
     let window_rect = ui.min_rect();
-    let image_size = Vec2::new(200.0, 200.0);
-    let rect = Rect::from_center_size(
-      pos2(
-        window_rect.center().x,
-        window_rect.min.y + image_size.y / 2.0 + 20.0
-      ),
-      image_size
+    let coin_diameter = 200.0;
+    let image_pos = pos2(
+      window_rect.center().x,
+      window_rect.min.y + (coin_diameter + 20.0) / 2.0
     );
-    WalaCoin::render(ui, rect);
-    ui.add_space(10.0);
+
+    DXImage::draw(ui, &Assets::get().wala_coin, coin_diameter, image_pos, egui::Align2::CENTER_CENTER);
+    ui.add_space(20.0);
 
     ui.heading(i18n("Transaction Success!"));
     ui.add_space(10.0);
@@ -297,9 +360,6 @@ fn render_confirm_state(&mut self, ui: &mut egui::Ui, core: &mut Core) {
                   match result {
                     Ok(response) => {
                       self.state = SendState::Success;
-                      // ui.heading(i18n("Transaction successful!"));
-                      // ui.label("");
-                      // ui.label(format!("Transaction IDs: {:?}", response.transaction_ids));
                     }
                     Err(err) => {
                       ui.label(i18n("Transaction failed."));
@@ -308,18 +368,16 @@ fn render_confirm_state(&mut self, ui: &mut egui::Ui, core: &mut Core) {
                   }
                 } else {
                   let window_rect = ui.min_rect();
-                  let image_size = Vec2::new(200.0, 200.0);
 
-                  let rect = Rect::from_center_size(
-                    pos2(
-                      window_rect.center().x,
-                      window_rect.min.y + image_size.y / 2.0
-                    ),
-                    image_size
+                  let coin_diameter = 200.0;
+                  let image_pos = pos2(
+                    window_rect.center().x,
+                    window_rect.min.y + (coin_diameter + 20.0) / 2.0
                   );
+              
+                  DXImage::draw(ui, &Assets::get().wala_coin, coin_diameter, image_pos, egui::Align2::CENTER_CENTER);
 
-                  WalaCoin::render(ui, rect);
-                  ui.add_space(10.0)
+                  ui.add_space(20.0)
                 }
               }
 

@@ -1,8 +1,11 @@
 mod toggle_switch;
 pub use toggle_switch::*;
 
-mod alt_buttons;
-pub use alt_buttons::*;
+mod dx_buttons;
+pub use dx_buttons::*;
+
+mod dx_image;
+pub use dx_image::*;
 
 mod confirm;
 pub use confirm::*;
@@ -12,6 +15,3 @@ pub use dx_spinner::*;
 
 mod qr;
 pub use qr::*;
-
-mod wala_coin;
-pub use wala_coin::*;

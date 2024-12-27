@@ -9,68 +9,68 @@ pub struct Footer {
 }
 
 impl ComponentT for Footer {
-    fn name(&self) -> Option<&'static str> {
-        Some("Footer")
-    }
+  fn name(&self) -> Option<&'static str> {
+    Some("Footer")
+  }
 
-    fn render(
-        &mut self,
-        core: &mut Core,
-        ctx: &egui::Context,
-        _frame: &mut eframe::Frame,
-        ui: &mut egui::Ui,
-    ) 
-    {
-      let footer_height = 28.0;
-      let footer_rect = ui.max_rect().shrink2(egui::vec2(0.0, ui.max_rect().height() - footer_height));
+  fn render(
+    &mut self,
+    core: &mut Core,
+    ctx: &egui::Context,
+    _frame: &mut eframe::Frame,
+    ui: &mut egui::Ui,
+  ) 
+  {
+    let footer_height = 28.0;
+    let footer_rect = ui.max_rect().shrink2(egui::vec2(0.0, ui.max_rect().height() - footer_height));
 
-      ui.allocate_ui_at_rect(footer_rect, |ui| {
-        ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
-          ui.spacing_mut().item_spacing = Vec2::ZERO;
-          ui.visuals_mut().button_frame = false;
+    ui.allocate_ui_at_rect(footer_rect, |ui| {
+      ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+        ui.spacing_mut().item_spacing = Vec2::ZERO;
+        ui.visuals_mut().button_frame = false;
 
-          ui.add_space(3.0);
+        ui.add_space(3.0);
 
-          // Settings gear icon
-          let gear_response = self.animated_gear_button(ui, ctx);
-          
-          if gear_response.clicked() {
-            self.show_settings = true;
-          }
+        // Settings gear icon
+        let gear_response = self.animated_gear_button(ui, ctx);
+        
+        if gear_response.clicked() {
+          self.show_settings = true;
+        }
 
-          ui.separator();
+        ui.separator();
 
-          // Language selection
-          self.language_select_ui(core, ui, ctx);
+        // Language selection
+        self.language_select_ui(core, ui, ctx);
 
-          ui.separator();
+        ui.separator();
 
-          // Node status
-          self.node_status(core, ui, ctx);
+        // Node status
+        self.node_status(core, ui, ctx);
 
-          ui.separator();
-        });
+        ui.separator();
       });
+    });
 
-      // Draw a line above the footer
-      let stroke = ctx.style().visuals.widgets.noninteractive.bg_stroke;
-      ui.painter().line_segment(
-        [footer_rect.left_top(), footer_rect.right_top()],
-        stroke,
-      );
+    // Draw a line above the footer
+    let stroke = ctx.style().visuals.widgets.noninteractive.bg_stroke;
+    ui.painter().line_segment(
+      [footer_rect.left_top(), footer_rect.right_top()],
+      stroke,
+    );
 
-      // Render settings window if show_settings is true
-      if self.show_settings {
-        egui::Window::new("Settings")
-          .open(&mut self.show_settings)
-          .frame(create_custom_popup(ctx))
-          .default_size([400.0, 400.0])
-          .show(ctx, |ui| {
-            let mut binding = core.clone();
-            let mut settings = binding.get_mut::<components::settings::Settings>();
-            settings.render(core, ctx, _frame, ui);
-          });
-      }
+    // Render settings window if show_settings is true
+    if self.show_settings {
+      egui::Window::new("Settings")
+        .open(&mut self.show_settings)
+        .frame(create_custom_popup(ctx))
+        .default_size([400.0, 400.0])
+        .show(ctx, |ui| {
+          let mut binding = core.clone();
+          let mut settings = binding.get_mut::<components::settings::Settings>();
+          settings.render(core, ctx, _frame, ui);
+        });
+    }
   }
 }
 
@@ -93,14 +93,18 @@ impl Footer {
             .font(egui::FontId::new(icon_size, egui::FontFamily::Name("phosphor-bold".into())))
             .color(icon_color),
         ),
-      );
+      )
+        .on_hover_cursor(egui::CursorIcon::Default)
+      ;
 
       ui.add_sized(
         [desired_width - icon_size, footer_height],
         egui::Label::new(
           egui::RichText::new(status_message).color(status_color),
-        ),
-      );
+        )
+      )
+        .on_hover_cursor(egui::CursorIcon::Default)
+      ;
 
       ui.separator();
 
@@ -108,8 +112,21 @@ impl Footer {
         [70.0, footer_height],
         egui::Label::new(
           egui::RichText::new(describe_peers(core.node_state())).color(theme_color().separator_color),
-        ),
-      );
+        )
+      )
+        .on_hover_cursor(egui::CursorIcon::Default)
+      ;
+
+      ui.separator();
+
+      ui.add_sized(
+        [165.0, footer_height],
+        egui::Label::new(
+          egui::RichText::new(describe_daa(core.node_state())).color(theme_color().separator_color),
+        )
+      )
+        .on_hover_cursor(egui::CursorIcon::Default)
+      ;
     });
   }
 

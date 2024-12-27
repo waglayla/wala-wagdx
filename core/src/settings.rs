@@ -34,8 +34,8 @@ cfg_if! {
       fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
           WaglayladNodeKind::Disabled => write!(f, "{}", i18n("Disabled")),
-          WaglayladNodeKind::Remote => write!(f, "{}", i18n("Remote")),
-          WaglayladNodeKind::IntegratedAsDaemon => write!(f, "{}", i18n("Integrated Daemon")),
+          WaglayladNodeKind::Remote => write!(f, "{}", i18n("Light")),
+          WaglayladNodeKind::IntegratedAsDaemon => write!(f, "{}", i18n("Full")),
         }
       }
     }
@@ -73,7 +73,7 @@ impl WaglayladNodeKind {
       WaglayladNodeKind::Disabled => i18n("Disables waglaylad. Required for deleting or changing the storage location. (These can be done in the Settings menu after startup)"),
       WaglayladNodeKind::Remote => i18n("Connects to a Remote Rusty Waglayla Node via wRPC."),
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::IntegratedAsDaemon => i18n("The node is spawned as a child daemon process (recommended)."),
+      WaglayladNodeKind::IntegratedAsDaemon => i18n("The node is spawned as a child daemon process (recommended, if you have the ample free storage available)."),
     }
   }
 

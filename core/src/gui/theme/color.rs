@@ -3,360 +3,176 @@ use crate::imports::*;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct ThemeColor {
-    pub name: String,
-    pub dark_mode: bool,
+  pub name: String,
+  pub dark_mode: bool,
 
-    pub waglayla_color: Color32,
-    pub hyperlink_color: Color32,
-    pub node_data_color: Color32,
-    pub balance_color: Color32,
-    pub balance_syncing_color: Color32,
-    pub error_color: Color32,
-    pub alert_color: Color32,
-    pub warning_color: Color32,
-    pub info_color: Color32,
-    pub icon_syncing_color: Color32,
-    pub icon_connected_color: Color32,
-    pub icon_color_default: Color32,
-    pub ack_color: Color32,
-    pub nack_color: Color32,
-    pub metrics_text_color: Color32,
-    pub market_default_color: Color32,
-    pub market_up_color: Color32,
-    pub market_down_color: Color32,
+  pub waglayla_color: Color32,
+  pub hyperlink_color: Color32,
+  pub node_data_color: Color32,
+  pub balance_color: Color32,
+  pub balance_syncing_color: Color32,
+  pub error_color: Color32,
+  pub alert_color: Color32,
+  pub warning_color: Color32,
+  pub info_color: Color32,
 
-    pub raised_text_color: Color32,
-    pub raised_text_shadow: Color32,
+  pub qr_background: Color32,
+  pub qr_foreground: Color32,
 
-    pub qr_background: Color32,
-    pub qr_foreground: Color32,
-    pub selection_background_color: Color32,
-    pub selection_text_color: Color32,
-    pub progress_color: Color32,
+  pub default_color: Color32,
+  pub strong_color: Color32,
 
-    pub default_color: Color32,
-    pub strong_color: Color32,
+  pub separator_color: Color32,
+  pub button_color: Color32,
+  pub toggle_active: Color32,
 
-    pub separator_color: Color32,
-    pub button_color: Color32,
-    pub toggle_active: Color32,
+  pub bg_color: Color32,
+  pub fg_color: Color32,
 
-    pub bg_color: Color32,
-    pub fg_color: Color32,
+  pub null_balance_color: Color32,
 
-    pub null_balance_color: Color32,
-
-    pub transaction_incoming: Color32,
-    pub transaction_outgoing: Color32,
-    pub transaction_external: Color32,
-    pub transaction_reorg: Color32,
-    pub transaction_batch: Color32,
-    pub transaction_stasis: Color32,
-    pub transaction_transfer_incoming: Color32,
-    pub transaction_transfer_outgoing: Color32,
-    pub transaction_change: Color32,
-
-    pub logs_info_color: Color32,
-    pub logs_error_color: Color32,
-    pub logs_warning_color: Color32,
-    pub logs_debug_color: Color32,
-    pub logs_trace_color: Color32,
-    pub logs_processed_color: Color32,
-
-    pub graph_frame_color: Color32,
-    pub performance_graph_color: Color32,
-    pub storage_graph_color: Color32,
-    pub connections_graph_color: Color32,
-    pub bandwidth_graph_color: Color32,
-    pub network_graph_color: Color32,
-
-    pub text_off_color_1: Color32,
-    pub text_off_color_2: Color32,
-    pub text_on_color_1: Color32,
-    pub text_on_color_2: Color32,
-
-    pub block_dag_separator_color: Color32,
-    pub block_dag_new_block_fill_color: Color32,
-    pub block_dag_block_fill_color: Color32,
-    pub block_dag_block_stroke_color: Color32,
-    pub block_dag_vspc_connect_color: Color32,
-    pub block_dag_parent_connect_color: Color32,
+  pub text_off_color_1: Color32,
+  pub text_off_color_2: Color32,
+  pub text_on_color_1: Color32,
+  pub text_on_color_2: Color32,
 }
 
 impl ThemeColor {
-    pub fn pink() -> Self {
-        Self {
-            name: "Waglayla".to_string(),
-            dark_mode: true,
-            waglayla_color: Color32::from_rgb(255, 182, 193),
-            hyperlink_color: Color32::from_rgb(255, 105, 180),
+  pub fn pink() -> Self {
+    Self {
+      name: "Waglayla".to_string(),
+      dark_mode: true,
+      waglayla_color: Color32::from_rgb(255, 182, 193),
+      hyperlink_color: Color32::from_rgb(255, 105, 180),
 
-            default_color: Color32::from_rgb(255, 202, 228),
-            strong_color: Color32::WHITE,
+      default_color: Color32::from_rgb(255, 202, 228),
+      strong_color: Color32::WHITE,
 
-            separator_color: Color32::from_rgb(69, 77, 99),
-            button_color: Color32::from_rgb(14, 22, 42),
-            toggle_active: Color32::from_rgb(223, 117, 141),
+      separator_color: Color32::from_rgb(69, 77, 99),
+      button_color: Color32::from_rgb(14, 22, 42),
+      toggle_active: Color32::from_rgb(223, 117, 141),
 
-            bg_color: Color32::from_rgb(223, 117, 141),
-            fg_color: Color32::from_rgb(29, 36, 55),
+      bg_color: Color32::from_rgb(223, 117, 141),
+      fg_color: Color32::from_rgb(29, 36, 55),
 
-            null_balance_color: Color32::from_rgb(251, 142, 165),
+      null_balance_color: Color32::from_rgb(251, 142, 165),
 
-            node_data_color: Color32::from_rgb(255, 192, 203),
-            balance_color: Color32::from_rgb(255, 240, 245),
-            balance_syncing_color: Color32::from_rgb(255, 182, 193),
-            error_color: Color32::from_rgb(255, 99, 71),
-            alert_color: Color32::from_rgb(255, 69, 0),
-            warning_color: Color32::from_rgb(255, 140, 0),
-            info_color: Color32::from_rgb(255, 218, 185),
-            icon_syncing_color: Color32::from_rgb(255, 165, 0),
-            icon_connected_color: Color32::from_rgb(255, 105, 180),
-            icon_color_default: Color32::from_rgb(240, 128, 128),
-            ack_color: Color32::from_rgb(255, 182, 193),
-            nack_color: Color32::from_rgb(255, 20, 147),
-            metrics_text_color: Color32::BLACK,
-            market_default_color: Color32::from_rgb(255, 182, 193),
-            market_up_color: Color32::from_rgb(255, 228, 225),
-            market_down_color: Color32::from_rgb(255, 105, 180),
+      node_data_color: Color32::from_rgb(255, 192, 203),
+      balance_color: Color32::from_rgb(255, 240, 245),
+      balance_syncing_color: Color32::from_rgb(255, 182, 193),
+      error_color: Color32::from_rgb(255, 99, 71),
+      alert_color: Color32::from_rgb(255, 69, 0),
+      warning_color: Color32::from_rgb(255, 140, 0),
+      info_color: Color32::from_rgb(255, 218, 185),
 
-            raised_text_color: Color32::from_rgb(139, 0, 139),
-            raised_text_shadow: Color32::from_rgba(255, 240, 245, 96),
+      qr_background: Color32::from_rgba(255, 240, 245, 0),
+      qr_foreground: Color32::from_rgb(255, 105, 180),
 
-            qr_background: Color32::from_rgba(255, 240, 245, 0),
-            qr_foreground: Color32::from_rgb(255, 105, 180),
-            selection_background_color: Color32::from_rgb(255, 182, 193),
-            selection_text_color: Color32::BLACK,
-            progress_color: Color32::from_rgb(255, 160, 122),
-
-            transaction_incoming: Color32::from_rgb(255, 182, 193),
-            transaction_outgoing: Color32::from_rgb(255, 105, 180),
-            transaction_transfer_incoming: Color32::from_rgb(255, 192, 203),
-            transaction_transfer_outgoing: Color32::from_rgb(255, 20, 147),
-            transaction_external: Color32::from_rgb(255, 182, 193),
-            transaction_reorg: Color32::from_rgb(255, 99, 71),
-            transaction_batch: Color32::from_rgb(255, 222, 173),
-            transaction_stasis: Color32::from_rgb(255, 160, 122),
-            transaction_change: Color32::GRAY,
-
-            logs_info_color: Color32::from_rgb(255, 218, 185),
-            logs_error_color: Color32::from_rgb(255, 99, 71),
-            logs_warning_color: Color32::from_rgb(255, 140, 0),
-            logs_debug_color: Color32::from_rgb(255, 182, 193),
-            logs_trace_color: Color32::from_rgb(255, 222, 173),
-            logs_processed_color: Color32::from_rgb(255, 160, 122),
-
-            graph_frame_color: Color32::from_rgb(255, 228, 225),
-            performance_graph_color: Color32::from_rgb(255, 182, 193),
-            storage_graph_color: Color32::from_rgb(255, 160, 122),
-            connections_graph_color: Color32::from_rgb(255, 218, 185),
-            bandwidth_graph_color: Color32::from_rgb(255, 105, 180),
-            network_graph_color: Color32::from_rgb(255, 182, 193),
-
-            text_off_color_1: Color32::from_rgb(14, 22, 42),
-            text_off_color_2: Color32::from_rgb(4, 7, 12),
-            text_on_color_1: Color32::WHITE,
-            text_on_color_2: Color32::from_rgb(255, 175, 210),
-
-            block_dag_separator_color: Color32::from_rgb(255, 182, 193),
-            block_dag_new_block_fill_color: Color32::from_rgb(255, 228, 225),
-            block_dag_block_fill_color: Color32::from_rgb(255, 160, 122),
-            block_dag_block_stroke_color: Color32::from_rgb(255, 69, 0),
-            block_dag_vspc_connect_color: Color32::from_rgb(255, 182, 193),
-            block_dag_parent_connect_color: Color32::from_rgba_premultiplied(255, 192, 203, 220),
-        }
+      text_off_color_1: Color32::from_rgb(14, 22, 42),
+      text_off_color_2: Color32::from_rgb(4, 7, 12),
+      text_on_color_1: Color32::WHITE,
+      text_on_color_2: Color32::from_rgb(255, 175, 210),
     }
+  }
 
-    pub fn dark() -> Self {
-        Self {
-            name: i18n("Carbon").to_string(),
-            dark_mode: true,
-            waglayla_color: Color32::from_rgb(58, 221, 190),
-            hyperlink_color: Color32::from_rgb(141, 184, 178),
+  pub fn dark() -> Self {
+    Self {
+      name: i18n("Carbon").to_string(),
+      dark_mode: true,
+      waglayla_color: Color32::from_rgb(58, 221, 190),
+      hyperlink_color: Color32::from_rgb(141, 184, 178),
 
-            default_color: Color32::from_rgb(164, 164, 164),
-            strong_color: Color32::from_rgb(223, 117, 141),
+      default_color: Color32::from_rgb(164, 164, 164),
+      strong_color: Color32::from_rgb(223, 117, 141),
 
-            separator_color: Color32::from_rgb(60, 60, 60),
-            button_color: Color32::from_rgb(13, 13, 13),
-            toggle_active: Color32::from_rgb(223, 117, 141),
+      separator_color: Color32::from_rgb(60, 60, 60),
+      button_color: Color32::from_rgb(13, 13, 13),
+      toggle_active: Color32::from_rgb(223, 117, 141),
 
-            bg_color: Color32::from_rgb(13, 13, 13),
-            fg_color: Color32::from_rgb(27, 27, 27),
+      bg_color: Color32::from_rgb(13, 13, 13),
+      fg_color: Color32::from_rgb(27, 27, 27),
 
-            null_balance_color: Color32::from_rgb(22, 22, 22),
+      null_balance_color: Color32::from_rgb(22, 22, 22),
 
-            node_data_color: Color32::WHITE,
-            balance_color: Color32::WHITE,
-            balance_syncing_color: Color32::DARK_GRAY,
-            error_color: Color32::from_rgb(255, 136, 136),
-            alert_color: Color32::from_rgb(255, 136, 136),
-            warning_color: egui::Color32::from_rgb(255, 255, 136),
-            info_color: egui::Color32::from_rgb(66, 178, 252),
-            icon_syncing_color: egui::Color32::from_rgb(255, 255, 136),
-            icon_connected_color: egui::Color32::from_rgb(85, 233, 136),
-            icon_color_default: Color32::from_rgb(240, 240, 240),
-            ack_color: Color32::from_rgb(100, 200, 100),
-            nack_color: Color32::from_rgb(200, 100, 100),
-            metrics_text_color: Color32::from_rgb(230, 230, 230),
-            market_default_color: Color32::from_rgb(240, 240, 240),
-            market_up_color: Color32::from_rgb(136, 255, 136),
-            market_down_color: Color32::from_rgb(255, 136, 136),
+      node_data_color: Color32::WHITE,
+      balance_color: Color32::WHITE,
+      balance_syncing_color: Color32::DARK_GRAY,
+      error_color: Color32::from_rgb(255, 136, 136),
+      alert_color: Color32::from_rgb(255, 136, 136),
+      warning_color: egui::Color32::from_rgb(255, 255, 136),
+      info_color: egui::Color32::from_rgb(66, 178, 252),
 
-            raised_text_color: Color32::from_rgb(255, 255, 255),
-            raised_text_shadow: Color32::from_rgba(0, 0, 0, 96),
+      qr_background: Color32::from_rgba(0, 0, 0, 0),
+      qr_foreground: Color32::WHITE,
 
-            qr_background: Color32::from_rgba(0, 0, 0, 0),
-            qr_foreground: Color32::WHITE,
-            selection_background_color: Color32::from_rgb(50, 50, 50),
-            selection_text_color: Color32::from_rgb(255, 255, 255),
-            progress_color: Color32::from_rgb(71, 105, 97),
-
-            transaction_incoming: Color32::from_rgb(162, 245, 187),
-            transaction_outgoing: Color32::from_rgb(245, 162, 162),
-            transaction_transfer_incoming: Color32::from_rgb(162, 245, 187),
-            transaction_transfer_outgoing: Color32::from_rgb(245, 162, 162),
-            transaction_external: Color32::from_rgb(162, 245, 187),
-            transaction_reorg: Color32::from_rgb(79, 64, 64),
-            transaction_batch: Color32::GRAY,
-            transaction_stasis: Color32::GRAY,
-            transaction_change: Color32::GRAY,
-
-            logs_info_color: Color32::WHITE,
-            logs_error_color: Color32::LIGHT_RED,
-            logs_warning_color: Color32::LIGHT_YELLOW,
-            logs_debug_color: Color32::LIGHT_BLUE,
-            logs_trace_color: Color32::LIGHT_GRAY,
-            logs_processed_color: Color32::LIGHT_GREEN,
-
-            graph_frame_color: Color32::GRAY,
-            performance_graph_color: Color32::from_rgb(186, 238, 255),
-            storage_graph_color: Color32::from_rgb(255, 231, 186),
-            connections_graph_color: Color32::from_rgb(241, 255, 186),
-            bandwidth_graph_color: Color32::from_rgb(196, 255, 199),
-            network_graph_color: Color32::from_rgb(186, 255, 241),
-
-            text_off_color_1: Color32::from_rgb(96, 96, 96),
-            text_off_color_2: Color32::from_rgb(27, 27, 27),
-            text_on_color_1: Color32::from_rgb(223, 117, 141),
-            text_on_color_2: Color32::from_rgb(137, 137, 137),
-
-            block_dag_separator_color: Color32::from_rgb(220, 220, 220),
-            block_dag_new_block_fill_color: Color32::from_rgb(220, 220, 220),
-            block_dag_block_fill_color: Color32::from_rgb(173, 216, 230),
-            block_dag_block_stroke_color: Color32::from_rgb(15, 84, 77),
-            block_dag_vspc_connect_color: Color32::from_rgb(23, 150, 137),
-            block_dag_parent_connect_color: Color32::from_rgba_premultiplied(173, 216, 230, 220),
-        }
+      text_off_color_1: Color32::from_rgb(96, 96, 96),
+      text_off_color_2: Color32::from_rgb(27, 27, 27),
+      text_on_color_1: Color32::from_rgb(223, 117, 141),
+      text_on_color_2: Color32::from_rgb(137, 137, 137),
     }
+  }
 
-    pub fn light() -> Self {
-        Self {
-            name: i18n("Sakura").to_string(),
-            dark_mode: false,
-            waglayla_color: Color32::from_rgb(58, 221, 190),
-            hyperlink_color: Color32::from_rgb(15, 84, 73),
+  pub fn light() -> Self {
+    Self {
+      name: i18n("Sakura").to_string(),
+      dark_mode: false,
+      waglayla_color: Color32::from_rgb(58, 221, 190),
+      hyperlink_color: Color32::from_rgb(15, 84, 73),
 
-            default_color: Color32::from_rgb(255, 99, 160),
-            strong_color: Color32::from_rgb(239, 42, 139),
+      default_color: Color32::from_rgb(255, 99, 160),
+      strong_color: Color32::from_rgb(239, 42, 139),
 
-            separator_color: Color32::from_rgb(255, 255, 255),
-            button_color: Color32::from_rgb(255, 227, 244),
-            toggle_active: Color32::from_rgb(255, 99, 160),
+      separator_color: Color32::from_rgb(255, 255, 255),
+      button_color: Color32::from_rgb(255, 227, 244),
+      toggle_active: Color32::from_rgb(255, 99, 160),
 
-            bg_color: Color32::WHITE,
-            fg_color: Color32::from_rgb(255, 196, 225),
+      bg_color: Color32::WHITE,
+      fg_color: Color32::from_rgb(255, 196, 225),
 
-            null_balance_color: Color32::from_rgb(255, 232, 238),
+      null_balance_color: Color32::from_rgb(255, 232, 238),
 
-            node_data_color: Color32::BLACK,
-            balance_color: Color32::BLACK,
-            balance_syncing_color: Color32::LIGHT_GRAY,
-            error_color: Color32::from_rgb(77, 41, 41),
-            alert_color: Color32::from_rgb(77, 41, 41),
-            warning_color: egui::Color32::from_rgb(77, 77, 41),
-            info_color: egui::Color32::from_rgb(41, 56, 77),
-            icon_syncing_color: egui::Color32::from_rgb(117, 117, 4),
-            icon_connected_color: egui::Color32::from_rgb(8, 110, 65),
-            icon_color_default: Color32::from_rgb(32, 32, 32),
-            ack_color: Color32::from_rgb(100, 200, 100),
-            nack_color: Color32::from_rgb(200, 100, 100),
-            metrics_text_color: Color32::from_rgb(20, 20, 20),
-            market_default_color: Color32::from_rgb(20, 20, 20),
-            market_up_color: Color32::from_rgb(41, 77, 41),
-            market_down_color: Color32::from_rgb(77, 41, 41),
+      node_data_color: Color32::BLACK,
+      balance_color: Color32::BLACK,
+      balance_syncing_color: Color32::LIGHT_GRAY,
+      error_color: Color32::from_rgb(255, 69, 0),
+      alert_color: Color32::from_rgb(255, 69, 0),
+      warning_color: egui::Color32::from_rgb(77, 77, 41),
+      info_color: egui::Color32::from_rgb(41, 56, 77),
 
-            raised_text_color: Color32::from_rgb(0, 0, 0),
-            raised_text_shadow: Color32::from_rgba(255, 255, 255, 64),
+      qr_background: Color32::from_rgba(255, 255, 255, 0),
+      qr_foreground: Color32::BLACK,
 
-            qr_background: Color32::from_rgba(255, 255, 255, 0),
-            qr_foreground: Color32::BLACK,
-            selection_background_color: Color32::from_rgb(165, 201, 197),
-            selection_text_color: Color32::from_rgb(20, 20, 20),
-            progress_color: Color32::from_rgb(165, 201, 197),
-
-            transaction_incoming: Color32::from_rgb(15, 77, 35),
-            transaction_outgoing: Color32::from_rgb(77, 15, 15),
-            transaction_transfer_incoming: Color32::from_rgb(15, 77, 35),
-            transaction_transfer_outgoing: Color32::from_rgb(77, 15, 15),
-            transaction_external: Color32::from_rgb(15, 77, 35),
-            transaction_change: Color32::GRAY,
-            transaction_reorg: Color32::from_rgb(38, 31, 31),
-            transaction_batch: Color32::GRAY,
-            transaction_stasis: Color32::GRAY,
-
-            logs_info_color: Color32::BLACK,
-            logs_error_color: Color32::DARK_RED,
-            logs_warning_color: Color32::BROWN,
-            logs_debug_color: Color32::DARK_BLUE,
-            logs_trace_color: Color32::DARK_GRAY,
-            logs_processed_color: Color32::DARK_GREEN,
-
-            graph_frame_color: Color32::GRAY,
-            performance_graph_color: Color32::from_rgb(56, 71, 77),
-            storage_graph_color: Color32::from_rgb(77, 69, 56),
-            connections_graph_color: Color32::from_rgb(72, 77, 56),
-            bandwidth_graph_color: Color32::from_rgb(59, 77, 60),
-            network_graph_color: Color32::from_rgb(56, 77, 72),
-
-            text_off_color_1: Color32::from_rgb(255, 196, 225),
-            text_off_color_2: Color32::LIGHT_GRAY,
-            text_on_color_1: Color32::from_rgb(239, 42, 139),
-            text_on_color_2: Color32::DARK_GRAY,
-
-            block_dag_separator_color: Color32::from_rgb(120, 120, 120),
-            block_dag_new_block_fill_color: Color32::from_rgb(220, 220, 220),
-            block_dag_block_fill_color: Color32::from_rgb(201, 230, 240),
-            block_dag_block_stroke_color: Color32::from_rgb(42, 51, 50),
-            block_dag_vspc_connect_color: Color32::from_rgb(11, 77, 70),
-            block_dag_parent_connect_color: Color32::from_rgba_premultiplied(0, 0, 0, 72),
-        }
+      text_off_color_1: Color32::from_rgb(255, 196, 225),
+      text_off_color_2: Color32::LIGHT_GRAY,
+      text_on_color_1: Color32::from_rgb(239, 42, 139),
+      text_on_color_2: Color32::DARK_GRAY,
     }
+  }
 }
 
 impl Default for ThemeColor {
-    fn default() -> Self {
-        Self::pink()
-    }
+  fn default() -> Self {
+    Self::pink()
+  }
 }
 
 impl ThemeColor {
-    pub fn name(&self) -> &str {
-        &self.name
-    }
+  pub fn name(&self) -> &str {
+    &self.name
+  } 
 }
 
 static mut THEME_COLOR_LIST: Option<HashMap<String, ThemeColor>> = None;
 pub fn theme_colors() -> &'static HashMap<String, ThemeColor> {
-    unsafe {
-        THEME_COLOR_LIST.get_or_insert_with(|| {
-            let mut themes = HashMap::new();
-            [ThemeColor::pink(), ThemeColor::dark(), ThemeColor::light()]
-                .into_iter()
-                .for_each(|theme| {
-                    themes.insert(theme.name.clone(), theme.clone());
-                });
-            themes
-        })
-    }
+  unsafe {
+    THEME_COLOR_LIST.get_or_insert_with(|| {
+      let mut themes = HashMap::new();
+      [ThemeColor::pink(), ThemeColor::dark(), ThemeColor::light()]
+        .into_iter()
+        .for_each(|theme| {
+          themes.insert(theme.name.clone(), theme.clone());
+        });
+      themes
+    })
+  }
 }

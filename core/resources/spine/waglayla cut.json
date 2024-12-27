@@ -1,0 +1,29 @@
+{ "skeleton": { "images": "F:/WALA Assets/Graphics/images/" },
+"PhotoshopToSpine": { "scale": 1, "padding": 1, "trim": true },
+"bones": [
+	{ "name": "root" }
+],
+"slots": [
+	{ "name": "tail", "bone": "root", "attachment": "tail" },
+	{ "name": "body", "bone": "root", "attachment": "body" },
+	{ "name": "head", "bone": "root", "attachment": "head" },
+	{ "name": "tongue", "bone": "root", "attachment": "tongue" }
+],
+"skins": {
+	"default": {
+		"tail": {
+			"tail": { "x": 1396, "y": -1210, "width": 374, "height": 512 }
+		},
+		"body": {
+			"body": { "x": 777.5, "y": -1208, "width": 1161, "height": 1354 }
+		},
+		"head": {
+			"head": { "x": 720.5, "y": -468, "width": 1441, "height": 934 }
+		},
+		"tongue": {
+			"tongue": { "x": 663.5, "y": -863, "width": 95, "height": 68 }
+		}
+	}
+},
+"animations": { "animation": {} }
+}

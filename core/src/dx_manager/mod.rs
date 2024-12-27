@@ -215,51 +215,51 @@ pub fn manager() -> DX_Manager {
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn halt() {
-    if let Some(runtime) = try_manager() {
-        runtime.try_send(Events::Exit).ok();
-        runtime.waglayla_service().clone().terminate();
+  if let Some(runtime) = try_manager() {
+    runtime.try_send(Events::Exit).ok();
+    runtime.waglayla_service().clone().terminate();
 
-        let handle = tokio::spawn(async move { runtime.shutdown().await });
+    let handle = tokio::spawn(async move { runtime.shutdown().await });
 
-        while !handle.is_finished() {
-            std::thread::sleep(std::time::Duration::from_millis(50));
-        }
+    while !handle.is_finished() {
+      std::thread::sleep(std::time::Duration::from_millis(50));
     }
+  }
 }
 
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn abort() {
-    const TIMEOUT: u128 = 5000;
-    let flag = Arc::new(AtomicBool::new(false));
-    let flag_ = flag.clone();
-    let thread = std::thread::Builder::new()
-        .name("halt".to_string())
-        .spawn(move || {
-            let start = std::time::Instant::now();
-            while !flag_.load(Ordering::SeqCst) {
-                if start.elapsed().as_millis() > TIMEOUT {
-                    println!("halting...");
-                    std::process::exit(1);
-                }
-                std::thread::sleep(std::time::Duration::from_millis(50));
-            }
-        })
-        .ok();
+  const TIMEOUT: u128 = 5000;
+  let flag = Arc::new(AtomicBool::new(false));
+  let flag_ = flag.clone();
+  let thread = std::thread::Builder::new()
+    .name("halt".to_string())
+    .spawn(move || {
+      let start = std::time::Instant::now();
+      while !flag_.load(Ordering::SeqCst) {
+        if start.elapsed().as_millis() > TIMEOUT {
+          println!("halting...");
+          std::process::exit(1);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+      }
+    })
+    .ok();
 
-    halt();
+  halt();
 
-    flag.store(true, Ordering::SeqCst);
-    if let Some(thread) = thread {
-        thread.join().unwrap();
-    }
+  flag.store(true, Ordering::SeqCst);
+  if let Some(thread) = thread {
+    thread.join().unwrap();
+  }
 
-    #[cfg(feature = "console")]
-    {
-        println!("Press Enter to exit...");
-        let mut input = String::new();
-        let _ = std::io::stdin().read_line(&mut input);
-    }
+  #[cfg(feature = "console")]
+  {
+    println!("Press Enter to exit...");
+    let mut input = String::new();
+    let _ = std::io::stdin().read_line(&mut input);
+  }
 
-    std::process::exit(1);
+  std::process::exit(1);
 }

@@ -6,14 +6,17 @@ use core::cmp::max;
 
 use components::wallet_ui::BOTTOM_SPACE; // wtf rust why do I need this
 
-pub type UnlockResult = std::result::Result<Option<Vec<AccountDescriptor>>, waglayla_wallet_core::error::Error>;
-
 #[derive(Clone, Default)]
 pub enum State {
   #[default]
   Idle,
   Unlock { wallet_descriptor : WalletDescriptor, error : Option<String>},
 }
+
+define_indexed_enum!(
+  Focus,
+  WalletSecret
+);
 
 pub struct OpenWallet {
   #[allow(dead_code)]
@@ -23,7 +26,10 @@ pub struct OpenWallet {
   pub message: Option<String>,
   pub unlock_result: Arc<Mutex<Option<UnlockResult>>>,
   pub is_pending: Arc<Mutex<bool>>,
+  focus_context: FocusContext,
 }
+
+impl_has_focus_context!(OpenWallet);
 
 impl OpenWallet {
   pub fn new(manager: DX_Manager) -> Self {
@@ -34,11 +40,13 @@ impl OpenWallet {
       message: None,
       unlock_result: Arc::new(Mutex::new(None)),
       is_pending: Arc::new(Mutex::new(false)),
+      focus_context: FocusContext { focus: Focus::WalletSecret.to_u32().unwrap() },
     }
   }
 
   pub fn open(&mut self, wallet_descriptor: WalletDescriptor) {
     self.state = State::Unlock { wallet_descriptor, error : None};
+    self.assign_focus(Focus::WalletSecret);
   }
 }
 
@@ -76,7 +84,7 @@ impl ComponentT for OpenWallet {
       State::Unlock { wallet_descriptor, error } => {
         let wallet_descriptor_delegate = wallet_descriptor.clone();
 
-        let action = render_centered_content(ctx, ui, i18n("Unlock Wallet"), |ui| {
+        let action = render_centered_content(ctx, ui, i18n("Unlock Wallet"), 180.0, |ui| {
           ui.vertical_centered(|ui| {
             ui.heading(format!(
               "{} \"{}\"",
@@ -108,14 +116,24 @@ impl ComponentT for OpenWallet {
                 .hint_text(i18n("Enter password"))
                 .font(egui::FontId::proportional(font_size)),
             );
+            self.next_focus(ui, Focus::WalletSecret, response.clone());
 
+            let enter = 
+              !self.wallet_secret.trim().is_empty() && 
+              response.lost_focus() && 
+              handle_enter_key(ui)
+            ;
+              
             ui.add_space(20.);
 
-            if ui.dx_large_button_enabled(!self.wallet_secret.trim().is_empty(), i18n("Unlock")).clicked() {
+            if 
+              enter ||
+              ui.dx_large_button_enabled(!self.wallet_secret.trim().is_empty(), i18n("Unlock")).clicked() 
+            {
               if !*self.is_pending.lock().unwrap() {      
                 *self.is_pending.lock().unwrap() = true;
                 let wallet_secret = Secret::new(self.wallet_secret.as_bytes().to_vec());
-                self.wallet_secret = "".to_string(); // Clear sensitive data
+                self.wallet_secret.zeroize();
                 let wallet = self.manager.wallet().clone();
                 let wallet_descriptor_delegate = wallet_descriptor.clone();
                 let unlock_result_clone = Arc::clone(&self.unlock_result);
@@ -145,7 +163,7 @@ impl ComponentT for OpenWallet {
           self.state = next_state;
         }
         WizardAction::Back => {
-          self.wallet_secret = "".to_string();
+          self.wallet_secret.zeroize();
           core.set_active_component::<components::wallet_ui::CreateWallet>();
         }
         _ => {}
@@ -168,7 +186,7 @@ impl ComponentT for OpenWallet {
         let rounding = if is_fullscreen || is_maximized {
           0.0
         } else {
-          crate::frame::WINDOW_ROUNDING
+          crate::gui::frame::WINDOW_ROUNDING
         };
 
         let mut response = ui.allocate_rect(
@@ -218,6 +236,7 @@ impl ComponentT for OpenWallet {
                   self.state = Default::default();
                 }
                 Err(err) => {
+                  self.assign_focus(Focus::WalletSecret);
                   self.state = State::Unlock {
                     wallet_descriptor,
                     error: Some(err.to_string()),

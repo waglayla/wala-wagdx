@@ -20,8 +20,7 @@ pub struct ViewWallet {
   pub state: State,
   pub message: Option<String>,
   pub info: WalletBiscuit,
-  // pub tx_result: Arc<Mutex<Option<UnlockResult>>>,
-  pub is_pending: Arc<Mutex<bool>>,
+  pub transactions: WalletTransactions,
 }
 
 impl ViewWallet {
@@ -31,8 +30,7 @@ impl ViewWallet {
       state: State::Info,
       message: None,
       info: Default::default(),
-      // tx_result: Arc::new(Mutex::new(None)),
-      is_pending: Arc::new(Mutex::new(false)),
+      transactions: Default::default(),
     }
   }
 
@@ -70,14 +68,39 @@ impl ComponentT for ViewWallet {
       .inner_margin(20.0)
       .show(ui, |ui| 
     {
-      egui::ScrollArea::vertical()
-        .show(ui, |ui| 
-      {
-        ui.set_style(style);
-        ui.vertical_centered(|ui| {
-          self.info.render(core, ctx, ui)
-        });
+      ui.set_style(style);
+      ui.vertical_centered(|ui| {
+        self.info.render(core, ctx, ui);
+        ui.add_space(16.0);
+        self.render_tx_header(ui);
+        ui.add_space(56.0);
+        self.transactions.render(core, ctx, ui);
       });
     });
+  }
+}
+
+impl ViewWallet {
+  fn render_tx_header(&self, ui: &mut egui::Ui) {
+    let text = i18n("Transaction History");
+    let font_id = egui::FontId::new(50.0, get_font_family("DINishCondensed", true, false));
+    let galley = ui.fonts(|f| {
+      f.layout_no_wrap(text.to_string(), font_id.clone(), theme_color().strong_color)
+    });
+
+    let available_rect = ui.available_rect_before_wrap();
+    let text_pos = egui::pos2(
+      available_rect.center().x - galley.size().x / 2.0,
+      available_rect.top() - 12.0,
+    );
+
+    let painter = ui.painter();
+    painter.text(
+      text_pos,
+      egui::Align2::LEFT_TOP,
+      text,
+      egui::FontId::new(50.0, get_font_family("DINishCondensed", true, false)),
+      theme_color().strong_color,
+    );
   }
 }

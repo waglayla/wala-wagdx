@@ -84,7 +84,7 @@ struct Inner {
   balance: Mutex<Option<Balance>>,
   descriptor: Mutex<AccountDescriptor>,
   context: Mutex<Option<Arc<AccountContext>>>,
-  // transactions: Mutex<TransactionCollection>,
+  transactions: Mutex<TransactionCollection>,
   max_spend: AtomicU64,
   total_transaction_count: AtomicU64,
   is_loading: AtomicBool,
@@ -100,7 +100,7 @@ impl Inner {
       balance: Mutex::new(None),
       descriptor: Mutex::new(descriptor),
       context: Mutex::new(context),
-      // transactions: Mutex::new(TransactionCollection::default()),
+      transactions: Mutex::new(TransactionCollection::default()),
       max_spend: AtomicU64::new(0),
       total_transaction_count: AtomicU64::new(0),
       is_loading: AtomicBool::new(true),
@@ -200,9 +200,13 @@ impl Account {
   }
 
   
-  // pub fn transactions(&self) -> MutexGuard<'_, TransactionCollection> {
-  //   self.inner.transactions.lock().unwrap()
-  // }
+  pub fn transactions(&self) -> MutexGuard<'_, TransactionCollection> {
+    self.inner.transactions.lock().unwrap()
+  }
+
+  pub fn transactions_mut(&self) -> MutexGuard<'_, TransactionCollection> {
+    self.inner.transactions.lock().unwrap()
+  }
 
   pub fn id(&self) -> AccountId {
     self.inner.id
@@ -238,7 +242,6 @@ impl Account {
 
   pub fn update_theme(&self) {
     let descriptor = self.descriptor().clone();
-    // *self.inner.context.lock().unwrap() = AccountContext::new(&descriptor);
   }
 
   pub fn context(&self) -> Option<Arc<AccountContext>> {
@@ -248,55 +251,11 @@ impl Account {
   pub fn update(&self, descriptor: AccountDescriptor) {
     println!("$$$$$ UPDATING ACCOUNT: {:?}", descriptor);
 
-    // *self.inner.context.lock().unwrap() = AccountContext::new(&descriptor);
     *self.inner.descriptor.lock().unwrap() = descriptor;
-  }
-
-  fn calculate_max_spendable_amount(summary: &GeneratorSummary) -> Option<u64> {
-    // Use the GeneratorSummary fields to create a simulated transaction
-    let total_mass = estimate_tx_mass_from_summary(summary, 1, 0);
-
-    // Check if the transaction mass exceeds the max limit
-    if total_mass > 500000 {
-      return None;
-    }
-
-    // Calculate the max spendable amount based on remaining mass
-    let remaining_mass = 500000 - total_mass;
-    Some(remaining_mass) // Return the max spendable amount
   }
 
   pub fn update_balance(&self, balance: Option<Balance>) -> Result<()> {
     *self.inner.balance.lock().unwrap() = balance;
-
-    let self_clone = self.clone();
-    tokio::spawn(async move {
-      let estimate_result = manager().wallet().accounts_estimate_call(AccountsEstimateRequest {
-        account_id: self_clone.inner.id,
-        destination: PaymentDestination::Change, // Use a Change destination
-        priority_fee_sompi: Fees::None,          // Replace with appropriate fees
-        payload: None,
-      }).await;
-
-      match estimate_result {
-        Ok(response) => {
-          let summary = response.generator_summary;
-
-          println!("Summary: {}", summary);
-
-          // Use the mass calculation function to determine max spend
-          if let Some(max_spend) = Self::calculate_max_spendable_amount(&summary) {
-            self_clone.inner.max_spend.store(max_spend, Ordering::SeqCst);
-
-            // println!("Max spendable amount updated: {}", max_spend);
-          }
-        }
-        Err(err) => {
-          // println!("Failed to estimate transaction: {}", err);
-        }
-      }
-    });
-
     Ok(())
   }
 
@@ -322,26 +281,25 @@ impl Account {
     self.inner.total_transaction_count.load(Ordering::SeqCst)
   }
 
-  // pub fn load_transactions(
-  //   &self,
-  //   mut transactions: Vec<Arc<TransactionRecord>>,
-  //   total: u64,
-  // ) -> Result<()> {
-  //   // TODO - pagination
-  //   self.transactions().clear();
+  pub fn load_transactions(
+    &self,
+    mut transactions: Vec<Arc<TransactionRecord>>,
+    total: u64,
+  ) -> Result<()> {
+    self.transactions().clear();
 
-  //   transactions.sort_by(|a, b| b.block_daa_score.cmp(&a.block_daa_score));
+    transactions.sort_by(|a, b| b.block_daa_score.cmp(&a.block_daa_score));
 
-  //   self.set_transaction_count(total);
-  //   self.transactions()
-  //       .load(transactions.into_iter().map(|t| t.into()));
+    self.set_transaction_count(total);
+    self.transactions()
+      .load(transactions.into_iter().map(|t| t.into()));
 
-  //   Ok(())
-  // }
+    Ok(())
+  }
 
   pub fn clear_transactions(&self) {
     self.set_transaction_count(0);
-    // self.transactions().clear();
+    self.transactions().clear();
   }
 }
 
@@ -368,8 +326,8 @@ pub trait DescribeAccount {
 impl DescribeAccount for AccountKind {
   fn describe(&self) -> (&'static str, &'static str) {
     match self.as_ref() {
-      LEGACY_ACCOUNT_KIND => ("Legacy Account", "KDX, PWA (waglayla.io)"),
-      BIP32_ACCOUNT_KIND => ("Waglayla Core BIP32", "waglaylawallet, kaspium"),
+      LEGACY_ACCOUNT_KIND => ("Legacy Account", "N/A"),
+      BIP32_ACCOUNT_KIND => ("Waglayla Core BIP32", "waglayla-cli wallet"),
       MULTISIG_ACCOUNT_KIND => ("Multi-Signature", ""),
       KEYPAIR_ACCOUNT_KIND => ("Keypair", "secp256k1"),
       _ => ("", ""),

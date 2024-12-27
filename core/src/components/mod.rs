@@ -1,53 +1,62 @@
 use std::any::type_name;
+use seq_macro::seq;
 
 use crate::imports::*;
 
 pub mod outline;
+pub use outline::*;
+
 pub mod hello;
+pub use hello::*;
+
 pub mod blank;
+pub use blank::*;
+
 pub mod console;
+pub use console::*;
+
 pub mod welcome;
-pub mod settings;
+pub use welcome::*;
+
 pub mod footer;
+pub use footer::*;
+
 pub mod wallet_ui;
+pub use wallet_ui::*;
 
-// waglayla_ng_macros::register_modules!(
-//     register_generic_modules,
-//     [
-//         account_create,
-//         account_manager,
-//         donations,
-//         export,
-//         import,
-//         overview,
-//         private_key_create,
-//         request,
-//         scanner,
-//         settings,
-//         testing,
-//         wallet_create,
-//         wallet_open,
-//         wallet_secret,
-//         welcome,
-//     ]
-// );
+pub mod about;
+pub use about::*;
 
-// #[cfg(not(target_arch = "wasm32"))]
-// waglayla_ng_macros::register_modules!(register_native_modules, [changelog, logs, node,]);
+pub mod focus;
+pub use focus::*;
 
-// #[cfg(not(feature = "lean"))]
-// waglayla_ng_macros::register_modules!(register_advanced_modules, [block_dag, metrics,]);
+pub mod donate;
+pub use donate::*;
 
-pub enum ComponentStyle {
-  Mobile,
-  Default,
-}
+// --
+
+pub mod settings;
+
+// --
 
 pub enum ComponentCaps {
   Desktop,
   Mobile,
   WebApp,
   Extension,
+}
+
+pub enum WizardAction {
+  Back,
+  Next(State),
+  NoAction,
+}
+
+#[derive(Default, Clone)]
+pub enum ComponentStyle {
+  #[default]
+  Default,
+  Mobile
 }
 
 pub trait WizardActionTrait {
@@ -61,6 +70,10 @@ pub trait ComponentT: Downcast {
     None
   }
 
+  fn style(&self) -> ComponentStyle {
+    ComponentStyle::Default
+  }
+
   fn modal(&self) -> bool {
     false
   }
@@ -69,18 +82,10 @@ pub trait ComponentT: Downcast {
     false
   }
 
-  fn style(&self) -> ComponentStyle {
-    // ComponentStyle::Large
-    ComponentStyle::Default
-  }
-
   fn status_bar(&self, _core: &mut Core, _ui: &mut Ui) {}
   fn activate(&mut self, _core: &mut Core) {}
   fn deactivate(&mut self, _core: &mut Core) {}
   fn reset(&mut self, _core: &mut Core) {}
-  // fn connect(&mut self, _core: &mut Core, _network: Network) {}
-  // fn disconnect(&mut self, _core: &mut Core) {}
-  // fn network_change(&mut self, _core: &mut Core, _network: Network) {}
   fn hide(&mut self, _core: &mut Core) {}
   fn show(&mut self, _core: &mut Core) {}
 
@@ -103,7 +108,7 @@ pub struct Inner {
   pub name: String,
   pub type_name: String,
   pub type_id: TypeId,
-  pub module: Rc<RefCell<dyn ComponentT>>,
+  pub component: Rc<RefCell<dyn ComponentT>>,
 }
 
 #[derive(Clone)]
@@ -113,43 +118,31 @@ pub struct Component {
 
 impl Component {
   pub fn init(&self, core: &mut Core) {
-    self.inner.module.borrow_mut().init(core)
+    self.inner.component.borrow_mut().init(core)
   }
 
   pub fn activate(&self, core: &mut Core) {
-    self.inner.module.borrow_mut().activate(core)
+    self.inner.component.borrow_mut().activate(core)
   }
 
   pub fn deactivate(&self, core: &mut Core) {
-    self.inner.module.borrow_mut().deactivate(core)
+    self.inner.component.borrow_mut().deactivate(core)
   }
 
   pub fn reset(&self, core: &mut Core) {
-    self.inner.module.borrow_mut().reset(core)
+    self.inner.component.borrow_mut().reset(core)
   }
 
-  // pub fn connect(&self, core: &mut Core, network: Network) {
-  //   self.inner.module.borrow_mut().connect(core, network)
-  // }
-
-  // pub fn disconnect(&self, core: &mut Core) {
-  //   self.inner.module.borrow_mut().disconnect(core)
-  // }
-
-  // pub fn network_change(&self, core: &mut Core, network: Network) {
-  //   self.inner.module.borrow_mut().network_change(core, network)
-  // }
-
   pub fn hide(&self, core: &mut Core) {
-    self.inner.module.borrow_mut().hide(core)
+    self.inner.component.borrow_mut().hide(core)
   }
 
   pub fn show(&self, core: &mut Core) {
-    self.inner.module.borrow_mut().show(core)
+    self.inner.component.borrow_mut().show(core)
   }
 
   pub fn status_bar(&self, core: &mut Core, ui: &mut Ui) {
-    self.inner.module.borrow_mut().status_bar(core, ui)
+    self.inner.component.borrow_mut().status_bar(core, ui)
   }
 
   pub fn render(
@@ -159,18 +152,10 @@ impl Component {
     frame: &mut eframe::Frame,
     ui: &mut egui::Ui,
   ) {
-    let mut module = self.inner.module.borrow_mut();
+    let mut component = self.inner.component.borrow_mut();
+    ui.style_mut().text_styles = core.default_style.text_styles.clone();
 
-    match module.style() {
-      ComponentStyle::Mobile => {
-        ui.style_mut().text_styles = core.mobile_style.text_styles.clone();
-      }
-      ComponentStyle::Default => {
-        ui.style_mut().text_styles = core.default_style.text_styles.clone();
-      }
-    }
-
-    module.render(core, ctx, frame, ui)
+    component.render(core, ctx, frame, ui)
   }
 
   pub fn render_default(
@@ -180,25 +165,25 @@ impl Component {
     frame: &mut eframe::Frame,
     ui: &mut egui::Ui,
   ) {
-    let mut module = self.inner.module.borrow_mut();
+    let mut component = self.inner.component.borrow_mut();
 
-    module.render(core, ctx, frame, ui)
+    component.render(core, ctx, frame, ui)
   }
 
   pub fn name(&self) -> &str {
     self.inner
-      .module
+      .component
       .borrow_mut()
       .name()
       .unwrap_or_else(|| self.inner.name.as_str())
   }
 
   pub fn modal(&self) -> bool {
-    self.inner.module.borrow_mut().modal()
+    self.inner.component.borrow_mut().modal()
   }
 
   pub fn secure(&self) -> bool {
-    self.inner.module.borrow_mut().secure()
+    self.inner.component.borrow_mut().secure()
   }
 
   pub fn type_id(&self) -> TypeId {
@@ -209,7 +194,7 @@ impl Component {
   where
     M: ComponentT + 'static,
   {
-    Ref::map(self.inner.module.borrow(), |r| {
+    Ref::map(self.inner.component.borrow(), |r| {
       (r).as_any()
         .downcast_ref::<M>()
         .expect("unable to downcast section")
@@ -220,10 +205,10 @@ impl Component {
   where
     M: ComponentT + 'static,
   {
-    RefMut::map(self.inner.module.borrow_mut(), |r| {
+    RefMut::map(self.inner.component.borrow_mut(), |r| {
       (r).as_any_mut()
         .downcast_mut::<M>()
-        .expect("unable to downcast_mut module")
+        .expect("unable to downcast_mut component")
     })
   }
 }
@@ -255,7 +240,7 @@ where
         name,
         type_name,
         type_id,
-        module: section,
+        component: section,
       }),
     }
   }

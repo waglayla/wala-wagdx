@@ -12,19 +12,19 @@ pub mod app;
 
 pub mod utils;
 pub mod settings;
-pub mod frame;
 pub mod imports;
 pub mod components;
-// pub mod interop;
-pub mod result;
+mod result;
 pub use result::*;
+
+mod dx_wallet;
+pub use dx_wallet::*;
 
 pub mod error;
 pub mod events;
 pub mod storage;
 pub mod fonts;
 pub mod network;
-pub mod dx_wallet;
 pub mod collection;
 pub mod node_state;
 

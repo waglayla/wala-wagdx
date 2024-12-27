@@ -1,15 +1,7 @@
-use crate::frame::window_frame;
+use crate::gui::frame::*;
 use crate::imports::*;
 
-use crate::components::HashMapComponentExtension;
-use crate::components::outline::Outline;
-use crate::components::hello::Hello;
-use crate::components::blank::Blank;
-use crate::components::console::DaemonConsole;
-use crate::components::welcome::Welcome;
-use crate::components::footer::Footer;
-
-use crate::components::wallet_ui::*;
+use crate::components::*;
 
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
@@ -45,13 +37,12 @@ pub struct Core {
   manager: DX_Manager,
   wallet: Arc<dyn WalletApi>,
   application_events_channel: ApplicationEventsChannel,
-  // deactivation: Option<Module>,
   prev_components: Option<Vec<TypeId>>,
   component: Component,
   components: HashMap<TypeId, Component>,
   pub stack: VecDeque<Component>,
   pub settings: Settings,
-  // pub toasts: Toasts,
+  pub toasts: Arc<Toasts>,
   pub mobile_style: egui::Style,
   pub default_style: egui::Style,
 
@@ -59,25 +50,15 @@ pub struct Core {
   hint: Option<Hint>,
   discard_hint: bool,
   exception: Option<Exception>,
-  // screenshot: Option<Arc<ColorImage>>,
 
   pub wallet_descriptor: Option<WalletDescriptor>,
   pub wallet_list: Vec<WalletDescriptor>,
   pub prv_key_data_map: Option<HashMap<PrvKeyDataId, Arc<PrvKeyDataInfo>>>,
   pub user_accounts: Option<AccountGroup>,
   pub current_account: Option<Account>,
-  // pub release: Option<Release>,
 
-  // pub device: Device,
-  // pub market: Option<Market>,
-  // pub debug: bool,
   pub window_frame: bool,
-  // callback_map: CallbackMap,
-  // pub network_pressure: NetworkPressure,
-  // notifications: Notifications,
   pub storage: Storage,
-  // pub feerate : Option<Arc<RpcFeeEstimate>>,
-  // pub feerate: Option<FeerateEstimate>, TODO maybe
   pub node_info: Option<Box<String>>,
   daemon_console: Component,
   footer: Component,
@@ -107,24 +88,28 @@ impl Core {
     );
 
     let mut components = HashMap::new();
-    components.insert_typeid(Welcome::new(manager.clone()));
-    components.insert_typeid(Outline::new(&cc.egui_ctx));
-    components.insert_typeid(Hello::default());
-    components.insert_typeid(Blank::default());
-    components.insert_typeid(components::settings::Settings::new(manager.clone()));
-    components.insert_typeid(CreateWallet::new(manager.clone()));
-    components.insert_typeid(OpenWallet::new(manager.clone()));
-    components.insert_typeid(DaemonConsole::new(daemon_receiver));
-    components.insert_typeid(ViewWallet::new(manager.clone()));
-    components.insert_typeid(WalletDelegator::default());
 
-    components.insert_typeid(Footer::default());
-    let footer = components.get(&TypeId::of::<Footer>()).unwrap().clone();
+    //TODO move all below to a separate function
+    components.insert_typeid(components::Welcome::new(manager.clone()));
+    components.insert_typeid(components::Outline::new(&cc.egui_ctx));
+    components.insert_typeid(components::Hello::default());
+    components.insert_typeid(components::Blank::default());
+    components.insert_typeid(components::settings::Settings::new(manager.clone()));
+    components.insert_typeid(components::CreateWallet::new(manager.clone()));
+    components.insert_typeid(components::OpenWallet::new(manager.clone()));
+    components.insert_typeid(components::DaemonConsole::new(daemon_receiver));
+    components.insert_typeid(components::ViewWallet::new(manager.clone()));
+    components.insert_typeid(components::WalletDelegator::default());
+    components.insert_typeid(components::About::default());
+    components.insert_typeid(components::Donate::default());
+    components.insert_typeid(components::Footer::default());
+
+    let footer = components.get(&TypeId::of::<components::Footer>()).unwrap().clone();
 
     let storage = Storage::default();
     #[cfg(not(target_arch = "wasm32"))]
     if settings.node.waglaylad_daemon_storage_folder_enable {
-        storage.track_storage_root(Some(settings.node.waglaylad_daemon_storage_folder.as_str()));
+      storage.track_storage_root(Some(settings.node.waglaylad_daemon_storage_folder.as_str()));
     }
 
     let mut this = Self {
@@ -137,9 +122,10 @@ impl Core {
       application_events_channel: manager.application_events().clone(),  // Assuming this method exists
       stack: VecDeque::new(),
       prev_components: None,
-      component: components.get(&TypeId::of::<CreateWallet>()).unwrap().clone(),
+      component: components.get(&TypeId::of::<components::CreateWallet>()).unwrap().clone(),
       components: components.clone(),
       settings,
+      toasts: Arc::new(Toasts::default()),
       mobile_style,
       default_style,
       wallet_descriptor: None,
@@ -151,12 +137,11 @@ impl Core {
       hint: None,
       discard_hint: false,
       exception: None,
-      // release: None,
       window_frame,
       storage,
       node_info: None,
       footer,
-      daemon_console: components.get(&TypeId::of::<DaemonConsole>()).unwrap().clone(),
+      daemon_console: components.get(&TypeId::of::<components::DaemonConsole>()).unwrap().clone(),
     };
 
     components.values().for_each(|component| {
@@ -166,17 +151,18 @@ impl Core {
     this.wallet_update_list();
 
     cfg_if! {
-        if #[cfg(target_arch = "wasm32")] {
-        //     this.register_visibility_handler();
-        } else {
-            let storage = this.storage.clone();
-            tokio::spawn(async move {
-                loop {
-                    storage.update();
-                    tokio::time::sleep(Duration::from_secs(60)).await;
-                }
-            });
-        }
+      if #[cfg(target_arch = "wasm32")] {
+        this.register_visibility_handler();
+      } else {
+        let storage = this.storage.clone();
+        tokio::spawn(async move {
+          loop {
+            storage.update();
+            tokio::time::sleep(Duration::from_secs(60)).await;
+          }
+          Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
+        });
+      }
     }
 
     this
@@ -187,7 +173,7 @@ impl Core {
     T: ComponentT + 'static,
   {
     let cell = self.components.get_mut(&TypeId::of::<T>()).unwrap();
-    RefMut::map(cell.inner.module.borrow_mut(), |r| {
+    RefMut::map(cell.inner.component.borrow_mut(), |r| {
       (r).as_any_mut()
         .downcast_mut::<T>()
         .expect("unable to downcast_mut module")
@@ -197,7 +183,7 @@ impl Core {
 
 impl eframe::App for Core {
   fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-      egui::Rgba::TRANSPARENT.to_array() // Keep transparent background
+    egui::Rgba::TRANSPARENT.to_array() // Keep transparent background
   }
 
   fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
@@ -213,7 +199,7 @@ impl eframe::App for Core {
 
       self.account_updated = false;
 
-      let mut view_wallet = self.get_mut::<ViewWallet>();
+      let mut view_wallet = self.get_mut::<components::ViewWallet>();
       view_wallet.update_biscuit_account(
         ctx, 
         &current_account, 
@@ -238,7 +224,6 @@ impl eframe::App for Core {
     ctx.request_repaint_after(std::time::Duration::from_secs_f32(1.0 / 60.0));
   }
 
-  // Optionally, include a basic exit handler
   #[cfg(not(target_arch = "wasm32"))]
   fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
     println!("Goodbye!");
@@ -247,7 +232,8 @@ impl eframe::App for Core {
 
 impl Core {
   pub fn render_frame(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
-    window_frame(self.window_frame, ctx, "Waglayla Wag-DX", |ui| {
+    let title = format!("Waglayla Wag-DX v{}", DX_VERSION);
+    window_frame(self.window_frame, ctx, title.as_str(), |ui| {
       if !self.settings.initialized {
         egui::CentralPanel::default()
         .frame(create_custom_popup(ctx))
@@ -277,31 +263,30 @@ impl Core {
 
       ui.allocate_ui_at_rect(footer_rect, |ui| {
         let mut components_clone = self.components.clone();
-        let footer_component = components_clone.get_mut(&TypeId::of::<Footer>()).unwrap();
+        let footer_component = components_clone.get_mut(&TypeId::of::<components::Footer>()).unwrap();
         footer_component.render(self, ctx, frame, ui);
       });
 
       ui.allocate_ui_at_rect(main_rect, |ui| {
-          // Render sidebar
-          let outline_type_id = TypeId::of::<Outline>();
-          let outline = self.components.get(&outline_type_id).cloned();
-          if let Some(outline) = self.components.get(&TypeId::of::<Outline>()) {
-            let mut components_clone = self.components.clone();
-            let outline_component = components_clone.get_mut(&outline_type_id).unwrap();
-            outline_component.render(self, ctx, frame, ui);
-          }
+        // Render sidebar
+        let outline_type_id = TypeId::of::<components::Outline>();
+        let outline = self.components.get(&outline_type_id).cloned();
+        if let Some(outline) = self.components.get(&TypeId::of::<components::Outline>()) {
+          let mut components_clone = self.components.clone();
+          let outline_component = components_clone.get_mut(&outline_type_id).unwrap();
+          outline_component.render(self, ctx, frame, ui);
+        }
 
-          // Render active component with a persistent state
-          let active_component = self.component.clone();
-          let content_rect = ui.available_rect_before_wrap();
-          ui.allocate_ui_at_rect(content_rect, |ui| {
-              // We clone components to avoid the borrow checker issue
-              let mut components_clone = self.components.clone();
-              let component_type_id = active_component.type_id();
-              let active_component_mut = components_clone.get_mut(&component_type_id).unwrap();
-              
-              active_component_mut.render(self, ctx, frame, ui);
-          });
+        // Render active component with a persistent state
+        let active_component = self.component.clone();
+        let content_rect = ui.available_rect_before_wrap();
+        ui.allocate_ui_at_rect(content_rect, |ui| {
+          let mut components_clone = self.components.clone();
+          let component_type_id = active_component.type_id();
+          let active_component_mut = components_clone.get_mut(&component_type_id).unwrap();
+          
+          active_component_mut.render(self, ctx, frame, ui);
+        });
       });
     });
   }
@@ -317,13 +302,7 @@ impl Core {
       self.component = component;
     }
   }
-  // tokio::spawn(async move {
-  //   let result: Result<()> = async {
-  //     wallet.accounts_activate(Some(account_ids)).await?;
-  //     Ok(())
-  //   }
-  //   .await;
-  // });
+
   pub fn select_account(&mut self, account: Option<Account>, notify : bool) {
     if let Some(account) = account {
       if notify {
@@ -341,16 +320,19 @@ impl Core {
         self.account_updated = true;
       }
     } else {
-      // TODO
-      // self.state = AccountManagerState::Select;
-      // self.context.loading = false;
+      self.set_active_component::<components::wallet_ui::CreateWallet>();
 
-      // if notify {
-      //   spawn(async move {
-      //     self.wallet.accounts_select(None).await?;
-      //     Ok(())
-      //   });
-      // }
+      if notify {
+        tokio::spawn(async move {
+          let result: Result<()> = async {
+            manager().wallet().accounts_select(None).await?;
+            Ok(())
+          }
+          .await;
+
+          result
+        });
+      }
     }
   }
 
@@ -393,14 +375,14 @@ impl Core {
       .unwrap();
   }
 
-  fn update_wallet(&self) {
-    // if let Some(user_accounts) = self.user_accounts.as_ref() {
-    //   if let Some(updated_account) = user_accounts.get(&account.id()) {
-    //     self.current_account = Some(updated_account.clone());
-    //   } else {
-    //     self.set_active_component_by_type(crate::components::CreateWallet);
-    //   }
-    // }
+  fn update_wallet(&mut self) {
+    if let Some(user_accounts) = self.user_accounts.as_ref() {
+      if let Some(updated_account) = user_accounts.get(&self.current_account.clone().unwrap().id()) {
+        self.current_account = Some(updated_account.clone());
+      } else {
+        self.set_active_component::<components::wallet_ui::CreateWallet>();
+      }
+    }
   }
 
   pub fn handle_events(
@@ -411,12 +393,12 @@ impl Core {
   ) -> Result<()> {
     match event {
         Events::Exit => {
-            cfg_if! {
-                if #[cfg(not(target_arch = "wasm32"))] {
-                    self.is_shutdown_pending = true;
-                    ctx.send_viewport_cmd(ViewportCommand::Close);
-                }
+          cfg_if! {
+            if #[cfg(not(target_arch = "wasm32"))] {
+              self.is_shutdown_pending = true;
+              ctx.send_viewport_cmd(ViewportCommand::Close);
             }
+          }
         }
 
         Events::WalletList { wallet_list } => {
@@ -447,7 +429,7 @@ impl Core {
           // println!("wallet event: {:?}", event);
           match *event {
             CoreWallet::WalletPing => {
-                // log_info!("received wallet ping event...");
+              log_info!("received wallet ping event...");
                 // crate::runtime::runtime().notify(UserNotification::info("Wallet ping"));
             }
             CoreWallet::Metrics {
@@ -502,7 +484,7 @@ impl Core {
             }
             #[allow(unused_variables)]
             CoreWallet::Connect { url, network_id } => {
-              // log_info!("Connected to {url:?} on network {network_id}");
+              log_info!("Connected to {url:?} on network {network_id}");
               self.node_state.is_connected = true;
               self.node_state.url = url;
               self.node_state.network_id = Some(network_id);
@@ -634,16 +616,10 @@ impl Core {
                 if let Some(id) = id {
                   if let Some(account) = user_accounts.get(&id) {
                     let account = account.clone();
-                    // let device = self.device().clone();
                     let wallet = self.wallet();
-                    // log_info!("--- selecting account: {id:?}");
+                    log_info!("--- selecting account: {id:?}");
                     self.current_account = Some(account);
-                    // self.get_mut::<modules::AccountManager>().select(
-                    //   wallet,
-                    //   Some(account),
-                    //   device,
-                    //   false,
-                    // );
+                    self.account_updated = true;
                   }
                 }
               }
@@ -654,27 +630,27 @@ impl Core {
             // Ignore scan notifications
             CoreWallet::Discovery { record } => match record.binding().clone() {
               Binding::Account(id) => {
-                // self.user_accounts
-                //   .as_ref()
-                //   .and_then(|user_accounts| {
-                //     user_accounts.get(&id).map(|account| {
-                //       if account
-                //         .transactions()
-                //         .replace_or_insert(Transaction::new_confirmed(
-                //           Arc::new(record),
-                //         ))
-                //         .is_none()
-                //       {
-                //         let mut binding = account.transactions();
-                //         while binding.len() as u64 > TRANSACTION_PAGE_SIZE {
-                //           binding.pop();
-                //         }
-                //         account.set_transaction_count(
-                //           account.transaction_count() + 1,
-                //         );
-                //       }
-                //     })
-                //   });
+                self.user_accounts
+                  .as_ref()
+                  .and_then(|user_accounts| {
+                    user_accounts.get(&id).map(|account| {
+                      if account
+                        .transactions()
+                        .replace_or_insert(Transaction::new_confirmed(
+                          Arc::new(record),
+                        ))
+                        .is_none()
+                      {
+                        let mut binding = account.transactions();
+                        while binding.len() as u64 > TRANSACTION_PAGE_SIZE {
+                          binding.pop();
+                        }
+                        account.set_transaction_count(
+                          account.transaction_count() + 1,
+                        );
+                      }
+                    })
+                  });
               }
               Binding::Custom(_) => {
                 log_error!("Error while processing transaction {}: custom bindings are not supported", record.id());
@@ -690,27 +666,27 @@ impl Core {
 
               match record.binding().clone() {
                 Binding::Account(id) => {
-                  // self.user_accounts
-                  //   .as_ref()
-                  //   .and_then(|user_accounts| {
-                  //     user_accounts.get(&id).map(|account| {
-                  //       if account
-                  //         .transactions()
-                  //         .replace_or_insert(Transaction::new_confirmed(
-                  //           Arc::new(record),
-                  //         ))
-                  //         .is_none()
-                  //       {
-                  //         let mut binding = account.transactions();
-                  //         while binding.len() as u64 > TRANSACTION_PAGE_SIZE {
-                  //           binding.pop();
-                  //         }
-                  //         account.set_transaction_count(
-                  //           account.transaction_count() + 1,
-                  //         );
-                  //       }
-                  //     })
-                  //   });
+                  self.user_accounts
+                    .as_ref()
+                    .and_then(|user_accounts| {
+                      user_accounts.get(&id).map(|account| {
+                        if account
+                          .transactions()
+                          .replace_or_insert(Transaction::new_confirmed(
+                            Arc::new(record),
+                          ))
+                          .is_none()
+                        {
+                          let mut binding = account.transactions();
+                          while binding.len() as u64 > TRANSACTION_PAGE_SIZE {
+                            binding.pop();
+                          }
+                          account.set_transaction_count(
+                            account.transaction_count() + 1,
+                          );
+                        }
+                      })
+                    });
                 }
                 Binding::Custom(_) => {
                   log_error!("Error while processing transaction {}: custom bindings are not supported", record.id());
@@ -719,43 +695,43 @@ impl Core {
             }
             
             CoreWallet::Pending { record } => match record.binding().clone() {
-                Binding::Account(id) => {
-                  // self.user_accounts
-                  //   .as_ref()
-                  //   .and_then(|user_accounts| {
-                  //     user_accounts.get(&id).map(|account| {
-                  //       if account
-                  //         .transactions()
-                  //         .replace_or_insert(Transaction::new_processing(
-                  //           Arc::new(record),
-                  //         ))
-                  //         .is_none()
-                  //       {
-                  //         let mut binding = account.transactions();
-                  //         while binding.len() as u64 > TRANSACTION_PAGE_SIZE {
-                  //           binding.pop();
-                  //         }
-                  //         account.set_transaction_count(
-                  //           account.transaction_count() + 1,
-                  //         );
-                  //       }
-                  //     })
-                  //   });
-                }
-                Binding::Custom(_) => {
-                  log_error!("Error while processing transaction {}: custom bindings are not supported", record.id());
-                }
+              Binding::Account(id) => {
+                self.user_accounts
+                  .as_ref()
+                  .and_then(|user_accounts| {
+                    user_accounts.get(&id).map(|account| {
+                      if account
+                        .transactions()
+                        .replace_or_insert(Transaction::new_processing(
+                          Arc::new(record),
+                        ))
+                        .is_none()
+                      {
+                        let mut binding = account.transactions();
+                        while binding.len() as u64 > TRANSACTION_PAGE_SIZE {
+                          binding.pop();
+                        }
+                        account.set_transaction_count(
+                          account.transaction_count() + 1,
+                        );
+                      }
+                    })
+                  });
+              }
+              Binding::Custom(_) => {
+                log_error!("Error while processing transaction {}: custom bindings are not supported", record.id());
+              }
             }
 
             CoreWallet::Reorg { record } => match record.binding().clone() {
               Binding::Account(id) => {
-                // self.user_accounts
-                //   .as_mut()
-                //   .and_then(|user_accounts| {
-                //     user_accounts
-                //       .get(&id)
-                //       .map(|account| account.transactions().remove(record.id()))
-                //   });
+                self.user_accounts
+                  .as_mut()
+                  .and_then(|user_accounts| {
+                    user_accounts
+                      .get(&id)
+                      .map(|account| account.transactions().remove(record.id()))
+                  });
               }
               Binding::Custom(_) => {
                 log_error!("Error while processing transaction {}: custom bindings are not supported", record.id());
@@ -812,18 +788,12 @@ impl Core {
         Ok(())
       }
       .await;
+      result
     });
 
     if let Some(first) = accounts.first() {
-      // let device = self.device().clone();
-      // let wallet = self.wallet();
-      self.current_account = Some(first.clone());
-      // self.get_mut::<modules::AccountManager>().select(
-      //   wallet,
-      //   Some(first.clone()),
-      //   device,
-      //   true,
-      // );
+      self.current_account = Some(first.to_owned());
+      self.account_updated = true;
     }
 
     accounts
@@ -833,13 +803,51 @@ impl Core {
     let manager = self.manager.clone();
     tokio::spawn(async move {
       let wallet_list = manager.wallet().wallet_enumerate().await?;
-      manager
+      let result = manager
         .send(Events::WalletList {
           wallet_list: Arc::new(wallet_list),
         })
-        .await?;
-      Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
+        .await;
+      result
     });
+  }
+
+  pub fn load_account_transactions_with_range(
+    &mut self,
+    account: &Account,
+    range: std::ops::Range<u64>,
+  ) -> Result<()> {
+    let account_id = account.id();
+    let network_id = Network::Mainnet.into();
+    let manager = self.manager.clone();
+    let account = account.clone();
+    tokio::spawn(async move {
+      let result: Result<()> = async {
+        let data = manager
+          .wallet()
+          .transactions_data_get_range(account_id, network_id, range)
+          .into_future()
+          .await?;
+
+        let TransactionsDataGetResponse {
+          account_id,
+          transactions,
+          start: _,
+          total,
+        } = data;
+
+        if let Err(err) = account.load_transactions(transactions, total) {
+          log_error!("error loading transactions into account {account_id}: {err}");
+        }
+
+        Ok(())
+      }
+      .await;
+
+      result
+    });
+
+    Ok(())
   }
 
   fn load_accounts(
@@ -885,40 +893,40 @@ impl Core {
             .map(|account| (account.id(), account))
             .collect::<HashMap<_, _>>();
 
-          // TODO - finish progressive transaction loading implementation
-          // let futures = account_ids
-          //   .into_iter()
-          //   .map(|account_id| {
-          //     runtime.wallet().transactions_data_get_range(
-          //       account_id,
-          //       network_id,
-          //       0..TRANSACTION_PAGE_SIZE,
-          //     )
-          //   })
-          //   .collect::<Vec<_>>();
+          let futures = account_ids
+            .into_iter()
+            .map(|account_id| {
+              manager.wallet().transactions_data_get_range(
+                account_id,
+                network_id,
+                0..TRANSACTION_PAGE_SIZE,
+              )
+            })
+            .collect::<Vec<_>>();
 
-          // let transaction_data = join_all(futures)
-          //   .await
-          //   .into_iter()
-          //   .map(|v| v.map_err(Error::from))
-          //   .collect::<Result<Vec<_>>>()?;
+          let transaction_data = join_all(futures)
+            .await
+            .into_iter()
+            .map(|v| v.map_err(Error::from))
+            .collect::<Result<Vec<_>>>()?;
 
-          // transaction_data.into_iter().for_each(|data| {
-          //     let TransactionsDataGetResponse {
-          //         account_id,
-          //         transactions,
-          //         start: _,
-          //         total,
-          //     } = data;
+          let mut amount = 0;
+          transaction_data.into_iter().for_each(|data| {
+            let TransactionsDataGetResponse {
+              account_id,
+              transactions,
+              start: _,
+              total,
+            } = data;
 
-          //     if let Some(account) = account_map.get(&account_id) {
-          //         if let Err(err) = account.load_transactions(transactions, total) {
-          //             log_error!("error loading transactions into account {account_id}: {err}");
-          //         }
-          //     } else {
-          //         log_error!("unable to find account {}", account_id);
-          //     }
-          // });
+            if let Some(account) = account_map.get(&account_id) {
+              if let Err(err) = account.load_transactions(transactions, total) {
+                log_error!("error loading transactions into account {account_id}: {err}");
+              }
+            } else {
+              log_error!("unable to find account {}", account_id);
+            }
+          });
 
           manager.wallet().accounts_activate(None).await?;
           application_events_sender.send(Events::WalletUpdate).await?;
@@ -926,6 +934,8 @@ impl Core {
           Ok(())
         }
         .await;
+
+        result
       });
 
       Ok(())

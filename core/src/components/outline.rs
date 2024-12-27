@@ -1,7 +1,7 @@
 use super::*;
 use crate::components::*;
 
-define_animation_frames!(SONIC_RUN, 4, "/resources/animation/sonic");
+define_animation_frames!(SONIC_RUN, 192, "/resources/animation/layla/wag");
 
 pub struct Outline {
   selected_tab: Tab,
@@ -15,6 +15,7 @@ pub enum Tab {
   NetworkInfo,
   WalaNode,
   WalaBridge,
+  Donate,
   About,
 }
 
@@ -22,9 +23,10 @@ impl Tab {
   fn label(&self) -> &'static str {
     match self {
       Tab::Wallet => i18n("Wallet"),
-      Tab::NetworkInfo => i18n("Network Info"),
-      Tab::WalaNode => i18n("WALA Node"),
-      Tab::WalaBridge => i18n("WALA Bridge"),
+      Tab::NetworkInfo => i18n("Network"),
+      Tab::WalaNode => i18n("Node"),
+      Tab::WalaBridge => i18n("Stratum Bridge"),
+      Tab::Donate => i18n("Donate"),
       Tab::About => i18n("About"),
     }
   }
@@ -35,7 +37,8 @@ impl Tab {
       Tab::NetworkInfo => TypeId::of::<blank::Blank>(),
       Tab::WalaNode => TypeId::of::<console::DaemonConsole>(),
       Tab::WalaBridge => TypeId::of::<blank::Blank>(),
-      Tab::About => TypeId::of::<blank::Blank>(),
+      Tab::Donate => TypeId::of::<donate::Donate>(),
+      Tab::About => TypeId::of::<about::About>(),
     }
   }
 }
@@ -52,43 +55,43 @@ impl ComponentT for Outline {
     _frame: &mut eframe::Frame,
     ui: &mut egui::Ui,
   ) {
-      let panel_fill = theme_color().fg_color;
-      let darkened_fill = theme_color().bg_color;
+    let panel_fill = theme_color().fg_color;
+    let darkened_fill = theme_color().bg_color;
 
-      egui::SidePanel::left("sidebar")
-        .exact_width(225.0)
-        .resizable(false)
-        .show_separator_line(false)
-        .frame(egui::Frame {
-          fill: darkened_fill, 
-          inner_margin: egui::Margin::ZERO,
-          outer_margin: egui::Margin::ZERO,
-          ..Default::default()
-        })
-        .show_inside(ui, |ui| {
-          ui.set_min_height(ui.available_height());
-          ui.spacing_mut().item_spacing = Vec2::ZERO;
+    egui::SidePanel::left("sidebar")
+      .exact_width(225.0)
+      .resizable(false)
+      .show_separator_line(false)
+      .frame(egui::Frame {
+        fill: darkened_fill, 
+        inner_margin: egui::Margin::ZERO,
+        outer_margin: egui::Margin::ZERO,
+        ..Default::default()
+      })
+      .show_inside(ui, |ui| {
+        ui.set_min_height(ui.available_height());
+        ui.spacing_mut().item_spacing = Vec2::ZERO;
 
-          let info_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), 132.0));
-          let info_rect = info_space.1;
-          
-          self.render_account_section(ui, core, &info_rect);
-          self.render_balance_section(ui, core, &info_rect);
+        let info_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), 132.0));
+        let info_rect = info_space.1;
+        
+        self.render_account_section(ui, core, &info_rect);
+        self.render_balance_section(ui, core, &info_rect);
 
-          ui.style_mut().text_styles.insert(
-            egui::TextStyle::Button,
-            egui::FontId::new(30.0, get_font_family("DINishCondensed", false, false))
-          );
+        ui.style_mut().text_styles.insert(
+          egui::TextStyle::Button,
+          egui::FontId::new(30.0, get_font_family("DINishCondensed", false, false))
+        );
 
-          self.render_layla(ui, core, &info_rect);
+        self.render_layla(ui, core, &info_rect);
 
-          for tab in self.available_tabs(core) {
-            if self.tab_button(ui, ctx, tab) {
-              self.selected_tab = tab;
-              core.set_active_component_by_type(tab.component().clone());
-            }
+        for tab in self.available_tabs(core) {
+          if self.tab_button(ui, ctx, tab) {
+            self.selected_tab = tab;
+            core.set_active_component_by_type(tab.component().to_owned());
           }
-        });
+        }
+      });
   }
 }
 
@@ -147,7 +150,7 @@ impl Outline {
       );
 
       ui.painter().text(
-        text_rect.left_top() + vec2(0.0, 12.0),
+        text_rect.left_top() + vec2(0.0, 24.0),
         egui::Align2::LEFT_CENTER,
         text,
         font_id,
@@ -205,16 +208,16 @@ impl Outline {
       dropdown_frame.show(ui, |ui| {
         ui.set_min_width(dropdown_rect.width());
 
-        let mut core_delegate = core.clone();
-        let current_account_delegate = core_delegate.clone().current_account.unwrap();
+        let mut core_delegate = core.to_owned();
+        let current_account_delegate = core_delegate.to_owned().current_account.unwrap();
 
         ScrollArea::vertical()
           .max_height(220.0)
           .show(ui, |ui| {
             ui.style_mut().spacing.item_spacing = Vec2::ZERO;
             
-            let mut account_list = if let Some(account_collection) = core_delegate.clone().user_accounts() {
-              account_collection.list().clone()
+            let mut account_list = if let Some(account_collection) = core_delegate.to_owned().user_accounts() {
+              account_collection.list().to_owned()
             } else {
               return;
             };
@@ -222,7 +225,7 @@ impl Outline {
               if account.id() != current_account_delegate.id() {
                 let account_name = account.name_or_id().to_string();
                 if self.account_button(ui, &account_name, vec2(220.0, 40.0)).clicked() {
-                  core_delegate.select_account(Some(account.clone()), true);
+                  core_delegate.select_account(Some(account.to_owned()), true);
                   self.account_dropdown_open = false;
                 }
               }
@@ -231,9 +234,12 @@ impl Outline {
 
         ui.separator();
         
-        if self.account_button(ui, i18n("Add Account"), vec2(220.0, 40.0)).clicked() {
+        if self.account_button(ui, i18n("Add Account"), vec2(220.0, 40.0))
+          .on_hover_cursor(egui::CursorIcon::Help)
+          .on_hover_text_at_pointer(i18n("Feature Coming Soon..."))
+          .clicked() {
           // Handle new account creation
-          self.account_dropdown_open = false;
+          // self.account_dropdown_open = false;
         }
         ui.add_space(6.0);
       });
@@ -243,7 +249,7 @@ impl Outline {
   fn render_layla(&mut self, ui: &mut Ui, core: &Core, info_rect: &Rect) {
     if let Some(animation) = &mut self.sonic_animation {
       let animation_pos = egui::Pos2 {
-        x: info_rect.max.x - 87.0,
+        x: info_rect.max.x - 92.0,
         y: info_rect.min.y + 5.0,
       };
 
@@ -251,7 +257,7 @@ impl Outline {
         animation.animate();
       }
 
-      animation.paint(ui, animation_pos, 0.4);
+      animation.paint(ui, animation_pos, 0.46);
     }
   }
 
@@ -259,7 +265,7 @@ impl Outline {
     let painter = ui.painter_at(*info_rect);
     let account_pos = egui::Pos2 {
       x: info_rect.min.x + 11.5,
-      y: info_rect.min.y,
+      y: info_rect.min.y + 12.0,
     };
 
     let has_account = core.current_account.is_some();
@@ -328,15 +334,15 @@ impl Outline {
     
     let whole_pos = egui::Pos2 {
       x: info_rect.min.x + 127.,
-      y: info_rect.max.y + 4.,
+      y: info_rect.max.y + 16.,
     };
     let part_pos = egui::Pos2 {
       x: info_rect.min.x + 127.5,
-      y: info_rect.max.y - 14.8,
+      y: info_rect.max.y - 2.8,
     };
     let sym_pos = egui::Pos2 {
       x: info_rect.max.x - 10.75,
-      y: info_rect.max.y - 18.,
+      y: info_rect.max.y - 6.,
     };
 
     let account_clone = core.current_account.clone();
@@ -368,7 +374,8 @@ impl Outline {
       },
     );
 
-    let response = ui.interact(balance_rect, egui::Id::new("balance_area"), egui::Sense::hover());
+    let response = ui.interact(balance_rect, egui::Id::new("balance_area"), egui::Sense::hover())
+      .on_hover_cursor(egui::CursorIcon::Help);
 
     painter.text(
       whole_pos,
@@ -481,8 +488,8 @@ impl Outline {
       font_id.size *= size_factor;
   
       ui.painter().text(
-        text_rect.left_top(),
-        egui::Align2::LEFT_TOP,
+        text_rect.left_center() + vec2(0.0, 3.0),
+        egui::Align2::LEFT_CENTER,
         tab.label(),
         font_id,
         text_color,
@@ -502,6 +509,7 @@ impl Outline {
       }
     }
 
+    tabs.push(Tab::Donate);
     tabs.push(Tab::About);
     tabs
   }

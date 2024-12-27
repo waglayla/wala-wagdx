@@ -1,10 +1,16 @@
 use crate::imports::*;
+
+use tokio::time::{timeout, Duration};
 use waglayla_wallet_core::tx::{GeneratorSummary, PaymentOutput, PaymentDestination, Fees};
 use waglayla_wallet_core::api::{AccountsSendRequest, AccountsSendResponse};
 use std::sync::{Arc, Mutex};
 use core::cmp::max;
 
-pub type SendResult = std::result::Result<AccountsSendResponse, waglayla_wallet_core::error::Error>;
+define_indexed_enum!(
+  Focus,
+  WalletSecret,
+  PaymentSecret
+);
 
 #[derive(Clone, Default)]
 pub struct WalletSweep {
@@ -12,8 +18,10 @@ pub struct WalletSweep {
   pub payment_secret: String,
   pub send_result: Arc<Mutex<Option<SendResult>>>,
   pub is_pending: Arc<Mutex<bool>>,
-  pub error: Option<String>,
+  focus_context: FocusContext,
 }
+
+impl_has_focus_context!(WalletSweep);
 
 impl WalletSweep {
   pub fn new() -> Self {
@@ -22,7 +30,7 @@ impl WalletSweep {
       payment_secret: String::new(),
       send_result: Arc::new(Mutex::new(None)),
       is_pending: Arc::new(Mutex::new(false)),
-      error: None,
+      focus_context: FocusContext { focus: FOCUS_NONE },
     }
   }
 
@@ -30,8 +38,9 @@ impl WalletSweep {
     let send_result_clone = Arc::clone(&self.send_result);
     *send_result_clone.lock().unwrap() = None;
 
-    self.wallet_secret = "".to_string();
-    self.payment_secret = "".to_string();
+    self.wallet_secret.zeroize();
+    self.payment_secret.zeroize();
+    self.assign_focus(Focus::WalletSecret);
   }
 
   pub fn render(
@@ -41,6 +50,8 @@ impl WalletSweep {
     ctx: &egui::Context,
     ui: &mut egui::Ui,
   ) {
+      let requires_bip39_passphrase = core.current_account.clone().unwrap()
+        .requires_bip39_passphrase(&core.clone());
       let mut F = create_custom_popup(ctx);
       F.rounding = 10.0.into();
 
@@ -96,48 +107,78 @@ impl WalletSweep {
                       }
                       Err(err) => {
                         ui.label(i18n("Transaction(s) failed."));
-                        ui.colored_label(egui::Color32::RED, format!("{:?}", err));
+                        ui.colored_label(egui::Color32::RED, format!("{:?}", err.to_string()));
                       }
                     }
                   }
                 }
 
                 if !finish {
-                  // Input for Address
-                  ui.label(i18n("Wallet Secret:"));
-                  ui.add_sized(
+                  let enabled =
+                    !self.wallet_secret.is_empty() &&
+                    (self.payment_secret.trim().is_empty() ^ requires_bip39_passphrase)
+                  ;
+
+                  ui.label(i18n("Wallet Password:"));
+                  let wallet_secret_response = ui.add_sized(
                     [ui.available_width(), 30.0],
                     egui::TextEdit::singleline(&mut self.wallet_secret)
                       .vertical_align(Align::Center)
                       .password(true),
                   );
+                  self.next_focus(ui, Focus::WalletSecret, wallet_secret_response.clone());
                   ui.add_space(12.0);
 
-                  // Input for Amount
-                  ui.label(i18n("Payment Secret:"));
-                  ui.add_sized(
-                    [ui.available_width(), 30.0],
-                    egui::TextEdit::singleline(&mut self.payment_secret)
-                      .vertical_align(Align::Center)
-                      .password(true),
-                  );
+                  if wallet_secret_response.lost_focus() && handle_enter_key(ui) {
+                    if requires_bip39_passphrase {
+                      self.assign_focus(Focus::PaymentSecret);
+                    } else {
+                      if enabled && !*self.is_pending.lock().unwrap() {
+                        let send_result_clone = Arc::clone(&self.send_result);
+                        *send_result_clone.lock().unwrap() = None;
+                        self.sweep(core);
+                      }
+                    }
+                  }
+
+                  if requires_bip39_passphrase {
+                    ui.label(i18n("Payment Secret:"));
+                    let payment_secret_response = ui.add_sized(
+                      [ui.available_width(), 30.0],
+                      egui::TextEdit::singleline(&mut self.payment_secret)
+                        .vertical_align(Align::Center)
+                        .password(true),
+                    );
+                    self.next_focus(ui, Focus::PaymentSecret, payment_secret_response.clone());
+
+                    if payment_secret_response.lost_focus() && handle_enter_key(ui) {
+                      if enabled && !*self.is_pending.lock().unwrap() {
+                        let send_result_clone = Arc::clone(&self.send_result);
+                        *send_result_clone.lock().unwrap() = None;
+                        self.sweep(core);
+                      }
+                    }
+                  } else {
+                    ui.add_space(30.0);
+                  }
+
                   ui.add_space(16.0);
 
                   if ui
                     .dx_large_button_enabled(
-                      !self.wallet_secret.is_empty() && !finish,
+                      enabled && !finish,
                       i18n("Confirm"),
                     )
                     .clicked()
                   {
-                    if !*self.is_pending.lock().unwrap() {
+                    if enabled && !*self.is_pending.lock().unwrap() {
                       let send_result_clone = Arc::clone(&self.send_result);
                       *send_result_clone.lock().unwrap() = None;
-
                       self.sweep(core);
                     }
                   }
                 } else {
+                  ui.add_space(92.0);
                   if ui.dx_large_button(i18n("Done")).clicked()
                   {
                     self.reset();
@@ -149,6 +190,8 @@ impl WalletSweep {
   }
 
   fn sweep(&mut self, core: &mut Core) {
+    use std::panic;
+
     let core_delegate = core.clone();
     let wallet = manager().wallet();
     let send_result_clone = Arc::clone(&self.send_result);
@@ -159,17 +202,43 @@ impl WalletSweep {
     *self.is_pending.lock().unwrap() = true;
 
     tokio::spawn(async move {
-      let request = AccountsSendRequest {
-        account_id: core_delegate.current_account.unwrap().id(),
-        destination: PaymentDestination::Change,
-        priority_fee_sompi: Fees::None,
-        wallet_secret: Secret::from(self_clone.wallet_secret),
-        payment_secret: Some(Secret::from(self_clone.payment_secret)),
-        payload: None,
-      };
+      let result = panic::AssertUnwindSafe(async {
+        let request = AccountsSendRequest {
+          account_id: core_delegate.current_account.unwrap().id(),
+          destination: PaymentDestination::Change,
+          priority_fee_sompi: Fees::None,
+          wallet_secret: Secret::from(self_clone.wallet_secret),
+          payment_secret: Some(Secret::from(self_clone.payment_secret)),
+          payload: None,
+        };
 
-      let result = wallet.accounts_send_call(request).await;
-      *send_result_clone.lock().unwrap() = Some(result);
+        let timeout_duration = Duration::from_secs(12); // Set your desired timeout duration here
+
+        let result = wallet.accounts_send_call(request).await;
+
+        match result {
+          Ok(call_result) => {
+            *send_result_clone.lock().unwrap() = Some(Ok(call_result));
+          }
+          Err(err) => {
+            *send_result_clone.lock().unwrap() = Some(Err(err));
+          }
+        }
+      })
+      .catch_unwind()
+      .await;
+
+      match result {
+        Ok(_) => {}
+        Err(_) => {
+          *send_result_clone.lock().unwrap() = Some(
+            Err(waglayla_wallet_core::error::Error::Custom(
+              i18n("Unknown Error when Compounding... Please check your UTXO count, or try again").to_string()
+            ))
+          );
+        }
+      }
+
       *is_pending_clone.lock().unwrap() = false;
     });
   }

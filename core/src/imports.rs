@@ -87,14 +87,13 @@ pub use crate::network::BASIC_TRANSACTION_MASS;
 pub use crate::network::{Network, NetworkPressure};
 pub use crate::gui::widgets::*;
 
-pub use crate::frame::*;
 // pub use crate::notifications::{Notifications, UserNotification, UserNotifyKind};
 // pub use crate::primitives::{
 //     Account, AccountCollection, AccountSelectorButtonExtension, BlockDagGraphSettings, DaaBucket,
 //     DagBlock, Transaction, TransactionCollection,
 // };
 pub use crate::dx_wallet::*;
-pub use crate::result::Result;
+pub use crate::result::*;
 // pub use crate::runtime::{runtime, spawn, spawn_with_result, Payload, Runtime, Service};
 pub use crate::dx_manager::{manager, DX_Manager, Service};
 pub use crate::dx_manager::channel::{ DaemonMessage };
@@ -113,3 +112,5 @@ pub use crate::assets::*;
 pub use strum::IntoEnumIterator;
 pub use strum_macros::{EnumIter, Display};
 pub use seq_macro::seq;
+
+pub const DX_VERSION: &str = env!("CARGO_PKG_VERSION");

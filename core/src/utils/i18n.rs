@@ -90,7 +90,7 @@ pub fn i18n_storage_file() -> Result<PathBuf> {
         if !storage_folder.exists() {
           std::fs::create_dir_all(&storage_folder)?;
         }
-        Ok(storage_folder.join("waglayla-ng.i18n.json"))
+        Ok(storage_folder.join("wala-wagdx.i18n.json"))
       }
     }
   }

@@ -14,18 +14,18 @@ pub fn confirm_ui(
   let (rect, response) = ui.allocate_exact_size(desired_size, egui::Sense::click());
 
   if ui.is_rect_visible(rect) {
-      ui.vertical(|ui| {
-          ui.horizontal(|ui| {
-              // Render "Yes" button
-              if ui.medium_button(i18n("Yes")).clicked() {
-                  *confirm = Some(Confirm::Yes);
-              }
-              // Render "No" button
-              if ui.medium_button(i18n("No")).clicked() {
-                  *confirm = Some(Confirm::No);
-              }
-          });
+    ui.vertical(|ui| {
+      ui.horizontal(|ui| {
+        // Render "Yes" button
+        if ui.medium_button(i18n("Yes")).clicked() {
+          *confirm = Some(Confirm::Yes);
+        }
+        // Render "No" button
+        if ui.medium_button(i18n("No")).clicked() {
+          *confirm = Some(Confirm::No);
+        }
       });
+    });
   }
 
   response
@@ -42,18 +42,18 @@ pub fn confirm_labels_ui(
   let (rect, response) = ui.allocate_exact_size(desired_size, egui::Sense::click());
 
   if ui.is_rect_visible(rect) {
-      ui.vertical(|ui| {
-          ui.horizontal(|ui| {
-              // Render "Yes" button
-              if ui.medium_button(yes_label).clicked() {
-                  *confirm = Some(Confirm::Yes);
-              }
-              // Render "No" button
-              if ui.medium_button(no_label).clicked() {
-                  *confirm = Some(Confirm::No);
-              }
-          });
+    ui.vertical(|ui| {
+      ui.horizontal(|ui| {
+        // Render "Yes" button
+        if ui.medium_button(yes_label).clicked() {
+          *confirm = Some(Confirm::Yes);
+        }
+        // Render "No" button
+        if ui.medium_button(no_label).clicked() {
+          *confirm = Some(Confirm::No);
+        }
       });
+    });
   }
 
   response
@@ -73,9 +73,9 @@ pub trait UiExtensions {
 
 impl UiExtensions for egui::Ui {
   fn confirm_widget(&mut self) -> Option<Confirm> {
-      let mut confirm = None;
-      confirm_ui(self, &mut confirm);
-      confirm
+    let mut confirm = None;
+    confirm_ui(self, &mut confirm);
+    confirm
   }
 
   fn confirm_widget_labels(

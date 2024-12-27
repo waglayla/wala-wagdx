@@ -64,3 +64,8 @@ pub fn describe_peers(state: NodeState) -> String {
   let peercount = state.peers().unwrap_or(0_usize);
   format!("{} {}", peercount, i18n("Peers"))
 }
+
+pub fn describe_daa(state: NodeState) -> String {
+  let daa_score = state.current_daa_score().unwrap_or(0_u64);
+  format!("{} {}", i18n("DAA:"), format_number(daa_score))
+}
