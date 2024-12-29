@@ -270,7 +270,7 @@ impl ComponentT for About {
 
     // Scale the font size based on window height
     let base_font_size = 20.0;
-    let font_size = (base_font_size * (window_height / 720.0)).clamp(16.0, 32.0);
+    let font_size = (base_font_size * (window_height / 720.0)).clamp(14.0, 32.0);
 
     egui::Frame::none()
       .inner_margin(20.0)
@@ -279,7 +279,7 @@ impl ComponentT for About {
       egui::ScrollArea::vertical().auto_shrink([false,true]).show(ui, |ui| {
         self.render_header(ctx, ui);
 
-        ui.add_space(font_size);
+        ui.add_space(font_size*3.0);
         ui.vertical_centered(|ui| {
           self.render_paragraph_with_strip(ui, max_width, font_size, i18n(PARAGRAPH_INFO));
         });

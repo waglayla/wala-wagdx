@@ -363,6 +363,10 @@ impl Settings {
           ui.add(toggle(&mut core.settings.user_interface.enable_sfx));
           ui.label(i18n("Sound Effects"));
         });
+        ui.horizontal(|ui| {
+          ui.add(toggle(&mut core.settings.user_interface.show_coinbase));
+          ui.label(i18n("Coinbase Notifications"));
+        });
 
         CollapsingHeader::new(i18n("Theme"))
           .default_open(true)
@@ -371,7 +375,7 @@ impl Settings {
               ui.horizontal(|ui| {
                 let current_theme_color_name = theme_color().name();
                 ui.menu_button(
-                  format!("{} ⏷", current_theme_color_name),
+                  format!("{}    ⏷", current_theme_color_name),
                   |ui| {
                     theme_colors().keys().for_each(|name| {
                       if name.as_str() != current_theme_color_name

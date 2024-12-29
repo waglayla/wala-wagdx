@@ -58,7 +58,11 @@ impl Assets {
     ctx.load_texture(
       "wala_coin",
       image,
-      egui::TextureOptions::default()
+      egui::TextureOptions {
+        magnification: TextureFilter::Linear,
+        minification: TextureFilter::Linear,
+        .. Default::default()
+      }
     )
   }
 
@@ -74,7 +78,11 @@ impl Assets {
     ctx.load_texture(
       "wala_text_logo_png",
       image,
-      egui::TextureOptions::default()
+      egui::TextureOptions {
+        magnification: TextureFilter::Linear,
+        minification: TextureFilter::Linear,
+        .. Default::default()
+      }
     )
   }
 
@@ -90,7 +98,11 @@ impl Assets {
     ctx.load_texture(
       "paw_banner",
       image,
-      egui::TextureOptions::default()
+      egui::TextureOptions {
+        magnification: TextureFilter::Linear,
+        minification: TextureFilter::Linear,
+        .. Default::default()
+      }
     )
   }
 }

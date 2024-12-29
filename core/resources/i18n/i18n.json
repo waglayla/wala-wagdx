@@ -100,6 +100,7 @@
       "Click to copy your full balance to clipboard": "Click to copy your full balance to clipboard",
       "Client RPC": "Client RPC",
       "Close the window": "Close the window",
+      "Coinbase Notifications": "Coinbase Notifications",
       "Compound": "Compound",
       "Compound UTXOs": "Compound UTXOs",
       "Compounding or sweeping your wallet allows you to combine several smaller UTXOs into larger ones. This may allow you to send more WALA than you otherwise could, due to transaction size limits.": "Compounding or sweeping your wallet allows you to combine several smaller UTXOs into larger ones. This may allow you to send more WALA than you otherwise could, due to transaction size limits.",

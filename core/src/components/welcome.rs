@@ -71,6 +71,10 @@ impl Welcome {
                 ui.add(toggle(&mut core.settings.user_interface.enable_sfx));
                 ui.label(i18n("Sound Effects"));
               });
+              ui.horizontal(|ui| {
+                ui.add(toggle(&mut core.settings.user_interface.show_coinbase));
+                ui.label(i18n("Coinbase Notifications"));
+              });
               
               ui.horizontal(|ui| {
                 ui.label(i18n("Language:"));

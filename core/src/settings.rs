@@ -421,6 +421,7 @@ pub struct UserInterfaceSettings {
   pub metrics: MetricsSettings,
   pub balance_padding: bool,
   pub enable_sfx: bool,
+  pub show_coinbase: bool,
   // #[serde(default)]
   // pub disable_frame: bool,
 }
@@ -462,6 +463,7 @@ impl Default for UserInterfaceSettings {
       metrics: MetricsSettings::default(),
       balance_padding: true,
       enable_sfx: true,
+      show_coinbase: false,
     }
   }
 }

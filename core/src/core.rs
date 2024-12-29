@@ -720,6 +720,12 @@ impl Core {
                         }
 
                         use waglayla_wallet_core::storage::TransactionData;
+                        let show_coinbase = self.settings.user_interface.show_coinbase;
+                        let is_coinbase = record.is_coinbase();
+
+                        if !show_coinbase && is_coinbase {
+                          return;
+                        }
                         match record.transaction_data() {
                           TransactionData::Outgoing { .. } => {
                             if self.settings.user_interface.enable_sfx {
@@ -731,7 +737,7 @@ impl Core {
                             if self.settings.user_interface.enable_sfx {
                               play_sound(&Assets::get().bark_incoming);
                             }
-                            if record.is_coinbase() {
+                            if is_coinbase {
                               self.add_notification(i18n("Block Found!"), ToastKind::Success, 5);
                             } else {
                               self.add_notification(i18n("Transaction Received"), ToastKind::Success, 5);
