@@ -276,7 +276,6 @@ pub struct NodeSettings {
 
   pub enable_bridge: bool,
 
-  // pub network: Network,
   pub node_kind: WaglayladNodeKind,
   pub waglaylad_daemon_binary: String,
   pub waglaylad_daemon_args: String,
@@ -302,7 +301,6 @@ impl Default for NodeSettings {
       enable_upnp: true,
 
       enable_bridge: false,
-      // network: Network::default(),
       node_kind: WaglayladNodeKind::default(),
       waglaylad_daemon_binary: String::default(),
       waglaylad_daemon_args: String::default(),
@@ -422,6 +420,7 @@ pub struct UserInterfaceSettings {
   pub scale: f32,
   pub metrics: MetricsSettings,
   pub balance_padding: bool,
+  pub enable_sfx: bool,
   // #[serde(default)]
   // pub disable_frame: bool,
 }
@@ -462,6 +461,7 @@ impl Default for UserInterfaceSettings {
       scale: 1.0,
       metrics: MetricsSettings::default(),
       balance_padding: true,
+      enable_sfx: true,
     }
   }
 }

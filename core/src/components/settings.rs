@@ -359,6 +359,11 @@ impl Settings {
       .default_open(false)
       .show(ui, |ui| {
 
+        ui.horizontal(|ui| {
+          ui.add(toggle(&mut core.settings.user_interface.enable_sfx));
+          ui.label(i18n("Sound Effects"));
+        });
+
         CollapsingHeader::new(i18n("Theme"))
           .default_open(true)
           .show(ui, |ui| {

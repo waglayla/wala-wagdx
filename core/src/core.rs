@@ -722,12 +722,20 @@ impl Core {
                         use waglayla_wallet_core::storage::TransactionData;
                         match record.transaction_data() {
                           TransactionData::Outgoing { .. } => {
-                            play_sound(&Assets::get().bark_outgoing);
+                            if self.settings.user_interface.enable_sfx {
+                              play_sound(&Assets::get().bark_outgoing);
+                            }
                             self.add_notification(i18n("Transaction Sent"), ToastKind::Success, 5);
                           },
                           TransactionData::Incoming { .. } => {
-                            play_sound(&Assets::get().bark_incoming);
-                            self.add_notification(i18n("Transaction Received"), ToastKind::Success, 5);
+                            if self.settings.user_interface.enable_sfx {
+                              play_sound(&Assets::get().bark_incoming);
+                            }
+                            if record.is_coinbase() {
+                              self.add_notification(i18n("Block Found!"), ToastKind::Success, 5);
+                            } else {
+                              self.add_notification(i18n("Transaction Received"), ToastKind::Success, 5);
+                            }
                           },
                           _ => {}
                         }

@@ -41,7 +41,7 @@ impl<'render> MnemonicPresenter<'render> {
     initiate a wallet recovery/import."
   }
 
-  pub fn render(&mut self, ui: &mut Ui, caption: Option<impl Into<String>>) {
+  pub fn render(&mut self, core: &mut Core, ui: &mut Ui, caption: Option<impl Into<String>>) {
     ui.vertical_centered(|ui| {
       ui.label(
         RichText::new(i18n("Never share your mnemonic seed phrase with anyone!"))
@@ -111,13 +111,9 @@ impl<'render> MnemonicPresenter<'render> {
 
     ui.vertical_centered(|ui| {
       ui.label("");
-      ui.checkbox(&mut self.context.allow_clipboard, i18n("Allow clipboard copy"));
-      if self.context.allow_clipboard {
-        ui.label("");
-        if ui.medium_button(format!("{CLIPBOARD_TEXT} Copy to clipboard")).clicked() {
-          ui.output_mut(|o| o.copied_text = self.phrase.to_string());
-          // manager().notify_clipboard(i18n("Copied to clipboard"));
-        }
+      if ui.medium_button(format!("{CLIPBOARD_TEXT} Copy to clipboard")).clicked() {
+        ui.output_mut(|o| o.copied_text = self.phrase.to_string());
+        core.notify_copy();
       }
     });
   }

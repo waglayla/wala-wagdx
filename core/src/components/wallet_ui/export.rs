@@ -263,7 +263,7 @@ impl WalletExport {
                     });
     
                     ui.label("");
-                    mnemonic_presenter.render(ui, Some(i18n("Your base wallets mnemonic seed is:")));
+                    mnemonic_presenter.render(core, ui, Some(i18n("Your base wallets mnemonic seed is:")));
                     ui.label("");
                 });
     

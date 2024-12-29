@@ -68,6 +68,11 @@ impl Welcome {
             .default_open(true)
             .show(ui, |ui| {
               ui.horizontal(|ui| {
+                ui.add(toggle(&mut core.settings.user_interface.enable_sfx));
+                ui.label(i18n("Sound Effects"));
+              });
+              
+              ui.horizontal(|ui| {
                 ui.label(i18n("Language:"));
 
                 let language_code = core.settings.language_code.clone();
@@ -144,7 +149,6 @@ impl Welcome {
               self.manager.waglayla_service().update_services(&self.settings.node, None);
               core.settings = settings.clone();
               core.get_mut::<components::settings::Settings>().load(settings);
-              core.set_active_component_by_type(TypeId::of::<Hello>());
             }
           });
         }
