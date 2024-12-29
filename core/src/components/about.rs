@@ -16,13 +16,13 @@ struct SocialIcon {
 }
 
 const PARAGRAPH_SOCIAL: &'static str = "\
-  Connect with us on Discord, Twitter, Telegram, and Reddit to stay updated \
+  Connect with us on Discord, Twitter, and Telegram to stay updated \
   on the latest news, events, and features. We’re more than just a meme-coin; \
   we’re a community of passionate individuals who share a love for crypto, mining \
   and dogs!";
 
 const PARAGRAPH_INFO: &'static str = "We are a fun fork of Kaspa with three primary goals: \
-  community, scalability, and longetivity. The WALA house created WagLayla for all memecoin \
+  community, scalability, and longetivity. The WALA House created WagLayla for all memecoin \
   lovers; miners, investors, and traders alike! Being built on Rust, the best qualities of the \
   KAS ecosystem shine through in WagLayla including speed, stability, and security. Wag with us, \
   and help build the ultimate memecoin community.";
@@ -37,7 +37,7 @@ const SOCIAL_ICONS: &[SocialIcon] = &[
   SocialIcon {
     icon: egui_phosphor::fill::GITHUB_LOGO,
     url: Some("https://github.com/waglayla"),
-    hover: Some("Waglayla on Github"),
+    hover: Some("WagLayla on Github"),
     variant: "phosphor-fill"
   },
   SocialIcon {
@@ -49,7 +49,7 @@ const SOCIAL_ICONS: &[SocialIcon] = &[
   SocialIcon {
     icon: egui_phosphor::regular::X_LOGO,
     url: Some("https://x.com/WagLayla"),
-    hover: Some("Waglayla on X"),
+    hover: Some("WagLayla on X"),
     variant: "phosphor"
   },
   SocialIcon {
@@ -279,7 +279,7 @@ impl ComponentT for About {
       egui::ScrollArea::vertical().auto_shrink([false,true]).show(ui, |ui| {
         self.render_header(ctx, ui);
 
-        ui.add_space(font_size*3.0);
+        ui.add_space(font_size*2.0);
         ui.vertical_centered(|ui| {
           self.render_paragraph_with_strip(ui, max_width, font_size, i18n(PARAGRAPH_INFO));
         });
@@ -291,12 +291,13 @@ impl ComponentT for About {
           ui.available_rect_before_wrap().min.y,
         );
     
-        DXImage::draw(ui, &Assets::get().paw_banner, max_width, image_pos, egui::Align2::CENTER_TOP);
+        DXImage::draw(ui, &Assets::get().paw_banner, max_width/1.5, image_pos, egui::Align2::CENTER_TOP);
         ui.add_space(24.0);
 
         ui.vertical_centered(|ui| {
           self.render_paragraph_with_strip(ui, max_width, font_size, i18n(PARAGRAPH_SOCIAL));
         });
+        ui.add_space(10.0);
         // self.dynamic_exchange_button_area(ui, max_width, &EXCHANGE_BUTTONS);
       });
     });

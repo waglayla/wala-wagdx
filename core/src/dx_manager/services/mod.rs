@@ -1,7 +1,7 @@
 use crate::imports::*;
 
 pub mod waglayla;
-pub use waglayla::WaglaylaService;
+pub use waglayla::WagLaylaService;
 
 pub mod peers;
 pub use peers::PeerMonitorService;
@@ -9,7 +9,7 @@ pub use peers::PeerMonitorService;
 pub mod stats;
 pub use stats::StatMonitorService;
 
-/// Service is a core component of the Waglayla NG application responsible for
+/// Service is a core component of the WagLayla NG application responsible for
 /// running application services and communication between these services.
 #[async_trait]
 pub trait Service: Sync + Send {

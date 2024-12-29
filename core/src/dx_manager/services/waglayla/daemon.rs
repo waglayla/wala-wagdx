@@ -1,5 +1,5 @@
 use crate::imports::*;
-use crate::dx_manager::services::waglayla::{Config, WaglayladServiceEvents};
+use crate::dx_manager::services::waglayla::{Config, WagLayladServiceEvents};
 use std::process::Stdio;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
@@ -16,7 +16,7 @@ struct Inner {
   path: Option<PathBuf>,
   is_running: Arc<AtomicBool>,
   pid: Mutex<Option<u32>>,
-  service_events: Channel<WaglayladServiceEvents>,
+  service_events: Channel<WagLayladServiceEvents>,
   task_ctl: DuplexChannel,
   termination_method: TerminationMethod,
 }
@@ -27,7 +27,7 @@ pub struct Daemon {
 }
 
 impl Daemon {
-  pub fn new(path: Option<PathBuf>, service_events: &Channel<WaglayladServiceEvents>) -> Self {
+  pub fn new(path: Option<PathBuf>, service_events: &Channel<WagLayladServiceEvents>) -> Self {
     Self {
       inner: Arc::new(Inner {
         path,
@@ -59,7 +59,7 @@ impl Daemon {
 }
 
 #[async_trait]
-impl super::Waglaylad for Daemon {
+impl super::WagLaylad for Daemon {
   async fn start(self: Arc<Self>, config: Config) -> Result<()> {
     let mut cmd = if let Some(path) = self.inner().path.clone() {
       Command::new(path)
@@ -123,7 +123,7 @@ impl super::Waglaylad for Daemon {
           line = reader.next_line().fuse() => {
             if let Ok(Some(line)) = line {
               // println!("waglaylad: {}", line);
-              stdout_relay_sender.send(WaglayladServiceEvents::Stdout { line }).await.unwrap();
+              stdout_relay_sender.send(WagLayladServiceEvents::Stdout { line }).await.unwrap();
             }
           }
         }

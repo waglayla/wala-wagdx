@@ -45,7 +45,7 @@ pub enum Error {
     Bip32(#[from] waglayla_bip32::Error),
 
     #[error("Missing external waglaylad node binary")]
-    MissingExternalWaglayladBinary,
+    MissingExternalWagLayladBinary,
 
     #[error("Invalid URL: {0}")]
     InvalidUrl(String),

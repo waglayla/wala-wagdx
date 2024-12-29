@@ -74,7 +74,7 @@ impl WalletExport {
     let mut F = create_custom_popup(ctx);
     F.rounding = 10.0.into();
 
-    let h_scale = max(450, (ui.available_width() / 1.5) as i32);
+    let h_scale = max(500, (ui.available_width() / 1.5) as i32);
     let v_scale = max(450, (ui.available_height() / 1.33) as i32);
 
     let screen_rect = ctx.screen_rect();
@@ -251,7 +251,7 @@ impl WalletExport {
                 let available_height = ui.available_height();
 
                 egui::ScrollArea::vertical()
-                  .max_height(available_height - 56.) 
+                  .max_height(available_height - 60.) 
                   .show(ui, |ui| {
                     // render_centered_content_noback(ctx, ui, i18n("Mnemonic Seed Phrase"), |ui| {
                     let mut mnemonic_presenter = MnemonicPresenter::new(mnemonic.as_str(), &mut self.mnemonic_presenter_context);

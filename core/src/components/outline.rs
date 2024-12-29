@@ -502,7 +502,7 @@ impl Outline {
   fn available_tabs(&self, core: &Core) -> Vec<Tab> {
     let mut tabs = vec![Tab::Wallet, Tab::NetworkInfo];
 
-    if core.settings.node.node_kind == WaglayladNodeKind::IntegratedAsDaemon {
+    if core.settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon {
       tabs.push(Tab::WalaNode);
       if core.settings.node.enable_bridge {
         tabs.push(Tab::WalaBridge);

@@ -23,7 +23,7 @@ pub struct Inner {
   start_time: Instant,
   // system: Option<System>,
 
-  waglayla: Arc<WaglaylaService>,
+  waglayla: Arc<WagLaylaService>,
   peer_monitor: Arc<PeerMonitorService>,
   stat_monitor: Arc<StatMonitorService>,
   daemon_channel : Channel<DaemonMessage>,
@@ -45,7 +45,7 @@ impl DX_Manager {
     let application_events =
       application_events.unwrap_or_else(ApplicationEventsChannel::unbounded);
 
-    let waglayla = Arc::new(WaglaylaService::new(
+    let waglayla = Arc::new(WagLaylaService::new(
       application_events.clone(),
       &settings, 
       daemon_channel.sender.clone(),
@@ -154,7 +154,7 @@ impl DX_Manager {
     self.inner.services.lock().unwrap().clone()
   }
 
-  pub fn waglayla_service(&self) -> &Arc<WaglaylaService> {
+  pub fn waglayla_service(&self) -> &Arc<WagLaylaService> {
     &self.inner.waglayla
   }
 

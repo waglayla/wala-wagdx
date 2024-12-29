@@ -17,25 +17,25 @@ cfg_if! {
   if #[cfg(not(target_arch = "wasm32"))] {
     #[derive(Default, Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
     #[serde(rename_all = "kebab-case")]
-    pub enum WaglayladNodeKind {
+    pub enum WagLayladNodeKind {
       Disabled,
       Remote,
       #[default]
       IntegratedAsDaemon,
     }
 
-    const WAGLAYLAD_NODE_KINDS: [WaglayladNodeKind; 3] = [
-      WaglayladNodeKind::Disabled,
-      WaglayladNodeKind::Remote,
-      WaglayladNodeKind::IntegratedAsDaemon,
+    const WAGLAYLAD_NODE_KINDS: [WagLayladNodeKind; 3] = [
+      WagLayladNodeKind::Disabled,
+      WagLayladNodeKind::Remote,
+      WagLayladNodeKind::IntegratedAsDaemon,
     ];
 
-    impl std::fmt::Display for WaglayladNodeKind {
+    impl std::fmt::Display for WagLayladNodeKind {
       fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-          WaglayladNodeKind::Disabled => write!(f, "{}", i18n("Disabled")),
-          WaglayladNodeKind::Remote => write!(f, "{}", i18n("Light")),
-          WaglayladNodeKind::IntegratedAsDaemon => write!(f, "{}", i18n("Full")),
+          WagLayladNodeKind::Disabled => write!(f, "{}", i18n("Disabled")),
+          WagLayladNodeKind::Remote => write!(f, "{}", i18n("Light")),
+          WagLayladNodeKind::IntegratedAsDaemon => write!(f, "{}", i18n("Full")),
         }
       }
     }
@@ -43,57 +43,57 @@ cfg_if! {
   } else {
     #[derive(Default, Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
     #[serde(rename_all = "kebab-case")]
-    pub enum WaglayladNodeKind {
+    pub enum WagLayladNodeKind {
       #[default]
       Remote,
     }
 
-    const WAGLAYLAD_NODE_KINDS: [WaglayladNodeKind; 1] = [
-      WaglayladNodeKind::Remote,
+    const WAGLAYLAD_NODE_KINDS: [WagLayladNodeKind; 1] = [
+      WagLayladNodeKind::Remote,
     ];
 
-    impl std::fmt::Display for WaglayladNodeKind {
+    impl std::fmt::Display for WagLayladNodeKind {
       fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-          WaglayladNodeKind::Remote => write!(f, "Remote"),
+          WagLayladNodeKind::Remote => write!(f, "Remote"),
         }
       }
     }
   }
 }
 
-impl WaglayladNodeKind {
-  pub fn iter() -> impl Iterator<Item = &'static WaglayladNodeKind> {
+impl WagLayladNodeKind {
+  pub fn iter() -> impl Iterator<Item = &'static WagLayladNodeKind> {
     WAGLAYLAD_NODE_KINDS.iter()
   }
 
   pub fn describe(&self) -> &str {
     match self {
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::Disabled => i18n("Disables waglaylad. Required for deleting or changing the storage location. (These can be done in the Settings menu after startup)"),
-      WaglayladNodeKind::Remote => i18n("Connects to a Remote Rusty Waglayla Node via wRPC."),
+      WagLayladNodeKind::Disabled => i18n("Disables waglaylad. Required for deleting or changing the storage location. (These can be done in the Settings menu after startup)"),
+      WagLayladNodeKind::Remote => i18n("Connects to a Remote WagLayla Rusty Node via wRPC."),
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::IntegratedAsDaemon => i18n("The node is spawned as a child daemon process (recommended, if you have the ample free storage available)."),
+      WagLayladNodeKind::IntegratedAsDaemon => i18n("The node is spawned as a child daemon process (recommended, if you have the ample free storage available)."),
     }
   }
 
   pub fn is_config_capable(&self) -> bool {
     match self {
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::Disabled => false,
-      WaglayladNodeKind::Remote => false,
+      WagLayladNodeKind::Disabled => false,
+      WagLayladNodeKind::Remote => false,
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::IntegratedAsDaemon => true,
+      WagLayladNodeKind::IntegratedAsDaemon => true,
     }
   }
 
   pub fn is_local(&self) -> bool {
     match self {
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::Disabled => false,
-      WaglayladNodeKind::Remote => false,
+      WagLayladNodeKind::Disabled => false,
+      WagLayladNodeKind::Remote => false,
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladNodeKind::IntegratedAsDaemon => true,
+      WagLayladNodeKind::IntegratedAsDaemon => true,
     }
   }
 }
@@ -254,7 +254,7 @@ impl NodeConnectionConfigKind {
   }
 }
 
-// Leave the management to the Waglayla daemon
+// Leave the management to the WagLayla daemon
 pub const NODE_MEMORY_SCALE: f64 = 1.0;
 
 // Complete settings suite/section for the daemon
@@ -276,7 +276,7 @@ pub struct NodeSettings {
 
   pub enable_bridge: bool,
 
-  pub node_kind: WaglayladNodeKind,
+  pub node_kind: WagLayladNodeKind,
   pub waglaylad_daemon_binary: String,
   pub waglaylad_daemon_args: String,
   pub waglaylad_daemon_args_enable: bool,
@@ -301,7 +301,7 @@ impl Default for NodeSettings {
       enable_upnp: true,
 
       enable_bridge: false,
-      node_kind: WaglayladNodeKind::default(),
+      node_kind: WagLayladNodeKind::default(),
       waglaylad_daemon_binary: String::default(),
       waglaylad_daemon_args: String::default(),
       waglaylad_daemon_args_enable: false,
@@ -457,7 +457,7 @@ impl Default for UserInterfaceSettings {
     // }
 
     Self {
-      theme_color: "Waglayla".to_string(),
+      theme_color: "WagLayla".to_string(),
       theme_style: "Rounded".to_string(),
       scale: 1.0,
       metrics: MetricsSettings::default(),

@@ -46,7 +46,7 @@ impl DaemonConsole {
 
 impl ComponentT for DaemonConsole {
   fn name(&self) -> Option<&'static str> {
-    Some("Waglaylad Console")
+    Some("WagLaylad Console")
   }
 
   fn render(

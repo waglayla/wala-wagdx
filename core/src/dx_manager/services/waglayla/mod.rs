@@ -29,7 +29,7 @@ cfg_if! {
     pub mod daemon;
 
     #[async_trait]
-    pub trait Waglaylad {
+    pub trait WagLaylad {
       async fn start(self : Arc<Self>, config : Config) -> Result<()>;
       async fn stop(self : Arc<Self>) -> Result<()>;
     }
@@ -40,7 +40,7 @@ cfg_if! {
 cfg_if! {
   if #[cfg(not(target_arch = "wasm32"))] {
     #[derive(Debug, Clone)]
-    pub enum WaglayladServiceEvents {
+    pub enum WagLayladServiceEvents {
       #[cfg(not(target_arch = "wasm32"))]
       StartInternalAsDaemon { config: Config, network: Network },
       StartRemoteConnection { rpc_config : RpcConfig, network : Network },
@@ -50,7 +50,7 @@ cfg_if! {
     }
   } else {
     #[derive(Debug)]
-    pub enum WaglayladServiceEvents {
+    pub enum WagLayladServiceEvents {
       StartRemoteConnection { rpc_config : RpcConfig, network : Network },
       Disable { network : Network },
       Exit,
@@ -58,22 +58,22 @@ cfg_if! {
   }
 }
 
-pub struct WaglaylaService {
+pub struct WagLaylaService {
   pub application_events: ApplicationEventsChannel,
-  pub service_events: Channel<WaglayladServiceEvents>,
+  pub service_events: Channel<WagLayladServiceEvents>,
   pub task_ctl: Channel<()>,
   pub network: Mutex<Network>,
   pub wallet: Arc<dyn WalletApi>,
   pub services_start_instant: Mutex<Option<Instant>>,
   #[cfg(not(target_arch = "wasm32"))]
-  pub waglaylad: Mutex<Option<Arc<dyn Waglaylad + Send + Sync + 'static>>>,
+  pub waglaylad: Mutex<Option<Arc<dyn WagLaylad + Send + Sync + 'static>>>,
   pub log_file: Mutex<std::fs::File>,
   pub daemon_sender: Sender<DaemonMessage>,
   pub connect_on_startup: Option<NodeSettings>,
   pub url: Mutex<Option<String>>,
 }
 
-impl WaglaylaService {
+impl WagLaylaService {
   pub fn new(
     application_events: ApplicationEventsChannel,
     settings: &Settings, 
@@ -102,7 +102,7 @@ impl WaglaylaService {
     });
 
     if !settings.initialized {
-      log_warn!("WaglaylaService::new(): Settings are not initialized");
+      log_warn!("WagLaylaService::new(): Settings are not initialized");
     }
 
     Self {
@@ -122,7 +122,7 @@ impl WaglaylaService {
   }
 
   #[cfg(not(target_arch = "wasm32"))]
-  pub fn retain(&self, waglaylad: Arc<dyn Waglaylad + Send + Sync + 'static>) {
+  pub fn retain(&self, waglaylad: Arc<dyn WagLaylad + Send + Sync + 'static>) {
     self.waglaylad.lock().unwrap().replace(waglaylad);
   }
 
@@ -250,34 +250,34 @@ impl WaglaylaService {
   }
 
   pub async fn apply_node_settings(&self, node_settings: &NodeSettings) -> Result<()> {
-    match WaglayladServiceEvents::from_node_settings(node_settings, None) {
+    match WagLayladServiceEvents::from_node_settings(node_settings, None) {
       Ok(event) => {
         self.service_events
           .sender
           .try_send(event)
           .unwrap_or_else(|err| {
-            log_error!("WaglayladService error: {}", err);
+            log_error!("WagLayladService error: {}", err);
           });
       }
       Err(err) => {
-        log_error!("WaglayladServiceEvents::try_from() error: {}", err);
+        log_error!("WagLayladServiceEvents::try_from() error: {}", err);
       }
     }
     Ok(())
   }
 
   pub fn update_services(&self, node_settings: &NodeSettings, options: Option<RpcOptions>) {
-    match WaglayladServiceEvents::from_node_settings(node_settings, options) {
+    match WagLayladServiceEvents::from_node_settings(node_settings, options) {
       Ok(event) => {
         self.service_events
           .sender
           .try_send(event)
           .unwrap_or_else(|err| {
-            log_error!("WaglayladService error: {}", err);
+            log_error!("WagLayladService error: {}", err);
           });
       }
       Err(err) => {
-        log_error!("WaglayladServiceEvents::try_from() error: {}", err);
+        log_error!("WagLayladServiceEvents::try_from() error: {}", err);
       }
     }
   }
@@ -309,10 +309,10 @@ impl WaglaylaService {
     manager().update_storage(options);
   }
 
-  async fn handle_event(self: &Arc<Self>, event: WaglayladServiceEvents) -> Result<bool> {
+  async fn handle_event(self: &Arc<Self>, event: WagLayladServiceEvents) -> Result<bool> {
     match event {
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladServiceEvents::Stdout { line } => {
+      WagLayladServiceEvents::Stdout { line } => {
         let wallet = self.core_wallet().ok_or(Error::WalletIsNotLocal)?;
         if !wallet.utxo_processor().is_synced() {
           wallet
@@ -332,7 +332,7 @@ impl WaglaylaService {
         let _ = self.daemon_sender.try_send(DaemonMessage(line));
       }
       #[cfg(not(target_arch = "wasm32"))]
-      WaglayladServiceEvents::StartInternalAsDaemon { config, network } => {
+      WagLayladServiceEvents::StartInternalAsDaemon { config, network } => {
         self.stop_all_services().await?;
 
         let waglaylad = Arc::new(daemon::Daemon::new(None, &self.service_events));
@@ -340,14 +340,14 @@ impl WaglaylaService {
         waglaylad.clone().start(config).await.unwrap();
 
         let rpc = Self::create_rpc_client(Some("127.0.0.1".to_string()), None)
-          .expect("Waglaylad Service - unable to create wRPC client");
+          .expect("WagLaylad Service - unable to create wRPC client");
         *self.url.lock().unwrap() = Some("127.0.0.1".to_string());
         self.start_all_services(Some(rpc), network).await?;
         self.connect_rpc_client().await?;
 
         self.update_storage();
       }
-      WaglayladServiceEvents::StartRemoteConnection {
+      WagLayladServiceEvents::StartRemoteConnection {
         rpc_config,
         network,
       } => {
@@ -360,13 +360,13 @@ impl WaglaylaService {
           self.stop_all_services().await?;
 
           let rpc = Self::create_rpc_client(rpc_config.url(), None)
-            .expect("Waglaylad Service - unable to create wRPC client");
+            .expect("WagLaylad Service - unable to create wRPC client");
           *self.url.lock().unwrap() = rpc_config.url();
           self.start_all_services(Some(rpc), network).await?;
           self.connect_rpc_client().await?;
         }
       }
-      WaglayladServiceEvents::Disable { network } => {
+      WagLayladServiceEvents::Disable { network } => {
         self.stop_all_services().await?;
         if let Some(wallet) = self.core_wallet() {
           self.stop_all_services().await?;
@@ -384,7 +384,7 @@ impl WaglaylaService {
         }
         *self.url.lock().unwrap() = None;
       }
-      WaglayladServiceEvents::Exit => {
+      WagLayladServiceEvents::Exit => {
         return Ok(true);
       }
     }
@@ -512,7 +512,7 @@ impl WaglaylaService {
 pub struct Context {}
 
 #[async_trait]
-impl Service for WaglaylaService {
+impl Service for WagLaylaService {
   fn name(&self) -> &'static str {
     "waglayla-service"
   }
@@ -672,7 +672,7 @@ impl Service for WaglaylaService {
   fn terminate(self: Arc<Self>) {
     self.service_events
       .sender
-      .try_send(WaglayladServiceEvents::Exit)
+      .try_send(WagLayladServiceEvents::Exit)
       .unwrap();
   }
 
@@ -682,7 +682,7 @@ impl Service for WaglaylaService {
   }
 }
 
-impl WaglayladServiceEvents {
+impl WagLayladServiceEvents {
   pub fn from_node_settings(
       node_settings: &NodeSettings,
       options: Option<RpcOptions>,
@@ -690,20 +690,20 @@ impl WaglayladServiceEvents {
     cfg_if! {
       if #[cfg(not(target_arch = "wasm32"))] {
         match &node_settings.node_kind {
-          WaglayladNodeKind::Disabled => {
-            Ok(WaglayladServiceEvents::Disable { network : Network::Mainnet })
+          WagLayladNodeKind::Disabled => {
+            Ok(WagLayladServiceEvents::Disable { network : Network::Mainnet })
           }
-          WaglayladNodeKind::IntegratedAsDaemon => {
-            Ok(WaglayladServiceEvents::StartInternalAsDaemon { config : Config::from(node_settings.clone()), network : Network::Mainnet })
+          WagLayladNodeKind::IntegratedAsDaemon => {
+            Ok(WagLayladServiceEvents::StartInternalAsDaemon { config : Config::from(node_settings.clone()), network : Network::Mainnet })
           }
-          WaglayladNodeKind::Remote => {
-            Ok(WaglayladServiceEvents::StartRemoteConnection { rpc_config : RpcConfig::from_node_settings(node_settings,options), network : Network::Mainnet })
+          WagLayladNodeKind::Remote => {
+            Ok(WagLayladServiceEvents::StartRemoteConnection { rpc_config : RpcConfig::from_node_settings(node_settings,options), network : Network::Mainnet })
           }
         }
       } else {
         match &node_settings.node_kind {
-          WaglayladNodeKind::Remote => {
-            Ok(WaglayladServiceEvents::StartRemoteConnection { rpc_config : RpcConfig::from_node_settings(node_settings,options), network : Network::Mainnet })
+          WagLayladNodeKind::Remote => {
+            Ok(WagLayladServiceEvents::StartRemoteConnection { rpc_config : RpcConfig::from_node_settings(node_settings,options), network : Network::Mainnet })
           }
         }
       }

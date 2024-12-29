@@ -184,7 +184,7 @@ impl Storage {
 
               if *confirm_deletion {
                 ui.add_sized(vec2(260.,4.), Separator::default());
-                ui.label(i18n("This action will erase Waglayla database and logs"));
+                ui.label(i18n("This action will erase WagLayla database and logs"));
                 ui.label("");
                 ui.colored_label(theme_color().alert_color, i18n("Please Confirm Deletion"));
                 if let Some(response) = ui.confirm_widget_labels("Apply", "Cancel") {

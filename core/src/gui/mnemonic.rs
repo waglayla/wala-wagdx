@@ -55,15 +55,15 @@ impl<'render> MnemonicPresenter<'render> {
     let available_width = ui.available_width();
     // println!("available_width: {}", available_width);
     let (font_size, relative_size, width_per_col) = if available_width < 390.0 {
-      (12., 0.95, 80.)
+      (12., 0.95, 107.)
     } else if available_width < 600.0 {
-      (12., 0.95, 100.)
+      (12., 0.95, 120.)
     } else if available_width < 850.0 {
-      (14., 0.95, 120.)
+      (14., 0.95, 130.)
     } else if available_width < 1000.0 {
-      (14., 0.6, 120.)
+      (14., 0.6, 140.)
     } else {
-      (16., 0.6, 140.)
+      (16., 0.6, 150.)
     };
 
     ui.horizontal(|ui| {

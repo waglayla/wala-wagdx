@@ -602,7 +602,7 @@ impl ComponentT for CreateWallet {
               [input_width, 20.0],
               egui::TextEdit::singleline(&mut self.args_create.wallet_secret)
                 .password(!self.args_create.wallet_secret_show)
-                .hint_text(i18n("Type wallet password here"))
+                .hint_text(i18n("Type password here"))
                 .font(egui::FontId::proportional(font_size))
             );
             self.next_focus(ui, Focus::WalletSecret, password_response.clone());
@@ -611,7 +611,7 @@ impl ComponentT for CreateWallet {
               [input_width, 20.0],
               egui::TextEdit::singleline(&mut self.args_create.wallet_secret_confirm)
                 .password(!self.args_create.wallet_secret_show)
-                .hint_text(i18n("Confirm"))
+                .hint_text(i18n("Confirm password here"))
                 .font(egui::FontId::proportional(font_size))
             );
             self.next_focus(ui, Focus::WalletConfirm, confirm_response.clone());
@@ -639,7 +639,7 @@ impl ComponentT for CreateWallet {
             
             ui.add_space(20.);
 
-            ui.label(i18n("Enable separate payment password"));
+            ui.heading(i18n("Enable separate payment password"));
             ui.add(toggle(
               &mut self.args_create.enable_payment_secret,
             ));
@@ -1075,7 +1075,7 @@ impl ComponentT for CreateWallet {
         );
         if response.clicked(){}
 
-        let h_scale = max(450, (ui.available_width() / 1.5) as i32);
+        let h_scale = max(500, (ui.available_width() / 1.5) as i32);
         let v_scale = max(450, (ui.available_height() / 1.33) as i32);
 
         egui::Window::new(i18n("Mnemonic Seed Phrase"))
@@ -1090,7 +1090,7 @@ impl ComponentT for CreateWallet {
             match self.seed_state {
               SeedState::Display => {
                 egui::ScrollArea::vertical()
-                  .max_height(available_height - 56.) 
+                  .max_height(available_height - 60.) 
                   .show(ui, |ui| {
                     // render_centered_content_noback(ctx, ui, i18n("Mnemonic Seed Phrase"), |ui| {
                     let mut mnemonic_presenter = MnemonicPresenter::new(mnemonic.as_str(), &mut self.args_create.mnemonic_presenter_context);

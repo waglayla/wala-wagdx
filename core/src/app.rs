@@ -72,7 +72,7 @@ cfg_if! {
       Wdx {
         reset_settings : bool,
       },
-      Waglaylad { args : Box<NodeArgs> },
+      WagLaylad { args : Box<NodeArgs> },
     }
 
     fn include_icon(png_bytes: &[u8]) -> std::result::Result<IconData, Box<dyn std::error::Error>> {  
@@ -92,7 +92,7 @@ cfg_if! {
       if args().any(|arg| arg == "--daemon") || var("WALA_WAGDX_DAEMON").is_ok() {
         let args = once("waglaylad".to_string()).chain(args().skip(1).filter(|arg| arg != "--daemon"));//.collect::<Vec<String>>();
         match NodeArgs::parse(args) {
-          Ok(args) => Args::Waglaylad { args : Box::new(args) },
+          Ok(args) => Args::WagLaylad { args : Box::new(args) },
           Err(err) => {
             println!("{err}");
             std::process::exit(1);
@@ -102,7 +102,7 @@ cfg_if! {
         let cmd = Command::new("wala-wagdx")
           .about(format!("wala-wagdx v{VERSION}-{GIT_DESCRIBE} (rusty-waglayla {})",  waglayla_wallet_core::version()))
           .arg(arg!(--version "Display software version"))
-          .arg(arg!(--daemon "Run as Rusty Waglayla p2p daemon"))
+          .arg(arg!(--daemon "Run as WagLayla Rusty p2p daemon"))
           .arg(
             Arg::new("reset-settings")
             .long("reset-settings")
@@ -175,7 +175,7 @@ cfg_if! {
       }
 
       match parse_args() {
-        Args::Waglaylad{ args } => {
+        Args::WagLaylad{ args } => {
           init_ungraceful_panic_handler();
           let fd_total_budget = fd_budget::limit() - args.rpc_max_clients as i32 - args.inbound_limit as i32 - args.outbound_target as i32;
           let (core, _) = create_core(*args, fd_total_budget);
@@ -228,7 +228,7 @@ cfg_if! {
           let icon_data = include_icon(WALA_WAGDX_ICON_PNG).expect("Failed to load embedded icon");
 
           let mut viewport = egui::ViewportBuilder::default()
-            .with_title(i18n("Waglayla Wag-DX"))
+            .with_title(i18n("WagLayla Wag-DX"))
             .with_min_inner_size([1030.0, 600.0])
             .with_inner_size([1030.0,600.0])
             .with_icon(icon_data)

@@ -2,7 +2,7 @@ pub use cfg_if::cfg_if;
 pub use downcast_rs::{impl_downcast, Downcast, DowncastSync};
 pub use waglayla_consensus_core::constants::SOMPI_PER_WAGLAYLA;
 pub use waglayla_consensus_core::network::{NetworkId, NetworkType};
-pub use waglayla_consensus_core::Hash as WaglaylaHash;
+pub use waglayla_consensus_core::Hash as WagLaylaHash;
 pub use waglayla_metrics_core::MetricsSnapshot;
 pub use waglayla_rpc_core::api::rpc::RpcApi;
 // pub use waglayla_rpc_core::{RpcFeeEstimate, RpcFeerateBucket}; TODO maybe
@@ -98,7 +98,7 @@ pub use crate::dx_manager::{manager, DX_Manager, Service};
 pub use crate::dx_manager::channel::{ DaemonMessage };
 
 pub use crate::settings::{
-  WaglayladNodeKind, NetworkInterfaceConfig, NetworkInterfaceKind,
+  WagLayladNodeKind, NetworkInterfaceConfig, NetworkInterfaceKind,
   NodeConnectionConfigKind, NodeSettings, RpcConfig, RpcOptions, Settings,
   UserInterfaceSettings,
 };

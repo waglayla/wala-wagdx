@@ -50,8 +50,8 @@ impl ComponentT for Donate {
   ) {
     ui.set_height(ui.available_height());
     let base_estimated_height = 500.0;
-    let font_size = (ui.available_height() / 36.0).min(ui.available_width() / 36.0);
-    let factor = font_size/16.66;
+    let font_size = (ui.available_height() / 26.0).min(ui.available_width() / 26.0);
+    let factor = font_size/20.0;
 
     render_centered_content_noback(ctx, ui, i18n("Donation Wallets"), base_estimated_height*factor, |ui| {
       for cookie in COOKIES {

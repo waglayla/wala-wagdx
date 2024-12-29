@@ -149,6 +149,11 @@ impl From<Arc<TransactionRecord>> for Transaction {
 }
 
 impl Transaction {
+  pub fn maturity(&self) -> bool {
+    let Context { record, maturity } = &*self.context();
+    maturity.expect("No Maturity Set")
+  }
+
   pub fn render(
     &self,
     ui: &mut Ui,

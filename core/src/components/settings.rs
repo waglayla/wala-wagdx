@@ -177,14 +177,14 @@ impl Settings {
 
       let mut node_settings_error = None;
 
-      CollapsingHeader::new(i18n("Waglayla p2p Network & Node Connection"))
+      CollapsingHeader::new(i18n("WagLayla p2p Network & Node Connection"))
         .default_open(true)
         .show(ui, |ui| {
           CollapsingHeader::new(i18n("Node Mode"))
             .default_open(true)
             .show(ui, |ui| {
               ui.horizontal_wrapped(|ui|{
-                WaglayladNodeKind::iter().for_each(|node_kind| {
+                WagLayladNodeKind::iter().for_each(|node_kind| {
                   let mut is_selected = self.settings.node.node_kind == *node_kind;
                   let response = ui.add(toggle(&mut is_selected));
 
@@ -200,10 +200,10 @@ impl Settings {
               });
 
               match self.settings.node.node_kind {
-                WaglayladNodeKind::Remote => {
+                WagLayladNodeKind::Remote => {
 
                 },
-                WaglayladNodeKind::IntegratedAsDaemon => {
+                WagLayladNodeKind::IntegratedAsDaemon => {
                     // TODO
                     // CollapsingHeader::new(i18n("Stratum Bridge"))
                     //     .default_open(true)
@@ -260,7 +260,7 @@ impl Settings {
           self.settings.node.grpc_network_interface = self.grpc_network_interface.as_ref().try_into().unwrap(); //NetworkInterfaceConfig::try_from(&self.grpc_network_interface).unwrap();
         }
 
-        if self.settings.node.node_kind == WaglayladNodeKind::Remote {
+        if self.settings.node.node_kind == WagLayladNodeKind::Remote {
           node_settings_error = Self::render_remote_settings(core, ui, &mut self.settings.node);
         }
 

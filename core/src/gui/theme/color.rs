@@ -40,7 +40,7 @@ pub struct ThemeColor {
 impl ThemeColor {
   pub fn pink() -> Self {
     Self {
-      name: "Waglayla".to_string(),
+      name: "WagLayla".to_string(),
       dark_mode: true,
       waglayla_color: Color32::from_rgb(255, 182, 193),
       hyperlink_color: Color32::from_rgb(255, 105, 180),

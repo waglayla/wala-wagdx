@@ -13,7 +13,7 @@ impl Welcome {
     let mut settings = Settings::default();
 
     #[cfg(target_arch = "wasm32")] {
-      settings.node.node_kind = WaglayladNodeKind::IntegratedAsDaemon;
+      settings.node.node_kind = WagLayladNodeKind::IntegratedAsDaemon;
     }
 
     Self { 
@@ -30,40 +30,14 @@ impl Welcome {
 
       let mut error = None;
 
-      ui.heading(i18n("Welcome to Waglayla Wag-DX"));
+      ui.heading(i18n("Welcome to WagLayla Wag-DX"));
       ui.add_space(16.0);
-      ui.label(i18n("Please configure your Waglayla Wag-DX settings"));
+      ui.label(i18n("Please configure your WagLayla Wag-DX settings"));
       ui.add_space(16.0);
 
       CollapsingHeader::new(i18n("Settings"))
         .default_open(true)
         .show(ui, |ui| {
-          CollapsingHeader::new(i18n("Waglayla p2p Node & Connection"))
-            .default_open(true)
-            .show(ui, |ui| {
-              ui.horizontal_wrapped(|ui| {
-                WaglayladNodeKind::iter().for_each(|node_kind| {
-                  let mut is_selected = self.settings.node.node_kind == *node_kind;
-                  let response = ui.add(toggle(&mut is_selected));
-                  
-                  if response.changed() {
-                    self.settings.node.node_kind = *node_kind;
-                  }
-  
-                  ui.label(node_kind.to_string());
-                  response.on_hover_text_at_pointer(node_kind.describe());
-
-                  ui.separator();
-                });
-              });
-
-              if self.settings.node.node_kind == WaglayladNodeKind::Remote {
-                error = crate::components::settings::Settings::render_remote_settings(core,ui,&mut self.settings.node);
-              } else if self.settings.node.node_kind == WaglayladNodeKind::IntegratedAsDaemon {
-                error = crate::components::settings::Settings::render_node_storage_settings(core,ui,&mut self.settings.node);
-              }
-            });
-
           CollapsingHeader::new(i18n("User Interface"))
             .default_open(true)
             .show(ui, |ui| {
@@ -110,26 +84,33 @@ impl Welcome {
                   self.settings.user_interface.theme_color = theme_color;
                   apply_theme_color_by_name(ui.ctx(), self.settings.user_interface.theme_color.clone());
                 }
-
-                ui.add_space(16.);
-                ui.label(i18n("Theme Style:"));
-
-                let mut theme_style = self.settings.user_interface.theme_style.clone();
-                egui::ComboBox::from_id_source("theme_style_selector")
-                  .selected_text(theme_style.as_str())
-                  .show_ui(ui, |ui| {
-                    ui.style_mut().wrap_mode = Some(TextWrapMode::Extend);
-                    ui.set_min_width(60.0);
-                    theme_styles().keys().for_each(|name| {
-                      ui.selectable_value(&mut theme_style, name.to_string(), name);
-                    });
-                  });
-                    
-                if theme_style != self.settings.user_interface.theme_style {
-                  self.settings.user_interface.theme_style = theme_style;
-                  apply_theme_style_by_name(ui.ctx(), self.settings.user_interface.theme_style.clone());
-                }
             });        
+          });
+
+          CollapsingHeader::new(i18n("WagLayla p2p Node & Connection"))
+            .default_open(true)
+            .show(ui, |ui| {
+              ui.horizontal_wrapped(|ui| {
+                WagLayladNodeKind::iter().for_each(|node_kind| {
+                  let mut is_selected = self.settings.node.node_kind == *node_kind;
+                  let response = ui.add(toggle(&mut is_selected));
+                  
+                  if response.changed() {
+                    self.settings.node.node_kind = *node_kind;
+                  }
+  
+                  ui.label(node_kind.to_string());
+                  response.on_hover_text_at_pointer(node_kind.describe());
+
+                  ui.separator();
+                });
+              });
+
+              if self.settings.node.node_kind == WagLayladNodeKind::Remote {
+                error = crate::components::settings::Settings::render_remote_settings(core,ui,&mut self.settings.node);
+              } else if self.settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon {
+                error = crate::components::settings::Settings::render_node_storage_settings(core,ui,&mut self.settings.node);
+              }
           });
 
         ui.add_space(32.0);
@@ -162,12 +143,12 @@ impl Welcome {
     
     ui.vertical_centered(|ui| {
       ui.add_space(32.0);
-      ui.colored_label(theme_color().alert_color, "Please note - this is a beta release - Waglayla Wag-DX is still in early development and is not yet ready for production use.");
+      ui.colored_label(theme_color().alert_color, "Please note - this is a beta release - WagLayla Wag-DX is still in early development and is not yet ready for production use.");
       ui.add_space(32.0);
-      ui.label(format!("Waglayla Wag-DX v{}  •  Rusty Waglayla v{}", env!("CARGO_PKG_VERSION"), waglayla_wallet_core::version()));
+      ui.label(format!("WagLayla Wag-DX v{}  •  WagLayla Rusty v{}", env!("CARGO_PKG_VERSION"), waglayla_wallet_core::version()));
       ui.hyperlink_to(
-        "https://waglayla.org",
-        "https://waglayla.org",
+        "https://waglayla.com",
+        "https://waglayla.com",
       );
     });
   }

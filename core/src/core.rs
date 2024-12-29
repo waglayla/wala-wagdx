@@ -244,9 +244,14 @@ impl eframe::App for Core {
 
 impl Core {
   pub fn render_frame(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
-    let title = format!("Waglayla Wag-DX v{}", DX_VERSION);
+    let title = format!("WagLayla Wag-DX v{}", DX_VERSION);
     window_frame(self.window_frame, ctx, title.as_str(), |ui| {
       if !self.settings.initialized {
+        apply_theme_color_by_name(
+          ctx,
+          "WagLayla",
+        );
+
         egui::CentralPanel::default()
         .frame(create_custom_popup(ctx))
         .show_inside(ui, |ui| {
@@ -703,12 +708,12 @@ impl Core {
                     .as_ref()
                     .and_then(|user_accounts| {
                       user_accounts.get(&id).map(|account| {
-                        if account
+                        let TX = account
                           .transactions()
                           .replace_or_insert(Transaction::new_confirmed(
                             Arc::new(record.clone()),
-                          ))
-                          .is_none()
+                          ));
+                        if TX.is_none()
                         {
                           let mut binding = account.transactions();
                           while binding.len() as u64 > TRANSACTION_PAGE_SIZE {
@@ -717,33 +722,38 @@ impl Core {
                           account.set_transaction_count(
                             account.transaction_count() + 1,
                           );
-                        }
 
-                        use waglayla_wallet_core::storage::TransactionData;
-                        let show_coinbase = self.settings.user_interface.show_coinbase;
-                        let is_coinbase = record.is_coinbase();
+                          self.update_wallet();
+                        } else {
+                          if TX.unwrap().maturity() { return; }
 
-                        if !show_coinbase && is_coinbase {
-                          return;
-                        }
-                        match record.transaction_data() {
-                          TransactionData::Outgoing { .. } => {
-                            if self.settings.user_interface.enable_sfx {
-                              play_sound(&Assets::get().bark_outgoing);
-                            }
-                            self.add_notification(i18n("Transaction Sent"), ToastKind::Success, 5);
-                          },
-                          TransactionData::Incoming { .. } => {
-                            if self.settings.user_interface.enable_sfx {
-                              play_sound(&Assets::get().bark_incoming);
-                            }
-                            if is_coinbase {
-                              self.add_notification(i18n("Block Found!"), ToastKind::Success, 5);
-                            } else {
-                              self.add_notification(i18n("Transaction Received"), ToastKind::Success, 5);
-                            }
-                          },
-                          _ => {}
+                          use waglayla_wallet_core::storage::TransactionData;
+                          let show_coinbase = self.settings.user_interface.show_coinbase;
+                          let is_coinbase = record.is_coinbase();
+  
+                          if !show_coinbase && is_coinbase {
+                            return;
+                          }
+
+                          match record.transaction_data() {
+                            TransactionData::Outgoing { .. } => {
+                              if self.settings.user_interface.enable_sfx {
+                                play_sound(&Assets::get().bark_outgoing);
+                              }
+                              self.add_notification(i18n("Transaction Sent"), ToastKind::Success, 5);
+                            },
+                            TransactionData::Incoming { .. } => {
+                              if self.settings.user_interface.enable_sfx {
+                                play_sound(&Assets::get().bark_incoming);
+                              }
+                              if is_coinbase {
+                                self.add_notification(i18n("Block Found!"), ToastKind::Success, 5);
+                              } else {
+                                self.add_notification(i18n("Transaction Received"), ToastKind::Success, 5);
+                              }
+                            },
+                            _ => {}
+                          }
                         }
                       })
                     });

@@ -133,6 +133,7 @@ impl WalletSend {
     ui.add_space(16.0);
 
     let enabled = !self.address.trim().is_empty() 
+      && self.address.contains("waglayla:")
       && self.address.chars().all(|c| c.is_alphanumeric() || c == ':')
       && self.amount_sompi.is_some()
       && self.error.is_none();
