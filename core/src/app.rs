@@ -240,7 +240,6 @@ cfg_if! {
           let native_options = eframe::NativeOptions {
             persist_window : true,
             viewport,
-            follow_system_theme: false,
             hardware_acceleration: HardwareAcceleration::Preferred,
             vsync: true,
             ..Default::default()

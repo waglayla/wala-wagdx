@@ -70,6 +70,7 @@ pub struct WaglaylaService {
   pub log_file: Mutex<std::fs::File>,
   pub daemon_sender: Sender<DaemonMessage>,
   pub connect_on_startup: Option<NodeSettings>,
+  pub url: Mutex<Option<String>>,
 }
 
 impl WaglaylaService {
@@ -116,6 +117,7 @@ impl WaglaylaService {
       log_file: Mutex::new(log_file),
       daemon_sender,
       connect_on_startup: settings.initialized.then(|| settings.node.clone()),
+      url: Mutex::new(None),
     }
   }
 
@@ -339,6 +341,7 @@ impl WaglaylaService {
 
         let rpc = Self::create_rpc_client(Some("127.0.0.1".to_string()), None)
           .expect("Waglaylad Service - unable to create wRPC client");
+        *self.url.lock().unwrap() = Some("127.0.0.1".to_string());
         self.start_all_services(Some(rpc), network).await?;
         self.connect_rpc_client().await?;
 
@@ -358,6 +361,7 @@ impl WaglaylaService {
 
           let rpc = Self::create_rpc_client(rpc_config.url(), None)
             .expect("Waglaylad Service - unable to create wRPC client");
+          *self.url.lock().unwrap() = rpc_config.url();
           self.start_all_services(Some(rpc), network).await?;
           self.connect_rpc_client().await?;
         }
@@ -378,6 +382,7 @@ impl WaglaylaService {
           self.wallet().wallet_close().await.ok();
           self.wallet().change_network_id(network.into()).await.ok();
         }
+        *self.url.lock().unwrap() = None;
       }
       WaglayladServiceEvents::Exit => {
         return Ok(true);
@@ -462,6 +467,10 @@ impl WaglaylaService {
 
   pub fn wallet(&self) -> Arc<dyn WalletApi> {
     self.wallet.clone()
+  }
+
+  pub fn url(&self) -> Option<String> {
+    self.url.lock().unwrap().clone()
   }
 
   pub fn core_wallet(&self) -> Option<Arc<CoreWallet>> {

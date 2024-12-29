@@ -25,6 +25,7 @@ pub struct Inner {
 
   waglayla: Arc<WaglaylaService>,
   peer_monitor: Arc<PeerMonitorService>,
+  stat_monitor: Arc<StatMonitorService>,
   daemon_channel : Channel<DaemonMessage>,
 }
 
@@ -54,10 +55,15 @@ impl DX_Manager {
       application_events.clone(),
       settings,
     ));
+    let stat_monitor = Arc::new(StatMonitorService::new(
+      application_events.clone(),
+      settings,
+    ));
 
     let services: Mutex<Vec<Arc<dyn Service>>> = Mutex::new(vec![
       waglayla.clone(),
       peer_monitor.clone(),
+      stat_monitor.clone(),
     ]);
 
     let manager = Self {
@@ -69,6 +75,7 @@ impl DX_Manager {
         start_time: Instant::now(),
         waglayla,
         peer_monitor,
+        stat_monitor,
         daemon_channel: daemon_channel.clone(),
         // system: Some(system),
       }),
@@ -155,8 +162,16 @@ impl DX_Manager {
     &self.inner.peer_monitor
   }
 
+  pub fn stat_monitor(&self) -> &Arc<StatMonitorService> {
+    &self.inner.stat_monitor
+  }
+
   pub fn wallet(&self) -> Arc<dyn WalletApi> {
     self.inner.waglayla.wallet()
+  }
+
+  pub fn url(&self) -> Option<String> {
+    self.inner.waglayla.url()
   }
 
   pub fn application_events(&self) -> &ApplicationEventsChannel {

@@ -43,7 +43,7 @@ impl ComponentT for Donate {
 
   fn render(
     &mut self,
-    _core: &mut Core,
+    core: &mut Core,
     ctx: &egui::Context,
     _frame: &mut eframe::Frame,
     ui: &mut egui::Ui,
@@ -85,6 +85,7 @@ impl ComponentT for Donate {
                     ui.output_mut(|o| {
                       o.copied_text = cookie.address.to_string();
                     });
+                    core.notify_copy();
                   }
                 });
               });

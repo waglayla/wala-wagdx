@@ -133,7 +133,7 @@ impl WalletSend {
     ui.add_space(16.0);
 
     let enabled = !self.address.trim().is_empty() 
-      && self.address.chars().all(char::is_alphanumeric)
+      && self.address.chars().all(|c| c.is_alphanumeric() || c == ':')
       && self.amount_sompi.is_some()
       && self.error.is_none();
 
@@ -270,7 +270,7 @@ impl WalletSend {
     DXImage::draw(ui, &Assets::get().wala_coin, coin_diameter, image_pos, egui::Align2::CENTER_CENTER);
     ui.add_space(20.0);
 
-    ui.heading(i18n("Transaction Success!"));
+    ui.heading(i18n("Transaction Submitted!"));
     ui.add_space(10.0);
 
     // Scroll area for transaction IDs

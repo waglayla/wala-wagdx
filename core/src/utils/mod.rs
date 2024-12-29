@@ -28,6 +28,8 @@ mod focus;
 pub use focus::*;
 mod format;
 pub use format::*;
+mod sound;
+pub use sound::*;
 
 pub fn lerp_dx(start: f32, end: f32, t: f32) -> f32 {
   start + t * (end - start)

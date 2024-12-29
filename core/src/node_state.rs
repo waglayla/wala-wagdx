@@ -17,6 +17,12 @@ pub struct NodeState {
   pub node_mempool_size: Option<usize>,
   pub network_tps: Option<f64>,
 
+  pub block_reward: Option<u64>,
+  pub current_supply: Option<u64>,
+  pub max_supply: Option<u64>,
+  pub hashes_per_second: Option<u64>,
+  pub difficulty: Option<u64>,
+
   pub error: Option<String>,
 }
 
@@ -69,6 +75,26 @@ impl NodeState {
   pub fn tps(&self) -> Option<f64> {
     self.network_tps
       .or_else(|| self.metrics().map(|m| m.network_transactions_per_second))
+  }
+
+  pub fn block_reward(&self) -> Option<u64> {
+    self.block_reward
+  }
+
+  pub fn current_supply(&self) -> Option<u64> {
+    self.current_supply
+  }
+
+  pub fn max_supply(&self) -> Option<u64> {
+    self.max_supply
+  }
+
+  pub fn hashes_per_second(&self) -> Option<u64> {
+    self.hashes_per_second
+  }
+
+  pub fn difficulty(&self) -> Option<u64> {
+    self.difficulty
   }
 
   pub fn mempool_size(&self) -> Option<usize> {

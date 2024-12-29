@@ -34,7 +34,7 @@ impl Tab {
   fn component(&self) -> TypeId {
     match self {
       Tab::Wallet => TypeId::of::<wallet_ui::WalletDelegator>(),
-      Tab::NetworkInfo => TypeId::of::<blank::Blank>(),
+      Tab::NetworkInfo => TypeId::of::<network::NetworkInfo>(),
       Tab::WalaNode => TypeId::of::<console::DaemonConsole>(),
       Tab::WalaBridge => TypeId::of::<blank::Blank>(),
       Tab::Donate => TypeId::of::<donate::Donate>(),

@@ -9,7 +9,7 @@ trait RegisterStaticFont {
 impl RegisterStaticFont for FontDefinitions {
   fn add_static(&mut self, family: FontFamily, name: &str, bytes: &'static [u8]) {
     self.font_data
-      .insert(name.to_owned(), FontData::from_static(bytes));
+      .insert(name.to_owned(), FontData::from_static(bytes).into());
 
     self.families
       .entry(family)
@@ -79,7 +79,7 @@ macro_rules! load_font_family {
         name.clone(),
         FontData::from_static(include_bytes!(
           concat!("../resources/fonts/", $base_name, "/", $base_name, "-", stringify!($variant), ".ttf")
-        ))
+        )).into()
       );
       $fonts.families
       .entry(FontFamily::Name(name.clone().into()))
@@ -131,7 +131,7 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
     "ubuntu_mono".to_owned(),
     egui::FontData::from_static(include_bytes!(
       "../resources/fonts/UbuntuMono/UbuntuMono-Regular.ttf"
-    )),
+    )).into(),
   );
   // ---
 
@@ -139,7 +139,7 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
     "noto_sans_mono_light".to_owned(),
     FontData::from_static(include_bytes!(
       "../resources/fonts/NotoSans/NotoSansMono-Light.ttf"
-    )),
+    )).into(),
   );
 
   fonts

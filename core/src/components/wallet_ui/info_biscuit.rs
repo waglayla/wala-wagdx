@@ -182,7 +182,7 @@ impl WalletBiscuit {
     }
   }
 
-  fn render_base_qr(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
+  fn render_base_qr(&mut self, ui: &mut Ui, core: &mut Core, rect: &Rect) {
     let total_qr_size = rect.height() - 24.0;  // Size including background
     let qr_background_rect = egui::Rect::from_min_size(
       egui::pos2(rect.max.x - total_qr_size - 12.0, rect.min.y + 12.0),
@@ -210,7 +210,7 @@ impl WalletBiscuit {
     }
   }
 
-  fn render_base_address(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
+  fn render_base_address(&mut self, ui: &mut Ui, core: &mut Core, rect: &Rect) {
     let painter = ui.painter_at(*rect);
     let address_pos = egui::Pos2 {
       x: rect.max.x - 200.0,
@@ -270,8 +270,7 @@ impl WalletBiscuit {
         ui.output_mut(|o| {
           o.copied_text = address_txt.clone();
         });
-
-        // manager().notify_clipboard(i18n("Copied to clipboard"));
+        core.notify_copy();
       }
 
       response = response.on_hover_cursor(egui::CursorIcon::PointingHand);
@@ -442,7 +441,7 @@ impl WalletBiscuit {
     }
   }
 
-  fn render_balance_section(&mut self, ui: &mut Ui, core: &Core, rect: &Rect) {
+  fn render_balance_section(&mut self, ui: &mut Ui, core: &mut Core, rect: &Rect) {
     let painter = ui.painter_at(*rect);
     
     let whole_pos = egui::Pos2 {
@@ -526,8 +525,7 @@ impl WalletBiscuit {
       ui.output_mut(|o| {
         o.copied_text = format!("{}{}", whole_raw, frac_raw);
       });
-    
-      // manager().notify_clipboard(i18n("Copied to clipboard"));
+      core.notify_copy();
     }
 
     response = response.on_hover_cursor(egui::CursorIcon::PointingHand);

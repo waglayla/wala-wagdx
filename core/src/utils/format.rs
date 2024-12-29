@@ -68,7 +68,7 @@ pub fn format_balance(num: u64) -> String {
   format!("{}.{}", formatted_integer, formatted_fractional)
 }
 
-pub fn format_balance_tx(num: u64) -> (String) {
+pub fn format_balance_tx(num: u64) -> String {
   let suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "N", "Dc"];
   let mut value = num as f64;
   let mut idx = 0;
@@ -85,6 +85,78 @@ pub fn format_balance_tx(num: u64) -> (String) {
 
   let fractional_str = format!("{:08}", (fractional_part * 100000000.0) as u64);
   let fractional_with_suffix = format!(".{}{}", fractional_str, suffixes[idx]);
+
+  let whole_part_formatted = format!("{}", whole_part)
+    .chars()
+    .rev()
+    .collect::<Vec<char>>()
+    .chunks(3)
+    .map(|chunk| chunk.iter().collect::<String>())
+    .collect::<Vec<String>>()
+    .join(",")
+    .chars()
+    .rev()
+    .collect::<String>();
+
+  format!("{}{}", whole_part_formatted, fractional_with_suffix)
+}
+
+pub fn format_diff(num: u64) -> String {
+  let suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "N", "Dc"];
+  let mut value = num as f64;
+  let mut idx = 0;
+
+  while value >= 1000.0 && idx < suffixes.len() - 1 {
+    value /= 1000.0;
+    idx += 1;
+  }
+
+  let whole_part = value.trunc() as u64;
+  let fractional_part = value.fract();
+
+  let scale = 10f64.powi(2 as i32);
+  let truncated_fractional = (fractional_part * scale).trunc() / scale;
+
+  let fractional_str = format!("{:2}", truncated_fractional)
+    .trim_start_matches('0')
+    .to_string();
+  let fractional_with_suffix = format!("{}{}", fractional_str, suffixes[idx]);
+
+  let whole_part_formatted = format!("{}", whole_part)
+    .chars()
+    .rev()
+    .collect::<Vec<char>>()
+    .chunks(3)
+    .map(|chunk| chunk.iter().collect::<String>())
+    .collect::<Vec<String>>()
+    .join(",")
+    .chars()
+    .rev()
+    .collect::<String>();
+
+  format!("{}{}", whole_part_formatted, fractional_with_suffix)
+}
+
+pub fn format_hashrate(num: u64) -> String {
+  let suffixes = ["", "K", "M", "G", "T", "P", "E", "Z"];
+  let mut value = num as f64;
+  let mut idx = 0;
+
+  while value >= 1000.0 && idx < suffixes.len() - 1 {
+    value /= 1000.0;
+    idx += 1;
+  }
+
+  let whole_part = value.trunc() as u64;
+  let fractional_part = value.fract();
+
+  let scale = 10f64.powi(2 as i32);
+  let truncated_fractional = (fractional_part * scale).trunc() / scale;
+
+  let fractional_str = format!("{:2}", truncated_fractional)
+    .trim_start_matches('0')
+    .to_string();
+  let fractional_with_suffix = format!("{}{}H/s", fractional_str, suffixes[idx]);
 
   let whole_part_formatted = format!("{}", whole_part)
     .chars()

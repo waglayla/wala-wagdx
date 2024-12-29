@@ -63,7 +63,6 @@ pub use egui::epaint::{
   FontFamily, FontId,
 };
 pub use egui::*;
-pub use egui_plot::{PlotPoint, PlotPoints};
 
 pub use crate::collection::Collection;
 pub use crate::core::Core;

@@ -6,6 +6,9 @@ pub use waglayla::WaglaylaService;
 pub mod peers;
 pub use peers::PeerMonitorService;
 
+pub mod stats;
+pub use stats::StatMonitorService;
+
 /// Service is a core component of the Waglayla NG application responsible for
 /// running application services and communication between these services.
 #[async_trait]

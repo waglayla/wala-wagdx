@@ -6,7 +6,7 @@ use crate::components::*;
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
 use egui::load::Bytes;
-use egui_notify::Toasts;
+use egui_notify::{Toasts, Anchor};
 use waglayla_wallet_core::api::TransactionsDataGetResponse;
 use waglayla_wallet_core::events::Events as CoreWallet;
 use waglayla_wallet_core::storage::{Binding, Hint, PrvKeyDataInfo};
@@ -28,6 +28,13 @@ pub enum Exception {
   UtxoIndexNotEnabled { url: Option<String> },
 }
 
+#[derive(Clone, Debug)]
+pub enum ToastKind {
+  Info,
+  Success,
+  Error,
+}
+
 #[derive(Clone)]
 pub struct Core {
   is_shutdown_pending: bool,
@@ -42,7 +49,7 @@ pub struct Core {
   components: HashMap<TypeId, Component>,
   pub stack: VecDeque<Component>,
   pub settings: Settings,
-  pub toasts: Arc<Toasts>,
+  pub toasts: Arc<Mutex<Toasts>>,
   pub mobile_style: egui::Style,
   pub default_style: egui::Style,
 
@@ -102,6 +109,7 @@ impl Core {
     components.insert_typeid(components::WalletDelegator::default());
     components.insert_typeid(components::About::default());
     components.insert_typeid(components::Donate::default());
+    components.insert_typeid(components::NetworkInfo::default());
     components.insert_typeid(components::Footer::default());
 
     let footer = components.get(&TypeId::of::<components::Footer>()).unwrap().clone();
@@ -111,6 +119,8 @@ impl Core {
     if settings.node.waglaylad_daemon_storage_folder_enable {
       storage.track_storage_root(Some(settings.node.waglaylad_daemon_storage_folder.as_str()));
     }
+
+    let mut toasts = Toasts::new().with_anchor(Anchor::BottomLeft).with_margin(vec2(10.0,38.0));
 
     let mut this = Self {
       is_shutdown_pending: false,
@@ -125,7 +135,7 @@ impl Core {
       component: components.get(&TypeId::of::<components::CreateWallet>()).unwrap().clone(),
       components: components.clone(),
       settings,
-      toasts: Arc::new(Toasts::default()),
+      toasts: Arc::new(Mutex::new(toasts)),
       mobile_style,
       default_style,
       wallet_descriptor: None,
@@ -220,6 +230,8 @@ impl eframe::App for Core {
     }
 
     self.render_frame(ctx, frame);
+    let mut toasts = self.toasts.lock().unwrap();
+    toasts.show(ctx);
 
     ctx.request_repaint_after(std::time::Duration::from_secs_f32(1.0 / 60.0));
   }
@@ -408,6 +420,27 @@ impl Core {
 
         Events::PeerCountUpdate(count) => {
           self.node_state.node_peers = Some(count);
+        }
+
+        Events::BlockRewardUpdate(reward) => {
+          self.node_state.block_reward = Some(reward);
+        }
+
+        Events::CoinSupplyUpdate(current, max) => {
+          self.node_state.current_supply = Some(current);
+          self.node_state.max_supply = Some(max);
+        }
+
+        Events::HashrateUpdate(hashes) => {
+          self.node_state.hashes_per_second = Some(hashes);
+        }
+
+        Events::DifficultyUpdate(diff) => {
+          self.node_state.difficulty = Some(diff);
+        }
+
+        Events::MempoolUpdate(count) => {
+          self.node_state.node_mempool_size = Some(count);
         }
 
         Events::WalletUpdate => {
@@ -627,7 +660,7 @@ impl Core {
             CoreWallet::DaaScoreChange { current_daa_score } => {
               self.node_state.current_daa_score.replace(current_daa_score);
             }
-            // Ignore scan notifications
+
             CoreWallet::Discovery { record } => match record.binding().clone() {
               Binding::Account(id) => {
                 self.user_accounts
@@ -666,14 +699,14 @@ impl Core {
 
               match record.binding().clone() {
                 Binding::Account(id) => {
-                  self.user_accounts
+                  self.user_accounts.clone()
                     .as_ref()
                     .and_then(|user_accounts| {
                       user_accounts.get(&id).map(|account| {
                         if account
                           .transactions()
                           .replace_or_insert(Transaction::new_confirmed(
-                            Arc::new(record),
+                            Arc::new(record.clone()),
                           ))
                           .is_none()
                         {
@@ -684,6 +717,19 @@ impl Core {
                           account.set_transaction_count(
                             account.transaction_count() + 1,
                           );
+                        }
+
+                        use waglayla_wallet_core::storage::TransactionData;
+                        match record.transaction_data() {
+                          TransactionData::Outgoing { .. } => {
+                            play_sound(&Assets::get().bark_outgoing);
+                            self.add_notification(i18n("Transaction Sent"), ToastKind::Success, 5);
+                          },
+                          TransactionData::Incoming { .. } => {
+                            play_sound(&Assets::get().bark_incoming);
+                            self.add_notification(i18n("Transaction Received"), ToastKind::Success, 5);
+                          },
+                          _ => {}
                         }
                       })
                     });
@@ -753,6 +799,9 @@ impl Core {
             }
           }
         }
+        Events::Notify(msg, kind, duration) => {
+          self.add_notification(msg, kind, duration);
+        }
         // Events::Error(error) => {
         //     manager().notify(UserNotification::error(error.as_str()));
         // }
@@ -760,6 +809,25 @@ impl Core {
     }
 
     Ok(())
+  }
+
+  pub fn add_notification(&mut self, message: &str, kind: ToastKind, duration: u64) {
+    let mut toasts = self.toasts.lock().unwrap();
+    match kind {
+      ToastKind::Info => {
+        toasts.info(message).duration(Some(Duration::from_secs(duration)));
+      },
+      ToastKind::Success => {
+        toasts.success(message).duration(Some(Duration::from_secs(duration)));
+      },
+      ToastKind::Error => {
+        toasts.error(message).duration(Some(Duration::from_secs(duration)));
+      }
+    }
+  }
+
+  pub fn notify_copy(&mut self) {
+    self.add_notification(i18n("Copied To Clipboard"), ToastKind::Info, 2);
   }
 
   pub fn handle_account_creation(

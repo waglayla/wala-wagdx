@@ -7,10 +7,22 @@ pub struct Assets {
   pub wala_coin: TextureHandle,
   pub wala_text_logo_png: TextureHandle,
   pub paw_banner: TextureHandle,
+  pub bark_incoming: Vec<u8>,
+  pub bark_outgoing: Vec<u8>,
 }
 
 static mut ASSETS: Option<Assets> = None;
 static INIT: Once = Once::new();
+
+#[macro_export]
+macro_rules! load_bytes {
+  ($path:expr) => {
+    include_bytes!(concat!(
+      env!("CARGO_MANIFEST_DIR"),
+      $path
+    )).to_vec()
+  };
+}
 
 impl Assets {
   pub fn init(ctx: &Context) {
@@ -19,6 +31,8 @@ impl Assets {
         wala_coin: Self::load_wala_coin(ctx),
         wala_text_logo_png: Self::load_wala_text_logo_png(ctx),
         paw_banner: Self::load_paw_banner_png(ctx),
+        bark_incoming: load_bytes!("/resources/sound/barks/incoming.wav"),
+        bark_outgoing: load_bytes!("/resources/sound/barks/outgoing.wav"),
       };
       unsafe {
         ASSETS = Some(assets);
@@ -67,7 +81,7 @@ impl Assets {
   fn load_paw_banner_png(ctx: &Context) -> TextureHandle {
     let image_bytes = include_bytes!(concat!(
       env!("CARGO_MANIFEST_DIR"),
-      "/resources/images/paws.png"
+      "/resources/images/paw_banner.png"
     ));
     
     let image = load_image_bytes(image_bytes)
