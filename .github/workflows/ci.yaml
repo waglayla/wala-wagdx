@@ -224,8 +224,6 @@ jobs:
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x64 || true
           cargo build --bin wala-wagdx --release
           cp target/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx.exe
-          cargo build --bin wala-wagdx --profile console --features console
-          cp target/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx-console.exe
           archive="wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx-${{ env.SHORT_SHA }}-windows-x64.zip"
           powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/* \"${archive}\""
 

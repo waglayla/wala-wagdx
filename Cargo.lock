@@ -8185,7 +8185,6 @@ dependencies = [
  "tokio",
  "waglayla-alloc",
  "wala-wagdx-core",
- "wasm-bindgen-futures",
  "workflow-log",
 ]
 
