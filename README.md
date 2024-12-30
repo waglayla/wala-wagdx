@@ -11,3 +11,4 @@
 - Integrate Stratum Bridge
 - Add multi-account support
 - Add address book / contacts per acccount
+- Expanded language support
