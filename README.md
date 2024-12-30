@@ -3,6 +3,7 @@
 
 ### TODO List
 - Widespread code cleanup + memory cloning reduction
+- Market monitor service
 - Integrate Stratum Bridge
 - Add multi-account support
 - Add address book / contacts per acccount
