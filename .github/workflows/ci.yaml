@@ -258,6 +258,12 @@ jobs:
           name: wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip
           path: wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip
 
+      - name: Install Dependencies on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev pkg-config
+
       - name: Build on Linux
         if: runner.os == 'Linux'
         run: |
