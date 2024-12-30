@@ -2,9 +2,9 @@
 # A desktop GUI wallet for WagLayla
 
 ### Compatibility:
-- Windows 10/11 x86
+- Windows 10/11 x86_64
 - macOS on ARM(M-series chips) and x86
-- Linux on x86
+- Linux on x86_64
 ### TODO List
 - Widespread code cleanup + memory cloning reduction
 - Market monitor service
