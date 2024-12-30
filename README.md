@@ -2,7 +2,7 @@
 # Custom Desktop GUI Wallet for WagLayla
 
 ### Compatibility:
-- Windows 10/11 x86_64
+- Windows 10/11 on x86_64
 - macOS on ARM(M-series chips) and x86_64
 - Linux on x86_64
 ### TODO List
