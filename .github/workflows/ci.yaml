@@ -242,6 +242,10 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Add Rust target for macOS x86'
+        if: runner.os == 'macOS'
+        run: rustup target add x86_64-apple-darwin
+
       - name: Build on MacOS
         if: runner.os == 'macOS'
         run: |
