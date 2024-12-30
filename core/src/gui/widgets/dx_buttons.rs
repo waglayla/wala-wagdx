@@ -524,7 +524,7 @@ pub fn dx_button_sized_enabled_ui(
   // Draw the text with a vertical offset
   let text_pos = egui::Pos2 {
     x: button_rect.rect.center().x - text_width / 2.0,
-    y: button_rect.rect.center().y - font_size / 2.0 - font_size/12.0,
+    y: button_rect.rect.center().y - font_size / 2.0,
   };
 
   ui.painter().text(
