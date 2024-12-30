@@ -42,11 +42,13 @@ impl Welcome {
             .default_open(true)
             .show(ui, |ui| {
               ui.horizontal(|ui| {
-                ui.add(toggle(&mut core.settings.user_interface.enable_sfx));
+                ui.add(toggle(&mut core.settings.user_interface.enable_sfx))
+                  .on_hover_text_at_pointer(i18n("Turn Layla's barking on/off"));
                 ui.label(i18n("Sound Effects"));
               });
               ui.horizontal(|ui| {
-                ui.add(toggle(&mut core.settings.user_interface.show_coinbase));
+                ui.add(toggle(&mut core.settings.user_interface.show_coinbase))
+                  .on_hover_text_at_pointer(i18n("Show notifications for newly minted coins from mining blocks"));
                 ui.label(i18n("Coinbase Notifications"));
               });
               

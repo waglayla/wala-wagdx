@@ -7,6 +7,7 @@ pub struct Assets {
   pub wala_coin: TextureHandle,
   pub wala_text_logo_png: TextureHandle,
   pub paw_banner: TextureHandle,
+  pub paw_watermark: TextureHandle,
   pub bark_incoming: Vec<u8>,
   pub bark_outgoing: Vec<u8>,
 }
@@ -31,6 +32,7 @@ impl Assets {
         wala_coin: Self::load_wala_coin(ctx),
         wala_text_logo_png: Self::load_wala_text_logo_png(ctx),
         paw_banner: Self::load_paw_banner_png(ctx),
+        paw_watermark: Self::load_paw_watermark_png(ctx),
         bark_incoming: load_bytes!("/resources/sound/barks/incoming.wav"),
         bark_outgoing: load_bytes!("/resources/sound/barks/outgoing.wav"),
       };
@@ -94,6 +96,26 @@ impl Assets {
     
     let image = load_image_bytes(image_bytes)
       .expect("Failed to load paw banner image");
+    
+    ctx.load_texture(
+      "paw_banner",
+      image,
+      egui::TextureOptions {
+        magnification: TextureFilter::Linear,
+        minification: TextureFilter::Linear,
+        .. Default::default()
+      }
+    )
+  }
+
+  fn load_paw_watermark_png(ctx: &Context) -> TextureHandle {
+    let image_bytes = include_bytes!(concat!(
+      env!("CARGO_MANIFEST_DIR"),
+      "/resources/images/paw_watermark.png"
+    ));
+    
+    let image = load_image_bytes(image_bytes)
+      .expect("Failed to load paw watermark image");
     
     ctx.load_texture(
       "paw_banner",

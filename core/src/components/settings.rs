@@ -360,11 +360,13 @@ impl Settings {
       .show(ui, |ui| {
 
         ui.horizontal(|ui| {
-          ui.add(toggle(&mut core.settings.user_interface.enable_sfx));
+          ui.add(toggle(&mut core.settings.user_interface.enable_sfx))
+            .on_hover_text_at_pointer(i18n("Turn Layla's barking on/off"));
           ui.label(i18n("Sound Effects"));
         });
         ui.horizontal(|ui| {
-          ui.add(toggle(&mut core.settings.user_interface.show_coinbase));
+          ui.add(toggle(&mut core.settings.user_interface.show_coinbase))
+            .on_hover_text_at_pointer(i18n("Show notifications for newly minted coins from mining blocks"));
           ui.label(i18n("Coinbase Notifications"));
         });
 
@@ -375,11 +377,14 @@ impl Settings {
               ui.horizontal(|ui| {
                 let current_theme_color_name = theme_color().name();
                 ui.menu_button(
-                  format!("{}    ⏷", current_theme_color_name),
+                  format!("{} ⏷", current_theme_color_name),
                   |ui| {
                     theme_colors().keys().for_each(|name| {
                       if name.as_str() != current_theme_color_name
-                        && ui.button(format!("{}   ", name)).clicked()
+                        && ui.add_sized(
+                          [65.0, 16.0],
+                          egui::Button::new(name)
+                      ).clicked()
                       {
                         apply_theme_color_by_name(
                           ui.ctx(),

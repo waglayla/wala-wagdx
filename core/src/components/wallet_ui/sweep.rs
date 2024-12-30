@@ -23,6 +23,8 @@ pub struct WalletSweep {
 
 impl_has_focus_context!(WalletSweep);
 
+const EDIT_SIZE: f32 = 20.0;
+
 impl WalletSweep {
   pub fn new() -> Self {
     Self {
@@ -55,7 +57,7 @@ impl WalletSweep {
       let mut F = create_custom_popup(ctx);
       F.rounding = 10.0.into();
 
-      let h_scale = max(450, (ui.available_width() / 1.5) as i32);
+      let h_scale = max(310, (ui.available_width() / 1.5) as i32);
       let v_scale = max(450, (ui.available_height() / 1.33) as i32);
 
       let screen_rect = ctx.screen_rect();
@@ -69,7 +71,7 @@ impl WalletSweep {
         .collapsible(true)
         .resizable(false)
         .default_pos(default_pos)
-        .max_size([h_scale as f32, v_scale as f32])
+        .max_size([310.0, v_scale as f32])
         .frame(F)
         .show(ui.ctx(), |ui| {
           egui::Frame::none()
@@ -119,10 +121,11 @@ impl WalletSweep {
                     (self.payment_secret.trim().is_empty() ^ requires_bip39_passphrase)
                   ;
 
-                  ui.label(i18n("Wallet Password:"));
+                  ui.heading(i18n("Wallet Password:"));
                   let wallet_secret_response = ui.add_sized(
-                    [ui.available_width(), 30.0],
+                    [ui.available_width(), 35.0],
                     egui::TextEdit::singleline(&mut self.wallet_secret)
+                      .font(FontId::proportional(EDIT_SIZE))
                       .vertical_align(Align::Center)
                       .password(true),
                   );
@@ -142,10 +145,11 @@ impl WalletSweep {
                   }
 
                   if requires_bip39_passphrase {
-                    ui.label(i18n("Payment Secret:"));
+                    ui.heading(i18n("Payment Secret:"));
                     let payment_secret_response = ui.add_sized(
-                      [ui.available_width(), 30.0],
+                      [ui.available_width(), 35.0],
                       egui::TextEdit::singleline(&mut self.payment_secret)
+                        .font(FontId::proportional(EDIT_SIZE))
                         .vertical_align(Align::Center)
                         .password(true),
                     );
@@ -159,7 +163,8 @@ impl WalletSweep {
                       }
                     }
                   } else {
-                    ui.add_space(30.0);
+                    ui.heading("");
+                    ui.add_space(35.0);
                   }
 
                   ui.add_space(16.0);

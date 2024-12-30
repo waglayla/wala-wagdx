@@ -242,27 +242,43 @@ impl eframe::App for Core {
   }
 }
 
+static mut opened: bool = false;
+
 impl Core {
   pub fn render_frame(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
     let title = format!("WagLayla Wag-DX v{}", DX_VERSION);
     window_frame(self.window_frame, ctx, title.as_str(), |ui| {
       if !self.settings.initialized {
-        apply_theme_color_by_name(
-          ctx,
-          "WagLayla",
-        );
-
+        unsafe {
+          if !opened {
+            apply_theme_color_by_name(
+              ctx,
+              "WagLayla",
+            );
+          }
+          opened = true;
+        }
         egui::CentralPanel::default()
-        .frame(create_custom_popup(ctx))
-        .show_inside(ui, |ui| {
-          self.components
-            .get(&TypeId::of::<Welcome>())
-            .unwrap()
-            .clone()
-            .render(self, ctx, frame, ui);
-        });
+          .frame(create_custom_popup(ctx))
+          .show_inside(ui, |ui| {
+            self.components
+              .get(&TypeId::of::<Welcome>())
+              .unwrap()
+              .clone()
+              .render(self, ctx, frame, ui);
+          });
 
         return;
+      } else {
+        unsafe {
+          if !opened {
+            apply_theme_color_by_name(
+              ctx,
+              theme_color().name.clone(),
+            );
+          }
+          opened = true;
+        }
       }
 
       let available_rect = ui.available_rect_before_wrap();

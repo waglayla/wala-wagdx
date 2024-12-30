@@ -37,6 +37,8 @@ pub struct WalletSend {
 
 impl_has_focus_context!(WalletSend);
 
+const EDIT_SIZE: f32 = 20.0;
+
 impl WalletSend {
   pub fn new() -> Self {
     Self {
@@ -98,12 +100,14 @@ impl WalletSend {
 
   
   fn render_details_state(&mut self, ui: &mut egui::Ui) {
-    ui.label(i18n("Recipient Address:"));
+    ui.heading(i18n("Recipient Address:"));
     let address_response = ui.add_sized(
-      [ui.available_width(), 30.0],
+      [ui.available_width(), 35.0],
       egui::TextEdit::singleline(
         &mut self.address,
       )
+        .hint_text(i18n("waglayla: prefix required"))
+        .font(FontId::proportional(EDIT_SIZE))
         .vertical_align(Align::Center)
         .frame(true)
     );
@@ -115,12 +119,14 @@ impl WalletSend {
     }
 
     let amount_before = self.amount.clone();
-    ui.label(i18n("Amount:"));
+    ui.heading(i18n("Amount:"));
     let amount_response = ui.add_sized(
-      [ui.available_width(), 30.0],
+      [ui.available_width(), 35.0],
       egui::TextEdit::singleline(
         &mut self.amount,
       )
+        .hint_text(i18n("Enter WALA here"))
+        .font(FontId::proportional(EDIT_SIZE))
         .vertical_align(Align::Center)
         .frame(true)
     );
@@ -160,12 +166,13 @@ impl WalletSend {
     let requires_bip39_passphrase = core.current_account.clone().unwrap()
       .requires_bip39_passphrase(&core.clone());
 
-    ui.label(i18n("Wallet Password:"));
+    ui.heading(i18n("Wallet Password:"));
     let wallet_response = ui.add_sized(
-      [ui.available_width(), 30.0],
+      [ui.available_width(), 35.0],
       egui::TextEdit::singleline(
         &mut self.wallet_secret,
       )
+        .font(FontId::proportional(EDIT_SIZE))
         .vertical_align(Align::Center)
         .password(true)
         .frame(true)
@@ -201,12 +208,13 @@ impl WalletSend {
     }
 
     if requires_bip39_passphrase {
-      ui.label(i18n("Payment Secret:"));
+      ui.heading(i18n("Payment Secret:"));
       let payment_response = ui.add_sized(
-        [ui.available_width(), 30.0],
+        [ui.available_width(), 35.0],
         egui::TextEdit::singleline(
           &mut self.payment_secret,
         )
+          .font(FontId::proportional(EDIT_SIZE))
           .vertical_align(Align::Center)
           .password(true)
           .frame(true)
@@ -225,7 +233,8 @@ impl WalletSend {
         }
       }
     } else {
-      ui.add_space(30.0);
+      ui.heading("");
+      ui.add_space(35.0);
     }
 
     ui.add_space(16.0);
@@ -327,12 +336,12 @@ impl WalletSend {
     let mut F = create_custom_popup(ctx);
     F.rounding = 10.0.into();
 
-    let h_scale = max(450, (ui.available_width() / 1.5) as i32);
+    let h_scale = max(310, (ui.available_width() / 1.5) as i32);
     let v_scale = max(450, (ui.available_height() / 1.33) as i32);
 
     let screen_rect = ctx.screen_rect();
     let default_pos = egui::Pos2 {
-      x: screen_rect.center().x - (h_scale as f32 / 2.0).min(300.0),
+      x: screen_rect.center().x - (h_scale as f32 / 2.0).min(310.0),
       y: screen_rect.center().y - (v_scale as f32 / 2.0),
     };
 
@@ -341,7 +350,7 @@ impl WalletSend {
       .collapsible(true)
       .resizable(false)
       .default_pos(default_pos)
-      .max_size([300.0, v_scale as f32])
+      .max_size([310.0, v_scale as f32])
       .frame(F)
       .show(ui.ctx(), |ui| {
         egui::Frame::none()

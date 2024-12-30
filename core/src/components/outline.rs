@@ -500,7 +500,7 @@ impl Outline {
   }
 
   fn available_tabs(&self, core: &Core) -> Vec<Tab> {
-    let mut tabs = vec![Tab::Wallet, Tab::NetworkInfo];
+    let mut tabs = vec![Tab::Wallet, Tab::NetworkInfo, Tab::Donate];
 
     if core.settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon {
       tabs.push(Tab::WalaNode);
@@ -509,7 +509,6 @@ impl Outline {
       }
     }
 
-    tabs.push(Tab::Donate);
     tabs.push(Tab::About);
     tabs
   }

@@ -50,10 +50,26 @@ impl ComponentT for Donate {
   ) {
     ui.set_height(ui.available_height());
     let base_estimated_height = 500.0;
-    let font_size = (ui.available_height() / 26.0).min(ui.available_width() / 26.0);
-    let factor = font_size/20.0;
+    let font_size = (ui.available_height() / 28.5).min(ui.available_width() / 28.5);
+    let factor = font_size/19.5;
 
     render_centered_content_noback(ctx, ui, i18n("Donation Wallets"), base_estimated_height*factor, |ui| {
+      DXImage::paint_at(
+        ui, 
+        &Assets::get().paw_watermark,
+        ui.available_width().min(ui.available_height()),
+        ui.available_rect_before_wrap().center() - vec2(ui.available_width()/2.0, 0.0), 
+        Align2::CENTER_CENTER
+      );
+
+      DXImage::paint_at(
+        ui, 
+        &Assets::get().paw_watermark,
+        ui.available_width().min(ui.available_height()),
+        ui.available_rect_before_wrap().center() + vec2(ui.available_width()/2.0, 0.0), 
+        Align2::CENTER_CENTER
+      );
+
       for cookie in COOKIES {
         ui.allocate_ui_with_layout(
           egui::vec2(540.0*factor, egui::Ui::available_height(ui)),
@@ -64,8 +80,20 @@ impl ComponentT for Donate {
               .rounding(egui::Rounding::same(10.0))
               .inner_margin(10.0)
               .show(ui, |ui| {
-                ui.add_space(56.0*factor);
-                ui.separator();
+                ui.horizontal(|ui| {
+                  ui.add_space(345.0*factor);
+                  let copy_size = (font_size * 1.8).max(18.0);
+                  egui::Frame::none()
+                    .inner_margin(0.0)
+                    .show(ui, |ui| {
+                      if ui.dx_button_sized(i18n("Copy Address"), copy_size, DX_Button::Biscuit, vec2(180.0*factor, 58.0*factor)).clicked() {
+                        ui.output_mut(|o| {
+                          o.copied_text = cookie.address.to_string();
+                        });
+                        core.notify_copy();
+                      }
+                    });
+                });
                 ui.painter().text(
                   ui.min_rect().min,
                   egui::Align2::LEFT_TOP,
@@ -78,16 +106,6 @@ impl ComponentT for Donate {
                     .font(egui::FontId::new(font_size, get_font_family("DINishCondensed", false, false)))
                     .color(theme_color().default_color)
                 );
-
-                let copy_size = font_size.max(18.0);
-                ui.horizontal(|ui| {
-                  if ui.dx_button(i18n("Copy Address"), copy_size, copy_size/4.0, DX_Button::Biscuit).clicked() {
-                    ui.output_mut(|o| {
-                      o.copied_text = cookie.address.to_string();
-                    });
-                    core.notify_copy();
-                  }
-                });
               });
           }
         );

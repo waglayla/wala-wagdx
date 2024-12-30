@@ -32,6 +32,8 @@ pub struct WalletRequest {
   error : Option<String>,
 }
 
+const EDIT_SIZE: f32 = 20.0;
+
 impl WalletRequest {
   pub fn new() -> Self {
     Self { 
@@ -131,12 +133,14 @@ impl WalletRequest {
 
             // --
 
-            ui.label(i18n("Requested Amount:"));
+            ui.heading(i18n("Amount:"));
                 
             let amount = self.amount.clone();
             ui.add_sized(
-              theme_style().panel_editor_size,
+              [200.0, 35.0],
               TextEdit::singleline(&mut self.amount)
+                .hint_text(i18n("Enter WALA here"))
+                .font(FontId::proportional(EDIT_SIZE))
                 .vertical_align(Align::Center),
             );
 
@@ -171,7 +175,7 @@ impl WalletRequest {
               }
             }
             
-            ui.add_space(4.0);
+            ui.add_space(8.0);
             if ui.dx_large_button_enabled(enabled, i18n("Copy Request URI")).clicked() {
               ui.output_mut(|o| {
                 o.copied_text = request_uri.to_string();

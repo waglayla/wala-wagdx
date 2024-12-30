@@ -65,6 +65,13 @@ impl ComponentT for NetworkInfo {
     _frame: &mut eframe::Frame,
     ui: &mut egui::Ui,
   ) {
+    DXImage::paint_at(
+      ui, 
+      &Assets::get().paw_watermark,
+      ui.available_width().min(ui.available_height()),
+      ui.available_rect_before_wrap().center(), Align2::CENTER_CENTER
+    );
+
     let mut endpoint = core.node_state().url().clone().unwrap_or("N/A".to_string());
     endpoint = if endpoint.contains("127.0.0.1") {
       "localhost".to_string() 
@@ -80,7 +87,7 @@ impl ComponentT for NetworkInfo {
       Align2::CENTER_TOP,
       format!("@{}", endpoint),
       egui::FontId::new(20.0, get_font_family("DINishCondensed", false, false)),
-      theme_color().strong_color,
+      theme_color().default_color,
     );
     ui.add_space(120.0);
 
