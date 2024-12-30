@@ -258,6 +258,22 @@ jobs:
           name: wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip
           path: wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip
 
+      - name: Build on MacOS x86
+        if: runner.os == 'macOS'
+        run: |
+          mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-x86 || true
+          cargo build --bin wala-wagdx --release --target x86_64-apple-darwin
+          cp target/x86_64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/
+          archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx-${{ env.SHORT_SHA }}-macos-x86.zip"
+          zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/*
+
+      - name: Upload MacOS x86 build to GitHub
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with: 
+          name: wala-wagdx-${{ env.SHORT_SHA }}-macos-x86.zip
+          path: wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx-${{ env.SHORT_SHA }}-macos-x86.zip
+
       - name: Install Dependencies on Linux
         if: runner.os == 'Linux'
         run: |
