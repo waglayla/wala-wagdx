@@ -1,5 +1,5 @@
 # wala-wagdx
-# A desktop GUI wallet for WagLayla
+# Custom Desktop GUI Wallet for WagLayla
 
 ### Compatibility:
 - Windows 10/11 x86_64
