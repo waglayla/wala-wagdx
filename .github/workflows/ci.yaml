@@ -240,16 +240,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Add Rust target for macOS x86'
+      - name: Add Rust target for macOS x86 and aarch64'
         if: runner.os == 'macOS'
         run: rustup target add x86_64-apple-darwin
+        run: rustup target add aarch64-apple-darwin
 
       - name: Build on MacOS
         if: runner.os == 'macOS'
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64 || true
-          cargo build --bin wala-wagdx --release
-          cp target/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/
+          cargo build --bin wala-wagdx --release --target aarch64-apple-darwin
+          cp target/aarch64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/*
 
