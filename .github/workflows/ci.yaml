@@ -242,8 +242,9 @@ jobs:
 
       - name: Add Rust target for macOS x86 and aarch64'
         if: runner.os == 'macOS'
-        run: rustup target add x86_64-apple-darwin
-        run: rustup target add aarch64-apple-darwin
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
 
       - name: Build on MacOS
         if: runner.os == 'macOS'
