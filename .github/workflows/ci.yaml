@@ -217,27 +217,49 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Add Rust target for Windows GNU'
+      - name: Add Rust target for Windows MSVC
+        if: runner.os == 'Windows'
+        run: |
+          rustup target add x86_64-pc-windows-msvc
+
+      - name: Build on Windows with MSVC target
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-msvc || true
+          cargo build --bin wala-wagdx --release --target x86_64-pc-windows-msvc
+          cp target/x86_64-pc-windows-msvc/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-msvc/wala-wagdx.exe
+          archive="wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-msvc.zip"
+          powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-msvc/* \"${archive}\""
+
+      - name: Upload Windows MSVC build to GitHub
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-msvc.zip
+          path: wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-msvc.zip
+
+      - name: Add Rust target for Windows GNU
         if: runner.os == 'Windows'
         run: |
           rustup target add x86_64-pc-windows-gnu
 
-      - name: Build on Windows
+      - name: Build on Windows with GNU target
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x64 || true
+          mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-gnu || true
           cargo build --bin wala-wagdx --release --target x86_64-pc-windows-gnu
-          cp target/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx.exe
-          archive="wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx-${{ env.SHORT_SHA }}-windows-x64.zip"
-          powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/* \"${archive}\""
+          cp target/x86_64-pc-windows-gnu/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-gnu/wala-wagdx.exe
+          archive="wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-gnu.zip"
+          powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-gnu/* \"${archive}\""
 
-      - name: Upload Windows build to GitHub 
+      - name: Upload Windows GNU build to GitHub
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
-        with: 
-          name: wala-wagdx-${{ env.SHORT_SHA }}-windows-x64.zip
-          path: wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx-${{ env.SHORT_SHA }}-windows-x64.zip
+        with:
+          name: wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-gnu.zip
+          path: wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-gnu.zip
 
       - name: Set up Python
         if: runner.os == 'macOS'
