@@ -217,12 +217,17 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Add Rust target for Windows GNU'
+        if: runner.os == 'Windows'
+        run: |
+          rustup target add x86_64-pc-windows-gnu
+
       - name: Build on Windows
         if: runner.os == 'Windows'
         shell: bash
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x64 || true
-          cargo build --bin wala-wagdx --release
+          cargo build --bin wala-wagdx --release --target x86_64-pc-windows-gnu
           cp target/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx.exe
           archive="wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/wala-wagdx-${{ env.SHORT_SHA }}-windows-x64.zip"
           powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x64/* \"${archive}\""
