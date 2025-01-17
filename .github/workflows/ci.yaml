@@ -226,11 +226,11 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-static || true
+          mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static || true
           cargo build --bin wala-wagdx --release --target x86_64-pc-windows-msvc
           cp target/x86_64-pc-windows-msvc/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static/wala-wagdx.exe
           archive="wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static.zip"
-          powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-static/* \"${archive}\""
+          powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static/* \"${archive}\""
 
       - name: Upload Static CRT build to GitHub
         if: runner.os == 'Windows'
