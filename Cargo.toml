@@ -136,3 +136,6 @@ strip = true
 [profile.console]
 inherits = "release"
 strip = false
+
+[build]
+rustflags = ["-C", "target-feature=+crt-static"]

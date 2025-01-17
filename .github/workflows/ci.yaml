@@ -218,11 +218,12 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Add Rust target for Windows MSVC with Static CRT
+        if: runner.os == 'Windows'
         run: |
           rustup target add x86_64-pc-windows-msvc
-          echo "RUSTFLAGS=-C target-feature=+crt-static" >> $Env:CARGO_HOME/config.toml
 
       - name: Build on Windows with Static CRT Linkage (MSVC)
+        if: runner.os == 'Windows'
         shell: bash
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-static || true
@@ -232,6 +233,7 @@ jobs:
           powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x64-static/* \"${archive}\""
 
       - name: Upload Static CRT build to GitHub
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: wala-wagdx-${{ env.SHORT_SHA }}-win32-x86_64-static.zip
