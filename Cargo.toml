@@ -126,7 +126,7 @@ num-derive = "0.3"
 rodio = "0.17"
 
 [profile.release]
-opt-level = 'z'
+opt-level = '2'
 lto = true
 
 [profile.native-release]
