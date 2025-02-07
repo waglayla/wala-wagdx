@@ -20,6 +20,16 @@ eframe.workspace = true
 env_logger = "0.10.0"  # Check for the latest version
 log = "0.4.19"  # Often needed with env_logger
 
+[build-dependencies]
+static_vcruntime = "2.0"
+
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 waglayla-alloc.workspace = true
 tokio.workspace = true
+
+[package.metadata.bundle.bin.wala-wagdx]
+name = "WagLayla Wag-DX"
+identifier = "com.example.wala-wagdx"
+icon = ["../core/resources/icons/**"]
+resources = ["../core/resources/**"]
+copyright = "Copyright (c) WALA House 2024."

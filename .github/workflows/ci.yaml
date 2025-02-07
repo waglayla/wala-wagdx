@@ -217,6 +217,10 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Install cargo-bundle
+        run: |
+          cargo install cargo-bundle
+
       - name: Add Rust target for Windows MSVC with Static CRT
         if: runner.os == 'Windows'
         run: |
@@ -255,7 +259,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64 || true
-          cargo build --bin wala-wagdx --release --target aarch64-apple-darwin
+          cargo bundle --bin wala-wagdx --release --target aarch64-apple-darwin
           cp target/aarch64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/*
@@ -271,7 +275,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-x86 || true
-          cargo build --bin wala-wagdx --release --target x86_64-apple-darwin
+          cargo bundle --bin wala-wagdx --release --target x86_64-apple-darwin
           cp target/x86_64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx-${{ env.SHORT_SHA }}-macos-x86.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/*
@@ -293,7 +297,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64 || true
-          cargo build --bin wala-wagdx --release
+          cargo bundle --bin wala-wagdx --release
           mkdir -p .debpkg/usr/bin
           cp target/release/wala-wagdx .debpkg/usr/bin/
           cp target/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64/

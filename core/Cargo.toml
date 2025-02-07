@@ -22,6 +22,7 @@ default = []
 
 [build-dependencies]
 vergen = { version = "8.2.6", features = ["build", "git", "gitcl", "rustc", "cargo"] }
+static_vcruntime = "2.0"
 
 [dependencies]
 waglayla-addresses.workspace = true
