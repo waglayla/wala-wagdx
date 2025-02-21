@@ -237,12 +237,29 @@ cfg_if! {
             .with_resizable(true)
           ;
   
-          let native_options = eframe::NativeOptions {
-            persist_window : true,
-            viewport,
-            hardware_acceleration: HardwareAcceleration::Preferred,
-            vsync: true,
-            ..Default::default()
+          let native_options = {
+            #[cfg(target_os = "macos")]
+            {
+              eframe::NativeOptions {
+                persist_window: true,
+                viewport,
+                renderer: eframe::Renderer::Glow,
+                hardware_acceleration: HardwareAcceleration::Preferred,
+                vsync: true,
+                ..Default::default()
+              }
+            }
+            
+            #[cfg(not(target_os = "macos"))]
+            {
+              eframe::NativeOptions {
+                persist_window: true,
+                viewport,
+                hardware_acceleration: HardwareAcceleration::Preferred,
+                vsync: true,
+                ..Default::default()
+              }
+            }
           };
 
           let application_events = ApplicationEventsChannel::unbounded();

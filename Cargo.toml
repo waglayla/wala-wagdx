@@ -29,6 +29,7 @@ eframe = { version = "0.29.1", default-features = false, features = [
   "accesskit",
   "default_fonts",
   "glow",
+  "wgpu",
   "persistence",
 ] }
 egui-phosphor = { version = "0.7.3", features = ["thin", "light", "regular", "bold", "fill"] }

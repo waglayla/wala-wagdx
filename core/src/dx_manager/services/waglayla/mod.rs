@@ -81,12 +81,7 @@ impl WagLaylaService {
     wallet: Option<Arc<dyn WalletApi>>,
   ) -> Self {
 
-    let log_file = OpenOptions::new()
-      .create(true)
-      .write(true)
-      .append(true)
-      .open("rusty-waglayla-service.log")
-      .expect("Failed to open log file");
+    let log_file = crate::platform::paths::open_log_file("rusty-waglayla-service").expect("Failed to Create Log File:");
 
     let storage = CoreWallet::local_store().unwrap_or_else(|e| {
       panic!("Failed to open local store: {}", e);
