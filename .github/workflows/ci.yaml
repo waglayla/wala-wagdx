@@ -219,7 +219,7 @@ jobs:
 
       - name: Install cargo-bundle
         run: |
-          cargo install cargo-bundle
+          cargo install cargo-bundle --force
 
       - name: Add Rust target for Windows MSVC with Static CRT
         if: runner.os == 'Windows'

@@ -30,6 +30,6 @@ tokio.workspace = true
 [package.metadata.bundle.bin.wala-wagdx]
 name = "WagLayla Wag-DX"
 identifier = "com.example.wala-wagdx"
-icon = ["core/resources/icons/maskable_icon_x512.icns"]
+icon = ["core/resources/icons/icon-256.icns"]
 copyright = "Copyright (c) WALA House 2024."
 osx_minimum_system_version = "10.14"
