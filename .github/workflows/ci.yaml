@@ -260,7 +260,7 @@ jobs:
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64 || true
           cargo bundle --bin wala-wagdx --release --target aarch64-apple-darwin
-          cp -R target/aarch64-apple-darwin/release/bundle/macos/*.app wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/
+          cp -R target/aarch64-apple-darwin/release/bundle/osx/*.app wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/*
 
@@ -276,7 +276,7 @@ jobs:
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-x86 || true
           cargo bundle --bin wala-wagdx --release --target x86_64-apple-darwin
-          cp -R target/x86_64-apple-darwin/release/bundle/macos/*.app wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/
+          cp -R target/x86_64-apple-darwin/release/bundle/osx/*.app wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx-${{ env.SHORT_SHA }}-macos-x86.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/*
 
