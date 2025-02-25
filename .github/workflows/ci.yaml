@@ -217,10 +217,6 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Install cargo-bundle
-        run: |
-          cargo install cargo-bundle --force
-
       - name: Add Rust target for Windows MSVC with Static CRT
         if: runner.os == 'Windows'
         run: |
@@ -233,6 +229,7 @@ jobs:
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static || true
           cargo build --bin wala-wagdx --release --target x86_64-pc-windows-msvc
           cp target/x86_64-pc-windows-msvc/release/wala-wagdx.exe wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static/wala-wagdx.exe
+          
           archive="wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static.zip"
           powershell "Compress-Archive wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static/* \"${archive}\""
 
@@ -259,8 +256,10 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64 || true
-          cargo bundle --bin wala-wagdx --release --target aarch64-apple-darwin
-          cp -R target/aarch64-apple-darwin/release/bundle/osx/*.app wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/
+          cargo build --bin wala-wagdx --release --target aarch64-apple-darwin
+
+          sudo chmod +x target/aarch64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx
+          cp target/aarch64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/*
 
@@ -275,8 +274,10 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-x86 || true
-          cargo bundle --bin wala-wagdx --release --target x86_64-apple-darwin
-          cp -R target/x86_64-apple-darwin/release/bundle/osx/*.app wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/
+          cargo build --bin wala-wagdx --release --target x86_64-apple-darwin
+
+          sudo chmod +x target/x86_64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx
+          cp target/x86_64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx-${{ env.SHORT_SHA }}-macos-x86.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/*
 
@@ -297,10 +298,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64 || true
-          cargo bundle --bin wala-wagdx --release
+          cargo build --bin wala-wagdx --release
           mkdir -p .debpkg/usr/bin
+          
+          sudo chmod +x target/release/wala-wagdx
           cp target/release/wala-wagdx .debpkg/usr/bin/
-          cp target/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64/
+          cp target/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64/wala-wagdx
           archive="wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64/wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-linux-gnu-amd64/*
 
