@@ -258,7 +258,7 @@ jobs:
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64 || true
           cargo build --bin wala-wagdx --release --target aarch64-apple-darwin
 
-          sudo chmod +x target/aarch64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx
+          sudo chmod +x target/aarch64-apple-darwin/release/wala-wagdx
           cp target/aarch64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-arm64/*
@@ -276,7 +276,7 @@ jobs:
           mkdir wala-wagdx-${{ env.SHORT_SHA }}-macos-x86 || true
           cargo build --bin wala-wagdx --release --target x86_64-apple-darwin
 
-          sudo chmod +x target/x86_64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx
+          sudo chmod +x target/x86_64-apple-darwin/release/wala-wagdx
           cp target/x86_64-apple-darwin/release/wala-wagdx wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx
           archive="wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/wala-wagdx-${{ env.SHORT_SHA }}-macos-x86.zip"
           zip -r "${archive}" ./wala-wagdx-${{ env.SHORT_SHA }}-macos-x86/*
