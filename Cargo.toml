@@ -17,6 +17,7 @@ repository = "https://github.com/waglayla/wala-wagdx"
 
 [workspace.dependencies]
 
+rust-embed = "6"
 wala-wagdx = { version = "1.0.0-k9", path = "app/", default-features = false }
 wala-wagdx-core = { version = "1.0.0-k9", path = "core/", default-features = false }
 

@@ -311,11 +311,11 @@ pub fn dx_button_enabled_ui(
   );
 
   // Draw the disabled color
-  let over_color = Color32::from_rgba_premultiplied(
+  let over_color = Color32::from_rgba_unmultiplied(
     theme_color().fg_color.r(),
     theme_color().fg_color.g(),
     theme_color().fg_color.b(),
-    210
+    theme_color().disabled_a,
   );
 
   if !enabled {
@@ -548,11 +548,11 @@ pub fn dx_button_sized_enabled_ui(
   );
 
   // Draw the disabled color
-  let over_color = Color32::from_rgba_premultiplied(
+  let over_color = Color32::from_rgba_unmultiplied(
     theme_color().fg_color.r(),
     theme_color().fg_color.g(),
     theme_color().fg_color.b(),
-    210
+    theme_color().disabled_a,
   );
 
   if !enabled {

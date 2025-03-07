@@ -82,6 +82,15 @@ pub fn theme_style() -> &'static ThemeStyle {
   &theme().style
 }
 
+
+#[inline(always)]
+pub fn theme_accent_img() -> &'static TextureHandle {
+    match &theme().color.accent_img {
+        AccentImgID::Paw => &Assets::get().paw_watermark,
+        AccentImgID::Snow => &Assets::get().snow_watermark,
+    }
+}
+
 pub fn apply_theme_by_name(
   ctx: &Context,
   theme_color_name: impl Into<String>,

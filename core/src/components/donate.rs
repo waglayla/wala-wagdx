@@ -56,7 +56,7 @@ impl ComponentT for Donate {
     render_centered_content_noback(ctx, ui, i18n("Donation Wallets"), base_estimated_height*factor, |ui| {
       DXImage::paint_at(
         ui, 
-        &Assets::get().paw_watermark,
+        theme_accent_img(),
         ui.available_width().min(ui.available_height()),
         ui.available_rect_before_wrap().center() - vec2(ui.available_width()/2.0, 0.0), 
         Align2::CENTER_CENTER
@@ -64,7 +64,7 @@ impl ComponentT for Donate {
 
       DXImage::paint_at(
         ui, 
-        &Assets::get().paw_watermark,
+        theme_accent_img(),
         ui.available_width().min(ui.available_height()),
         ui.available_rect_before_wrap().center() + vec2(ui.available_width()/2.0, 0.0), 
         Align2::CENTER_CENTER

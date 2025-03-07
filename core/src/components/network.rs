@@ -67,7 +67,7 @@ impl ComponentT for NetworkInfo {
   ) {
     DXImage::paint_at(
       ui, 
-      &Assets::get().paw_watermark,
+      theme_accent_img(),
       ui.available_width().min(ui.available_height()),
       ui.available_rect_before_wrap().center(), Align2::CENTER_CENTER
     );

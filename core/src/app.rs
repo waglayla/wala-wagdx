@@ -255,6 +255,7 @@ cfg_if! {
               eframe::NativeOptions {
                 persist_window: true,
                 viewport,
+                renderer: eframe::Renderer::Glow,
                 hardware_acceleration: HardwareAcceleration::Preferred,
                 vsync: true,
                 ..Default::default()

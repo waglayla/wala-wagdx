@@ -23,6 +23,8 @@ default = []
 [build-dependencies]
 vergen = { version = "8.2.6", features = ["build", "git", "gitcl", "rustc", "cargo"] }
 static_vcruntime = "2.0"
+git2 = "0.18"
+anyhow = "1"
 
 [dependencies]
 waglayla-addresses.workspace = true
@@ -49,6 +51,7 @@ workflow-store.workspace = true
 workflow-wasm.workspace = true
 chrome-sys.workspace = true
 
+rust-embed.workspace = true
 ahash.workspace = true
 async-trait.workspace = true
 borsh.workspace = true

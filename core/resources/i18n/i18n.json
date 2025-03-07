@@ -309,6 +309,7 @@
       "Please select the private key to export": "Please select the private key to export",
       "Please wait...": "Please wait...",
       "Processing Blocks...": "Processing Blocks...",
+      "Processing Proofs": "Processing Proofs",
       "Processing...": "Processing...",
       "Public wRPC (Borsh)": "Public wRPC (Borsh)",
       "Random Public Node": "Random Public Node",

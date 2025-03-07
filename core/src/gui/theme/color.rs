@@ -1,12 +1,17 @@
 use crate::imports::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum AccentImgID {
+  Paw,
+  Snow,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct ThemeColor {
   pub name: String,
   pub dark_mode: bool,
 
-  pub waglayla_color: Color32,
   pub hyperlink_color: Color32,
   pub node_data_color: Color32,
   pub balance_color: Color32,
@@ -35,6 +40,9 @@ pub struct ThemeColor {
   pub text_off_color_2: Color32,
   pub text_on_color_1: Color32,
   pub text_on_color_2: Color32,
+
+  pub disabled_a: u8,
+  pub accent_img: AccentImgID,
 }
 
 impl ThemeColor {
@@ -42,7 +50,6 @@ impl ThemeColor {
     Self {
       name: "WagLayla".to_string(),
       dark_mode: true,
-      waglayla_color: Color32::from_rgb(255, 182, 193),
       hyperlink_color: Color32::from_rgb(255, 105, 180),
 
       default_color: Color32::from_rgb(255, 202, 228),
@@ -72,6 +79,9 @@ impl ThemeColor {
       text_off_color_2: Color32::from_rgb(4, 7, 12),
       text_on_color_1: Color32::WHITE,
       text_on_color_2: Color32::from_rgb(255, 175, 210),
+
+      disabled_a: 95,
+      accent_img: AccentImgID::Paw,
     }
   }
 
@@ -79,7 +89,6 @@ impl ThemeColor {
     Self {
       name: i18n("Carbon").to_string(),
       dark_mode: true,
-      waglayla_color: Color32::from_rgb(58, 221, 190),
       hyperlink_color: Color32::from_rgb(141, 184, 178),
 
       default_color: Color32::from_rgb(164, 164, 164),
@@ -109,6 +118,9 @@ impl ThemeColor {
       text_off_color_2: Color32::from_rgb(27, 27, 27),
       text_on_color_1: Color32::from_rgb(223, 117, 141),
       text_on_color_2: Color32::from_rgb(137, 137, 137),
+
+      disabled_a: 95,
+      accent_img: AccentImgID::Paw,
     }
   }
 
@@ -116,7 +128,6 @@ impl ThemeColor {
     Self {
       name: i18n("Sakura").to_string(),
       dark_mode: false,
-      waglayla_color: Color32::from_rgb(58, 221, 190),
       hyperlink_color: Color32::from_rgb(15, 84, 73),
 
       default_color: Color32::from_rgb(255, 99, 160),
@@ -146,6 +157,48 @@ impl ThemeColor {
       text_off_color_2: Color32::LIGHT_GRAY,
       text_on_color_1: Color32::from_rgb(239, 42, 139),
       text_on_color_2: Color32::DARK_GRAY,
+
+      disabled_a: 95,
+      accent_img: AccentImgID::Paw,
+    }
+  }
+
+  pub fn snow() -> Self {
+    Self {
+      name: i18n("Snow").to_string(),
+      dark_mode: false,
+      hyperlink_color: Color32::from_rgb(15, 84, 73),
+
+      default_color: Color32::from_rgb(60, 151, 194),
+      strong_color: Color32::from_rgb(2, 130, 184),
+
+      separator_color: Color32::from_rgb(235, 238, 240),
+      button_color: Color32::from_rgb(192, 236, 252),
+      toggle_active: Color32::from_rgb(33, 184, 255),
+
+      bg_color: Color32::from_rgb(192, 236, 252),
+      fg_color: Color32::from_rgb(255, 255, 255),
+
+      null_balance_color: Color32::from_rgb(232, 250, 255),
+
+      node_data_color: Color32::BLACK,
+      balance_color: Color32::BLACK,
+      balance_syncing_color: Color32::LIGHT_GRAY,
+      error_color: Color32::from_rgb(255, 69, 0),
+      alert_color: Color32::from_rgb(255, 69, 0),
+      warning_color: egui::Color32::from_rgb(77, 77, 41),
+      info_color: egui::Color32::from_rgb(41, 56, 77),
+
+      qr_background: Color32::from_rgba(255, 255, 255, 0),
+      qr_foreground: Color32::BLACK,
+
+      text_off_color_1: Color32::from_rgb(232, 250, 255),
+      text_off_color_2: Color32::from_rgb(232, 250, 255),
+      text_on_color_1: Color32::from_rgb(2, 130, 184),
+      text_on_color_2: Color32::from_rgb(2, 130, 184),
+
+      disabled_a: 55,
+      accent_img: AccentImgID::Snow,
     }
   }
 }
@@ -167,7 +220,7 @@ pub fn theme_colors() -> &'static HashMap<String, ThemeColor> {
   unsafe {
     THEME_COLOR_LIST.get_or_insert_with(|| {
       let mut themes = HashMap::new();
-      [ThemeColor::pink(), ThemeColor::dark(), ThemeColor::light()]
+      [ThemeColor::pink(), ThemeColor::dark(), ThemeColor::light(), ThemeColor::snow()]
         .into_iter()
         .for_each(|theme| {
           themes.insert(theme.name.clone(), theme.clone());
