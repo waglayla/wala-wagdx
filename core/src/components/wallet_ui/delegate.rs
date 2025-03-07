@@ -1,5 +1,4 @@
 use crate::imports::*;
-use super::*;
 
 #[derive(Default, Clone)]
 pub struct WalletDelegator {}

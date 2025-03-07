@@ -1,4 +1,3 @@
-use waglayla_metrics_core::MetricGroup;
 
 mod color;
 pub use color::*;

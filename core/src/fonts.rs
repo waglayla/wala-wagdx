@@ -1,5 +1,4 @@
-use egui::{FontData, FontTweak, FontDefinitions, FontFamily};
-use std::path::Path;
+use egui::{FontData, FontDefinitions, FontFamily};
 use workflow_core::runtime;
 
 trait RegisterStaticFont {

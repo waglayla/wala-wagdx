@@ -1,5 +1,4 @@
 use crate::imports::*;
-use std::borrow::Cow;
 use egui_extras::image::RetainedImage;
 
 pub struct Qr;

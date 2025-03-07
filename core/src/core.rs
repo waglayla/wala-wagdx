@@ -5,22 +5,19 @@ use crate::components::*;
 
 // use crate::market::*; TODO: make our own market monitoring solution
 // use crate::mobile::MobileMenu; TODO: make own version of this
-use egui::load::Bytes;
 use egui_notify::{Toasts, Anchor};
 use waglayla_wallet_core::api::TransactionsDataGetResponse;
 use waglayla_wallet_core::events::Events as CoreWallet;
 use waglayla_wallet_core::storage::{Binding, Hint, PrvKeyDataInfo};
-use std::borrow::Cow;
 use std::future::IntoFuture;
 #[allow(unused_imports)]
 use workflow_i18n::*;
-use workflow_wasm::callback::CallbackMap;
 pub const TRANSACTION_PAGE_SIZE: u64 = 20;
 pub const MAINNET_EXPLORER: &str = "https://explorer.waglayla.org";
 pub const TESTNET10_EXPLORER: &str = "https://explorer-tn10.waglayla.org";
 pub const TESTNET11_EXPLORER: &str = "https://explorer-tn11.waglayla.org";
 
-use eframe::egui::{self, Context, Ui, RichText, Color32, Stroke};
+use eframe::egui::{self, Context};
 
 #[derive(Clone)]
 pub enum Exception {
@@ -82,8 +79,8 @@ impl Core {
     crate::fonts::init_fonts(cc);
     
     // Create default styles
-    let mut default_style = (*cc.egui_ctx.style()).clone();
-    let mut mobile_style = (*cc.egui_ctx.style()).clone();
+    let default_style = (*cc.egui_ctx.style()).clone();
+    let mobile_style = (*cc.egui_ctx.style()).clone();
 
     let manager = manager();
     
@@ -120,7 +117,7 @@ impl Core {
       storage.track_storage_root(Some(settings.node.waglaylad_daemon_storage_folder.as_str()));
     }
 
-    let mut toasts = Toasts::new().with_anchor(Anchor::BottomLeft).with_margin(vec2(10.0,38.0));
+    let toasts = Toasts::new().with_anchor(Anchor::BottomLeft).with_margin(vec2(10.0,38.0));
 
     let mut this = Self {
       is_shutdown_pending: false,
@@ -1018,7 +1015,7 @@ impl Core {
             .map(|v| v.map_err(Error::from))
             .collect::<Result<Vec<_>>>()?;
 
-          let mut amount = 0;
+          let amount = 0;
           transaction_data.into_iter().for_each(|data| {
             let TransactionsDataGetResponse {
               account_id,

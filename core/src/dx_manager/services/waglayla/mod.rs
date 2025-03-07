@@ -10,7 +10,6 @@ use waglayla_wallet_core::rpc::{
 use waglayla_wrpc_client::Resolver;
 use workflow_core::runtime;
 
-use std::fs::OpenOptions;
 use std::io::Write;
 use std::sync::Mutex;
 

@@ -1,10 +1,8 @@
 use crate::imports::*;
-use waglayla_wallet_core::{wallet::{AccountCreateArgs, PrvKeyDataCreateArgs, WalletCreateArgs}, encryption::EncryptionKind, api::{AccountsDiscoveryRequest, AccountsDiscoveryKind}};
-use waglayla_bip32::{WordCount, Mnemonic, Language};
 use std::sync::{Arc, Mutex};
 use core::cmp::max;
 
-use components::wallet_ui::BOTTOM_SPACE; // wtf rust why do I need this
+ // wtf rust why do I need this
 
 #[derive(Clone, Default)]
 pub enum State {
@@ -170,7 +168,7 @@ impl ComponentT for OpenWallet {
       }
 
       if *self.is_pending.lock().unwrap() {
-        let mut finish = false;
+        let finish = false;
         let mut F = create_custom_popup(ctx);
         F.rounding = 10.0.into();
         let screen_rect = ui.ctx().screen_rect();
@@ -189,7 +187,7 @@ impl ComponentT for OpenWallet {
           crate::gui::frame::WINDOW_ROUNDING
         };
 
-        let mut response = ui.allocate_rect(
+        let response = ui.allocate_rect(
           screen_rect, 
           egui::Sense::click_and_drag()
         );

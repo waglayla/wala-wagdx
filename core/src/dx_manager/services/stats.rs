@@ -1,6 +1,5 @@
 use crate::imports::*;
-use waglayla_rpc_core::RpcPeerInfo;
-use chrono::{Datelike, Duration, NaiveDate, Utc};
+use chrono::{Datelike, NaiveDate, Utc};
 
 pub const STAT_POLLING_INTERVAL_SECONDS: u64 = 1; // 1 sec
 

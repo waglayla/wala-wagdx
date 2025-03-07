@@ -1,5 +1,5 @@
 use super::*;
-use crate::components::{Component, ComponentT};
+use crate::components::ComponentT;
 use crate::core::Core;
 
 pub struct Hello {

@@ -1,9 +1,6 @@
 use crate::imports::*;
 use super::*;
 
-use waglayla_wallet_core::{wallet::{AccountCreateArgs, PrvKeyDataCreateArgs, WalletCreateArgs}, encryption::EncryptionKind, api::{AccountsDiscoveryRequest, AccountsDiscoveryKind}};
-use waglayla_bip32::{WordCount, Mnemonic, Language};
-use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
 pub enum State {

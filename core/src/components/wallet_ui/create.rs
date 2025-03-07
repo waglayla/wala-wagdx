@@ -1,8 +1,7 @@
 use crate::imports::*;
-use waglayla_wallet_core::{wallet::{AccountCreateArgs, PrvKeyDataCreateArgs, WalletCreateArgs}, encryption::EncryptionKind, api::{AccountsDiscoveryRequest, AccountsDiscoveryKind}};
+use waglayla_wallet_core::{wallet::{AccountCreateArgs, PrvKeyDataCreateArgs, WalletCreateArgs}, encryption::EncryptionKind};
 use waglayla_bip32::{WordCount, Mnemonic, Language};
 use std::sync::{Arc, Mutex};
-use tokio::sync::oneshot;
 use core::cmp::max;
 
 use crate::components::wallet_ui::BOTTOM_SPACE;
@@ -23,7 +22,7 @@ pub enum State {
   Unlock { wallet_descriptor : WalletDescriptor, error : Option<Arc<Error>>},
   Unlocking { wallet_descriptor : WalletDescriptor },
   EnterKey(String),
-  ImportKey { is_pending: Arc<Mutex<bool>>, result: Arc<Mutex<Option<Result<(AccountDescriptor)>>>> },
+  ImportKey { is_pending: Arc<Mutex<bool>>, result: Arc<Mutex<Option<Result<AccountDescriptor>>>> },
 }
 
 impl WizardActionTrait for WizardAction {
@@ -273,7 +272,7 @@ impl ComponentT for CreateWallet {
             let header_height = 64.;
             let header_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), header_height));
             let header_rect = header_space.1;
-            let mut painter = ui.painter_at(header_rect);
+            let painter = ui.painter_at(header_rect);
 
             let has_account = core.borrow().current_account.is_some();
             if has_account {
@@ -746,7 +745,7 @@ impl ComponentT for CreateWallet {
             crate::gui::frame::WINDOW_ROUNDING
           };
 
-          let mut response = ui.allocate_rect(
+          let response = ui.allocate_rect(
             screen_rect, 
             egui::Sense::click_and_drag()
           );
@@ -775,7 +774,7 @@ impl ComponentT for CreateWallet {
                       let header_height = 48.;
                       let header_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), header_height));
                       let header_rect = header_space.1;
-                      let mut painter = ui.painter_at(header_rect);
+                      let painter = ui.painter_at(header_rect);
       
                       painter.text(
                           header_rect.center(),
@@ -914,7 +913,7 @@ impl ComponentT for CreateWallet {
                           }
                           ui.add_space(8.);
 
-                          let mut resp = ui.dx_button_sized(
+                          let resp = ui.dx_button_sized(
                             i18n("Confirm and Create"), 
                             24.0, 
                             Default::default(), 
@@ -939,7 +938,7 @@ impl ComponentT for CreateWallet {
       }
       
       State::Create { is_pending, result } => {
-        let mut is_pending = is_pending.clone();
+        let is_pending = is_pending.clone();
         // Display the "Creating Wallet" UI
         render_centered_content_noback(ctx, ui, i18n("Creating Wallet"), 200.0, |ui| {
             ui.vertical_centered(|ui| {
@@ -960,7 +959,7 @@ impl ComponentT for CreateWallet {
       
           let args_create = self.args_create.clone();
           let wallet = self.manager.wallet().clone();
-          let mut result = result.clone();
+          let result = result.clone();
       
           tokio::spawn(async move {
             let res = async {
@@ -1064,7 +1063,7 @@ impl ComponentT for CreateWallet {
           crate::gui::frame::WINDOW_ROUNDING
         };
 
-        let mut response = ui.allocate_rect(
+        let response = ui.allocate_rect(
           screen_rect, 
           egui::Sense::click_and_drag()
         );
@@ -1138,7 +1137,7 @@ impl ComponentT for CreateWallet {
 
                 let mut is_correct = false;
 
-                let mut title = match self.seed_state.to_owned() {
+                let title = match self.seed_state.to_owned() {
                   SeedState::Confirm1(index) => {
                     i18n("Confirmation 1/3")
                   }
@@ -1153,7 +1152,7 @@ impl ComponentT for CreateWallet {
 
                 render_centered_content_noback(ctx, ui, title, 200.0, |ui| {
                   ui.vertical_centered(|ui| {
-                    let mut input_word = match self.seed_state.to_owned() {
+                    let input_word = match self.seed_state.to_owned() {
                       SeedState::Confirm1(index) => {
                         &mut self.confirm_1
                       }
@@ -1330,7 +1329,7 @@ impl ComponentT for CreateWallet {
 
       State::ImportKey { is_pending, result } => {
         let mnemonic = self.import_key_input.to_owned();
-        let mut is_pending = is_pending.clone();
+        let is_pending = is_pending.clone();
         // Display the "Creating Wallet" UI
         render_centered_content_noback(ctx, ui, i18n("Importing Wallet"), 200.0, |ui| {
             ui.vertical_centered(|ui| {
@@ -1351,7 +1350,7 @@ impl ComponentT for CreateWallet {
       
           let args_create = self.args_create.to_owned();
           let wallet = self.manager.wallet().to_owned();
-          let mut result = result.clone();
+          let result = result.clone();
       
           tokio::spawn(async move {
             let res = async {

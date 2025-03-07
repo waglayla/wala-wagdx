@@ -9,7 +9,6 @@ use wala_wagdx_core::dx_manager;
 use wala_wagdx_core::settings::Settings;
 use waglayla_wallet_core::api::WalletApi;
 
-use eframe::Renderer;
 
 use std::sync::Arc;
 use workflow_i18n::*;
@@ -54,7 +53,7 @@ cfg_if! {
     use waglayla_utils::fd_budget;
     use waglayla_core::signals::Signals;
     use clap::ArgAction;
-    use crate::utils::*;
+    
     use std::fs;
 
     const DESIRED_DAEMON_SOFT_FD_LIMIT: u64 = 4 * 1024;
@@ -198,7 +197,7 @@ cfg_if! {
 
           set_log_level(LevelFilter::Info);
 
-          let mut settings = if reset_settings {
+          let settings = if reset_settings {
             println!("Resetting wala-wagdx settings on user request...");
             Settings::default().store_sync()?.clone()
           } else {
@@ -227,7 +226,7 @@ cfg_if! {
 
           let icon_data = include_icon(WALA_WAGDX_ICON_PNG).expect("Failed to load embedded icon");
 
-          let mut viewport = egui::ViewportBuilder::default()
+          let viewport = egui::ViewportBuilder::default()
             .with_title(i18n("WagLayla Wag-DX"))
             .with_min_inner_size([1030.0, 600.0])
             .with_inner_size([1030.0,600.0])

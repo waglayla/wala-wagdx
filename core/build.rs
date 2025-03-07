@@ -4,7 +4,6 @@ use vergen::EmitBuilder;
 use anyhow::{Result};
 use git2::{build::RepoBuilder, FetchOptions, RemoteCallbacks, Progress};
 use std::env;
-use std::fs;
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::io::{self, BufRead};

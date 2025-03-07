@@ -44,7 +44,7 @@ pub fn get_sys_lang() -> String {
 }
 
 pub fn format_number(num: u64) -> String {
-  let mut value = num as f64;
+  let value = num as f64;
   let locale = Locale::from_name(get_sys_lang()).unwrap_or(Locale::en);
 
   let integer_part = value.trunc() as u64;

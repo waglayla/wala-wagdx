@@ -1,8 +1,5 @@
-use std::ops::{Deref, DerefMut};
 use crate::imports::*;
-use super::*;
-use num_derive::{FromPrimitive, ToPrimitive};
-use num_traits::{FromPrimitive, ToPrimitive};
+use num_traits::ToPrimitive;
 
 pub const FOCUS_NONE: u32 = 0;
 

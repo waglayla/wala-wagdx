@@ -1,14 +1,4 @@
 use crate::imports::*;
-use waglayla_bip32::{Language, Mnemonic, WordCount};
-use waglayla_wallet_core::{
-  wallet::{AccountCreateArgs, PrvKeyDataCreateArgs, WalletCreateArgs}, 
-  encryption::EncryptionKind, 
-  api::{AccountsDiscoveryRequest, AccountsDiscoveryKind},
-  tx::{GeneratorSummary, PaymentDestination, Fees},
-  prelude::AccountsEstimateRequest
-};
-use egui::{ColorImage, TextureHandle};
-use slug::slugify;
 
 use waglayla_wallet_core::account::{
   BIP32_ACCOUNT_KIND, KEYPAIR_ACCOUNT_KIND, LEGACY_ACCOUNT_KIND, MULTISIG_ACCOUNT_KIND,

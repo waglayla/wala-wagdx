@@ -1,5 +1,4 @@
 use crate::imports::*;
-use super::*;
 use crate::core::TRANSACTION_PAGE_SIZE;
 
 #[derive(Default)]
@@ -9,7 +8,7 @@ pub struct WalletTransactions {
 
 impl WalletTransactions {
   pub fn render(&mut self, core : &mut Core, ctx: &egui::Context, ui: &mut Ui) {
-    let mut account = core.current_account.as_ref().expect("No Account Selected").clone();
+    let account = core.current_account.as_ref().expect("No Account Selected").clone();
     let current_daa_score = core.node_state().current_daa_score();
 
     let max_height = ui.available_height() - (ui.fonts(|fonts|RichText::new("YWgy").font_height(fonts, ui.style())).at_least(ui.spacing().interact_size.y) * 2.0 + 5.0);
@@ -24,7 +23,7 @@ impl WalletTransactions {
         .rounding(egui::Rounding::same(10.0))
         .fill(theme_color().button_color)
         .show(ui, |ui| {
-          let mut transactions = account.transactions();
+          let transactions = account.transactions();
           if transactions.is_empty() {
             ui.vertical_centered(|ui| {
               ui.label("");

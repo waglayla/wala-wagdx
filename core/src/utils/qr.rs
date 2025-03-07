@@ -1,11 +1,5 @@
-use crate::imports::*;
-use image::ImageOutputFormat;
 use super::*;
 
-use qrcode::render::svg;
-use qrcode::*;
-use egui::{ColorImage, TextureHandle, IconData};
-use egui_extras::RetainedImage;
 
 pub fn generate_qr_code_svg(input: String) -> Result<String> {
   use qrcode::{QrCode, render::svg};

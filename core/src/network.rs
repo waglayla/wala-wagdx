@@ -2,7 +2,6 @@ use crate::imports::*;
 use waglayla_addresses::Prefix as AddressPrefix;
 use waglayla_consensus_core::config::params::Params;
 use waglayla_wallet_core::utxo::NetworkParams;
-use waglayla_wallet_core::tx::MassCombinationStrategy;
 
 pub const BASIC_TRANSACTION_MASS: u64 = 2036;
 

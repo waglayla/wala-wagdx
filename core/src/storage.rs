@@ -1,7 +1,6 @@
 use crate::imports::*;
 use crate::error::Error;
 use std::sync::{Arc, Mutex};
-use std::fs;
 use walkdir::WalkDir;
 
 #[derive(PartialEq, Eq)]

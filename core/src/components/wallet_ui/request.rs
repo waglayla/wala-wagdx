@@ -1,7 +1,6 @@
 use crate::imports::*;
-use super::*;
 use core::cmp::max;
-use std::{borrow::Cow, collections::hash_map::Entry};
+use std::collections::hash_map::Entry;
 use xxhash_rust::xxh3::xxh3_64;
 
 pub struct RequestUri {

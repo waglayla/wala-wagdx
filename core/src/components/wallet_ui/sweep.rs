@@ -1,8 +1,8 @@
 use crate::imports::*;
 
-use tokio::time::{timeout, Duration};
-use waglayla_wallet_core::tx::{GeneratorSummary, PaymentOutput, PaymentDestination, Fees};
-use waglayla_wallet_core::api::{AccountsSendRequest, AccountsSendResponse};
+use tokio::time::Duration;
+use waglayla_wallet_core::tx::{PaymentDestination, Fees};
+use waglayla_wallet_core::api::AccountsSendRequest;
 use std::sync::{Arc, Mutex};
 use core::cmp::max;
 

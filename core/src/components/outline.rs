@@ -1,5 +1,4 @@
 use super::*;
-use crate::components::*;
 
 define_animation_frames!(SONIC_RUN, 192, "/resources/animation/layla/wag");
 
@@ -216,7 +215,7 @@ impl Outline {
           .show(ui, |ui| {
             ui.style_mut().spacing.item_spacing = Vec2::ZERO;
             
-            let mut account_list = if let Some(account_collection) = core_delegate.to_owned().user_accounts() {
+            let account_list = if let Some(account_collection) = core_delegate.to_owned().user_accounts() {
               account_collection.list().to_owned()
             } else {
               return;

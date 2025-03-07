@@ -1,8 +1,6 @@
 use crate::imports::*;
-use super::*;
 use core::cmp::max;
 
-use components::wallet_ui::BOTTOM_SPACE;
 
 #[derive(Default, Clone, PartialEq)]
 enum ExportState {

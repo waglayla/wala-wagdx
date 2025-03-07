@@ -21,7 +21,7 @@ where
       let header_height = 64.;
       let header_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), header_height));
       let header_rect = header_space.1;
-      let mut painter = ui.painter_at(header_rect);
+      let painter = ui.painter_at(header_rect);
 
       painter.text(
         header_rect.center() + vec2(0.0, 8.0),
@@ -68,7 +68,7 @@ where
       let header_height = 64.;
       let header_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), header_height));
       let header_rect = header_space.1;
-      let mut painter = ui.painter_at(header_rect);
+      let painter = ui.painter_at(header_rect);
 
       painter.text(
         header_rect.center() + vec2(0.0, 8.0),

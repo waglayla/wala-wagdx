@@ -1,8 +1,7 @@
 use crate::imports::*;
-use crate::components::{Component, ComponentT};
+use crate::components::ComponentT;
 use crate::core::Core;
 
-use egui_extras::{StripBuilder, Size};
 
 pub struct About {}
 
@@ -169,7 +168,7 @@ impl About {
     let font_id = FontId::new(font_size, FontFamily::Proportional);
     let color = ui.visuals().text_color();
 
-    let mut layouter = |ui: &egui::Ui, string: &str, wrap_width: f32| {
+    let layouter = |ui: &egui::Ui, string: &str, wrap_width: f32| {
       let mut layout_job = LayoutJob::default();
       layout_job.wrap.max_width = wrap_width;
       layout_job.wrap.break_anywhere = false; // Only break at spaces

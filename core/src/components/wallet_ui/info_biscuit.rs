@@ -1,6 +1,5 @@
 use crate::imports::*;
 use super::*;
-use core::cmp::min;
 use egui_phosphor::fill::*;
 
 #[derive(Clone, Default)]
@@ -136,7 +135,7 @@ impl WalletBiscuit {
     });
 
     //
-    if (self.show_request) {
+    if self.show_request {
       self.request.render(
         &mut self.show_request,
         core,
@@ -405,7 +404,7 @@ impl WalletBiscuit {
       },
     );
 
-    let mut response = ui.interact(
+    let response = ui.interact(
       seed_rect, 
       egui::Id::new("show_seed_area"), 
       egui::Sense::click() | egui::Sense::hover(),
@@ -461,7 +460,7 @@ impl WalletBiscuit {
 
     let mut big_str = "000".to_string();
     let mut small_str = ".000".to_string();
-    let mut balance_color = theme_color().strong_color;
+    let balance_color = theme_color().strong_color;
 
     if let Some(ref account) = account_clone {
       let balance = account.balance().unwrap_or_default();
@@ -552,7 +551,7 @@ impl WalletBiscuit {
 
     let mut big_str = "000".to_string();
     let mut small_str = ".000".to_string();
-    let mut balance_color = theme_color().null_balance_color;
+    let balance_color = theme_color().null_balance_color;
 
     if let Some(ref account) = account_clone {
       let balance = account.balance().unwrap_or_default();

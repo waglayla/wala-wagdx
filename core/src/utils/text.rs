@@ -1,4 +1,4 @@
-use egui::{FontFamily, FontId, TextStyle};
+use egui::{FontFamily, FontId};
 
 pub fn calculate_text_width(
   text: &str, 

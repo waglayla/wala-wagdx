@@ -1,5 +1,4 @@
 use crate::imports::*;
-use crate::components::hello::Hello;
 
 pub struct Welcome {
     #[allow(dead_code)]

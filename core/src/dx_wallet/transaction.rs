@@ -1,12 +1,9 @@
 use crate::imports::*;
-use egui_phosphor::light::*;
-use waglayla_consensus_core::tx::{TransactionInput, TransactionOutpoint, TransactionOutput};
 use waglayla_wallet_core::storage::{
-    transaction::{TransactionData, UtxoRecord},
+    transaction::TransactionData,
     TransactionKind,
 };
 
-use chrono::{DateTime, Local, TimeZone};
 
 // For reference only
 // /// @category Wallet SDK

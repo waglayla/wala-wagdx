@@ -1,7 +1,6 @@
 use crate::imports::*;
-use waglayla_wallet_core::tx::{GeneratorSummary, PaymentOutput, PaymentDestination, Fees};
-use waglayla_wallet_core::api::{AccountsSendRequest, AccountsSendResponse};
-use egui_extras::RetainedImage;
+use waglayla_wallet_core::tx::{PaymentOutput, PaymentDestination, Fees};
+use waglayla_wallet_core::api::AccountsSendRequest;
 use std::sync::{Arc, Mutex};
 use core::cmp::max;
 
