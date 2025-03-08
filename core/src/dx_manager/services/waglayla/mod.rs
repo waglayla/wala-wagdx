@@ -379,6 +379,7 @@ impl WagLaylaService {
         *self.url.lock().unwrap() = None;
       }
       WagLayladServiceEvents::Exit => {
+        self.stop_all_services().await?;
         return Ok(true);
       }
     }

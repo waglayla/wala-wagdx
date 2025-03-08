@@ -31,7 +31,7 @@ impl Signals {
         }
         _ => {
           println!("^SIGTERM - halting");
-          std::process::exit(1);
+          crate::dx_manager::abort();
         }
       }
     })

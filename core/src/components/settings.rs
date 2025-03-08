@@ -347,13 +347,122 @@ impl Settings {
       }
   }
 
+  fn render_bridge_settings(
+    &mut self,
+    core: &mut Core,
+    ui: &mut egui::Ui,
+  ) {
+    if self.settings.node.node_kind != WagLayladNodeKind::IntegratedAsDaemon {
+      return;
+    }
 
+    let mut settings = &mut self.settings.bridge;
+    let mut bridge_settings_error: Option<&str> = None;
 
+    #[cfg(not(target_arch = "wasm32"))]
+    CollapsingHeader::new(i18n("Stratum Bridge Config"))
+      .default_open(false)
+      .show(ui, |ui| {
+      // Edit fields
+      ui.horizontal(|ui| {
+        ui.label("Stratum Port:");
+        ui.text_edit_singleline(&mut settings.stratum_port);
+      });
+      ui.horizontal(|ui| {
+        ui.label("Waglayla Address:");
+        ui.text_edit_singleline(&mut settings.waglayla_address);
+      });
+      ui.horizontal(|ui| {
+        ui.label("Min Share Diff:");
+        ui.add(egui::DragValue::new(&mut settings.min_share_diff).speed(1));
+      });
+      ui.horizontal(|ui| {
+        ui.add(toggle(&mut settings.var_diff));
+        ui.label(i18n("Enable Vardiff"));
+      });
+      ui.horizontal(|ui| {
+        ui.label("Shares Per Min:");
+        ui.add(egui::DragValue::new(&mut settings.shares_per_min).speed(1));
+      });
+      ui.horizontal(|ui| {
+        ui.add(toggle(&mut settings.var_diff_stats));
+        ui.label(i18n("Vardiff Stats"));
+      });
+      ui.horizontal(|ui| {
+        ui.add(toggle(&mut settings.solo_mining));
+        ui.label(i18n("Solo Mining Mode"));
+      });
+      ui.horizontal(|ui| {
+        ui.label("Block Wait Time:");
+        ui.text_edit_singleline(&mut settings.block_wait_time);
+      });
+      ui.horizontal(|ui| {
+        ui.label("Extranonce Size:");
+        ui.add(egui::DragValue::new(&mut settings.extranonce_size).range(0..=3));
+      });
+      ui.horizontal(|ui| {
+        ui.add(toggle(&mut settings.print_stats));
+        ui.label(i18n("Print Stats"));
+      });
+      ui.horizontal(|ui| {
+        ui.add(toggle(&mut settings.log_to_file));
+        ui.label(i18n("Log to File"));
+      });
+      ui.horizontal(|ui| {
+        ui.label("Prometheus Port:");
+        ui.text_edit_singleline(&mut settings.prom_port);
+      });
+
+      if let Some(error) = bridge_settings_error {
+        ui.add_space(4.);
+        ui.label(
+          RichText::new(error)
+            .color(theme_color().error_color),
+        );
+        ui.add_space(4.);
+        ui.label(i18n("Unable to change node settings until the problem is resolved"));
+
+        if ui.button(i18n("Ok")).clicked() {
+          *settings = core.settings.bridge.clone();
+          self.grpc_network_interface =
+            NetworkInterfaceEditor::from(&self.settings.node.grpc_network_interface);
+        }
+
+        ui.separator();
+
+      } else if bridge_settings_error.is_none() {
+        if *settings != core.settings.bridge {
+          if let Some(response) = ui.confirm_widget_labels("Apply", "Cancel") {
+            match response {
+              Confirm::Yes => {
+                core.settings.bridge = settings.clone();
+                core.settings.store_sync().unwrap();
+
+                cfg_if! {
+                  if #[cfg(not(target_arch = "wasm32"))] {
+                    let storage_root = core.settings.node.waglaylad_daemon_storage_folder_enable.then_some(core.settings.node.waglaylad_daemon_storage_folder.as_str());
+                    core.storage.track_storage_root(storage_root);
+                  }
+                }
+
+                self.manager.stop_services();
+                self.manager.start_services();
+              },
+              Confirm::No => {
+                *settings = core.settings.bridge.clone();
+              }
+            }
+          }
+          ui.separator();
+        }
+      }
+    });
+  }
 
   fn render_ui_settings(
-      &mut self,
-      core: &mut Core,
-      ui: &mut egui::Ui,
+    &mut self,
+    core: &mut Core,
+    ui: &mut egui::Ui,
   ) {
     CollapsingHeader::new(i18n("User Interface"))
       .default_open(false)
@@ -447,6 +556,7 @@ impl Settings {
 
     self.render_ui_settings(core,ui);
     self.render_node_settings(core,ui);
+    self.render_bridge_settings(core,ui);
         
     #[cfg(not(target_arch = "wasm32"))]
     core.storage.clone().render_settings(core, ui);

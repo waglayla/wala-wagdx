@@ -6,8 +6,8 @@ use git2::{build::RepoBuilder, FetchOptions, RemoteCallbacks, Progress};
 use std::env;
 use std::path::Path;
 use std::process::{Command, Stdio};
-use std::io::{self, BufRead};
-
+use std::io::{self, BufRead, Write};
+use std::fs;
 
 // https://docs.rs/vergen/latest/vergen/struct.EmitBuilder.html#method.emit
 fn main() -> Result<(), Box<dyn Error>> {
@@ -118,6 +118,18 @@ fn main() -> Result<(), Box<dyn Error>> {
         std::process::exit(1);
     }
     println!("cargo:warning=Built waglayla-stratum-bridge");
+
+    let embed_file_path = Path::new(&out_dir).join("embedded_executable.rs");
+    let mut embed_file = fs::File::create(&embed_file_path).unwrap();
+    writeln!(
+      embed_file,
+      "pub const BINARY: &[u8] = include_bytes!(r\"{}\");",
+      go_binary_path.display()
+    )
+    .unwrap();
+
+    println!("cargo:rerun-if-changed={}", go_binary_path.display());
+    println!("cargo:rerun-if-changed={}", embed_file_path.display());
   }
 
 

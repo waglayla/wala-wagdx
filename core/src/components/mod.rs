@@ -24,6 +24,9 @@ pub use footer::*;
 pub mod wallet_ui;
 pub use wallet_ui::*;
 
+pub mod bridge;
+pub use bridge::*;
+
 pub mod about;
 pub use about::*;
 

@@ -264,6 +264,7 @@ cfg_if! {
 
           let application_events = ApplicationEventsChannel::unbounded();
           let daemon_channel = Channel::<DaemonMessage>::unbounded();
+          let bridge_channel = Channel::<DaemonMessage>::unbounded();
           
           eframe::run_native(
             "WagDX",
@@ -275,14 +276,23 @@ cfg_if! {
                 Some(application_events), 
                 wallet_api, 
                 &settings, 
-                daemon_channel.clone()
+                daemon_channel.clone(),
+                bridge_channel.clone()
               );
               
               delegate.lock().unwrap().replace(manager.clone());
               dx_manager::signal_handler::Signals::bind(&manager);
               manager.start();
   
-              Ok(Box::new(wala_wagdx_core::Core::new(cc, settings, true, daemon_channel.receiver.clone())))
+              Ok(Box::new(
+                wala_wagdx_core::Core::new(
+                  cc, 
+                  settings, 
+                  true, 
+                  daemon_channel.receiver.clone(), 
+                  bridge_channel.receiver.clone()
+                )
+              ))
             }),
           )?;
           let manager = manager.lock().unwrap().take().unwrap();

@@ -103,14 +103,19 @@ impl super::WagLaylad for Daemon {
                 #[cfg(unix)]
                 this.sigterm(_pid);
               }
-            } else if let Err(err) = child.start_kill() {
-              println!("waglayla daemon start_kill error: {:?}", err);
+            } else {
+              if let Err(err) = child.kill().await {
+                println!("Failed to kill waglaylad: {:?}", err);
+              }
+              if let Err(err) = child.wait().await {
+                println!("Failed to wait for waglaylad exit: {:?}", err);
+              }
             }
           }
           status = child.wait().fuse() => {
             match status {
-              Ok(_status) => {
-                // println!("waglaylad shutdown: {:?}", _status);
+              Ok(status) => {
+                println!("waglaylad shutdown: {:?}", status);
               }
               Err(err) => {
                 println!("waglaylad shutdown error: {:?}", err);

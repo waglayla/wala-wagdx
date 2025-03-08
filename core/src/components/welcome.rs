@@ -12,7 +12,7 @@ impl Welcome {
     let mut settings = Settings::default();
 
     #[cfg(target_arch = "wasm32")] {
-      settings.node.node_kind = WagLayladNodeKind::IntegratedAsDaemon;
+      settings.node.node_kind = WagLayladNodeKind::IntegratedAsDaemon; // need to investigate this
     }
 
     Self { 

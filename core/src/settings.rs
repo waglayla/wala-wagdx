@@ -9,6 +9,7 @@ use sys_locale::get_locale;
 use serde_json::Value;
 
 use std::net::IpAddr;
+use std::time::Duration;
 
 const SETTINGS_REVISION: &str = "0.0.0";
 
@@ -257,6 +258,42 @@ impl NodeConnectionConfigKind {
 // Leave the management to the WagLayla daemon
 pub const NODE_MEMORY_SCALE: f64 = 1.0;
 
+// Stratum bridge configuration struct
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct BridgeSettings {
+  pub stratum_port: String,          // e.g., ":5555"
+  pub waglayla_address: String,      // e.g., "localhost:12110"
+  pub min_share_diff: u64,           // Unsigned integer for difficulty
+  pub var_diff: bool,                // Boolean for variable difficulty
+  pub shares_per_min: u32,           // Shares per minute target
+  pub var_diff_stats: bool,          // Boolean for stats logging
+  pub solo_mining: bool,             // Boolean for solo mining mode
+  pub block_wait_time: String,     // e.g., "500ms" parsed as Duration
+  pub extranonce_size: u8,           // 0-3 bytes
+  pub print_stats: bool,             // Boolean for console stats
+  pub log_to_file: bool,             // Boolean for file logging
+  pub prom_port: String,             // e.g., ":2114"
+}
+
+impl Default for BridgeSettings {
+  fn default() -> Self {
+    BridgeSettings {
+      stratum_port: ":5555".to_string(),
+      waglayla_address: "localhost:12110".to_string(),
+      min_share_diff: 4,
+      var_diff: true,
+      shares_per_min: 4,
+      var_diff_stats: false,
+      solo_mining: false,
+      block_wait_time: "500ms".to_string(), // 500ms
+      extranonce_size: 0,
+      print_stats: true,
+      log_to_file: true,
+      prom_port: ":2114".to_string(),
+    }
+  }
+}
+
 // Complete settings suite/section for the daemon
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -438,6 +475,8 @@ pub struct Settings {
   pub update: String,
   #[serde(default)]
   pub node: NodeSettings,
+  #[serde(default)]
+  pub bridge: BridgeSettings,
   pub user_interface: UserInterfaceSettings,
   pub language_code: String,
   pub update_monitor: bool,
@@ -492,6 +531,7 @@ impl Default for Settings {
       version: "0.0.0".to_string(),
       update: crate::app::VERSION.to_string(),
       node: NodeSettings::default(),
+      bridge: BridgeSettings::default(),
       user_interface: UserInterfaceSettings::default(),
       language_code,
       update_monitor: true,
@@ -503,33 +543,45 @@ impl Default for Settings {
 
 impl Settings {}
 
-fn storage() -> Result<Storage> {
-  Ok(Storage::try_new("wala-wagdx.settings")?)
+fn try_store(name: &str) -> Result<Storage> {
+  Ok(Storage::try_new(name)?)
 }
 
 impl Settings {
   pub async fn store(&self) -> Result<()> {
-    let storage = storage()?;
+    let storage = try_store("wala-wagdx.settings")?;
+    let bridge_cfg_storage = try_store("config.yaml")?;
     storage.ensure_dir().await?;
+    bridge_cfg_storage.ensure_dir().await?;
     // println!("{}", storage.filename().display());
     workflow_store::fs::write_json(storage.filename(), self).await?;
+    let yaml = serde_yaml::to_string(&self.bridge).expect("Bridge Config Error");
+    workflow_store::fs::write_string(&bridge_cfg_storage.filename(), &yaml).await?;
     Ok(())
   }
 
   pub fn store_sync(&self) -> Result<&Self> {
-    let storage = storage()?;
+    let storage = try_store("wala-wagdx.settings")?;
+    let bridge_cfg_storage = try_store("config.yaml")?;
     if runtime::is_chrome_extension() {
       let this = self.clone();
       spawn(async move {
-        println!("{}", storage.filename().display());
+        // println!("{}", storage.filename().display());
         if let Err(err) = workflow_store::fs::write_json(storage.filename(), &this).await {
+          log_error!("Settings::store_sync() error: {}", err);
+        }
+        let yaml = serde_yaml::to_string(&this.bridge).expect("Bridge Config Error");
+        if let Err(err) = workflow_store::fs::write_string(bridge_cfg_storage.filename(), &yaml).await {
           log_error!("Settings::store_sync() error: {}", err);
         }
       });
     } else {
       storage.ensure_dir_sync()?;
+      bridge_cfg_storage.ensure_dir_sync()?;
       // println!("{}", storage.filename().display());
       workflow_store::fs::write_json_sync(storage.filename(), self)?;
+      let yaml = serde_yaml::to_string(&self.bridge).expect("Bridge Config Error");
+      workflow_store::fs::write_string_sync(bridge_cfg_storage.filename(), &yaml)?;
     }
     Ok(self)
   }
@@ -537,7 +589,7 @@ impl Settings {
   pub async fn load() -> Result<Self> {
     use workflow_store::fs::read_json;
 
-    let storage = storage()?;
+    let storage = try_store("wala-wagdx.settings")?;
     if storage.exists().await.unwrap_or(false) {
       match read_json::<Self>(storage.filename()).await {
         Ok(mut settings) => {

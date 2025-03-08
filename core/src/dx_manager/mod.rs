@@ -25,8 +25,10 @@ pub struct Inner {
 
   waglayla: Arc<WagLaylaService>,
   peer_monitor: Arc<PeerMonitorService>,
+  bridge_service: Arc<BridgeService>,
   stat_monitor: Arc<StatMonitorService>,
   daemon_channel : Channel<DaemonMessage>,
+  bridge_channel : Channel<DaemonMessage>,
 }
 
 #[derive(Clone)]
@@ -40,7 +42,8 @@ impl DX_Manager {
     application_events: Option<ApplicationEventsChannel>,
     wallet_api: Option<Arc<dyn WalletApi>>,
     settings: &Settings,
-    daemon_channel: Channel<DaemonMessage>
+    daemon_channel: Channel<DaemonMessage>,
+    bridge_channel: Channel<DaemonMessage>
   ) -> Self {
     let application_events =
       application_events.unwrap_or_else(ApplicationEventsChannel::unbounded);
@@ -50,6 +53,11 @@ impl DX_Manager {
       &settings, 
       daemon_channel.sender.clone(),
       wallet_api
+    ));
+    let bridge_service = Arc::new(BridgeService::new(
+      application_events.clone(),
+      settings,
+      bridge_channel.sender.clone(),
     ));
     let peer_monitor = Arc::new(PeerMonitorService::new(
       application_events.clone(),
@@ -62,6 +70,7 @@ impl DX_Manager {
 
     let services: Mutex<Vec<Arc<dyn Service>>> = Mutex::new(vec![
       waglayla.clone(),
+      bridge_service.clone(),
       peer_monitor.clone(),
       stat_monitor.clone(),
     ]);
@@ -74,9 +83,11 @@ impl DX_Manager {
         is_running: Arc::new(AtomicBool::new(false)),
         start_time: Instant::now(),
         waglayla,
+        bridge_service,
         peer_monitor,
         stat_monitor,
         daemon_channel: daemon_channel.clone(),
+        bridge_channel: bridge_channel.clone(),
         // system: Some(system),
       }),
     };
@@ -156,6 +167,10 @@ impl DX_Manager {
 
   pub fn waglayla_service(&self) -> &Arc<WagLaylaService> {
     &self.inner.waglayla
+  }
+
+  pub fn bridge_service(&self) -> &Arc<BridgeService> {
+    &self.inner.bridge_service
   }
 
   pub fn peer_monitor(&self) -> &Arc<PeerMonitorService> {

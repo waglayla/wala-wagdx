@@ -74,6 +74,7 @@ impl Core {
     settings: Settings,
     window_frame: bool,
     daemon_receiver: Receiver<DaemonMessage>,
+    bridge_receiver: Receiver<DaemonMessage>,
   ) -> Self {
     // Initialize fonts if needed
     crate::fonts::init_fonts(cc);
@@ -108,6 +109,7 @@ impl Core {
     components.insert_typeid(components::Donate::default());
     components.insert_typeid(components::NetworkInfo::default());
     components.insert_typeid(components::Footer::default());
+    components.insert_typeid(components::StratumBridge::new(manager.clone(), bridge_receiver));
 
     let footer = components.get(&TypeId::of::<components::Footer>()).unwrap().clone();
 
@@ -235,6 +237,7 @@ impl eframe::App for Core {
 
   #[cfg(not(target_arch = "wasm32"))]
   fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+    self.manager.shutdown();
     println!("Goodbye!");
   }
 }

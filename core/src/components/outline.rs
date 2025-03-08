@@ -24,7 +24,7 @@ impl Tab {
       Tab::Wallet => i18n("Wallet"),
       Tab::NetworkInfo => i18n("Network"),
       Tab::WalaNode => i18n("Node"),
-      Tab::WalaBridge => i18n("Stratum Bridge"),
+      Tab::WalaBridge => i18n("Stratum"),
       Tab::Donate => i18n("Donate"),
       Tab::About => i18n("About"),
     }
@@ -35,7 +35,7 @@ impl Tab {
       Tab::Wallet => TypeId::of::<wallet_ui::WalletDelegator>(),
       Tab::NetworkInfo => TypeId::of::<network::NetworkInfo>(),
       Tab::WalaNode => TypeId::of::<console::DaemonConsole>(),
-      Tab::WalaBridge => TypeId::of::<blank::Blank>(),
+      Tab::WalaBridge => TypeId::of::<bridge::StratumBridge>(),
       Tab::Donate => TypeId::of::<donate::Donate>(),
       Tab::About => TypeId::of::<about::About>(),
     }
@@ -499,15 +499,17 @@ impl Outline {
   }
 
   fn available_tabs(&self, core: &Core) -> Vec<Tab> {
-    let mut tabs = vec![Tab::Wallet, Tab::NetworkInfo, Tab::Donate];
+    let mut tabs = vec![Tab::Wallet];
 
     if core.settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon {
+      #[cfg(not(target_arch = "wasm32"))]
+      tabs.push(Tab::WalaBridge);
+      
       tabs.push(Tab::WalaNode);
-      if core.settings.node.enable_bridge {
-        tabs.push(Tab::WalaBridge);
-      }
     }
 
+    tabs.push(Tab::NetworkInfo);
+    tabs.push(Tab::Donate);
     tabs.push(Tab::About);
     tabs
   }

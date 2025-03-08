@@ -6,13 +6,13 @@ use waglayla_core::waglaylad_env;
 pub use waglaylad_lib::args::Args;
 
 fn user_agent_comment() -> String {
-  format!("waglayla-ng:{}-{}", VERSION, GIT_DESCRIBE)
+  format!("wala-wagdx:{}-{}", VERSION, GIT_DESCRIBE)
 }
 
 #[allow(dead_code)]
 fn user_agent() -> String {
   format!(
-    "/{}:{}/waglayla-ng:{}-{}/",
+    "/{}:{}/wala-wagdx:{}-{}/",
     waglaylad_env::name(),
     waglaylad_env::version(),
     VERSION,

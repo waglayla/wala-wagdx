@@ -6,6 +6,9 @@ pub use waglayla::WagLaylaService;
 pub mod peers;
 pub use peers::PeerMonitorService;
 
+pub mod bridge;
+pub use bridge::BridgeService;
+
 pub mod stats;
 pub use stats::StatMonitorService;
 

@@ -9,7 +9,7 @@ default-members = ["app"]
 
 [workspace.package]
 rust-version = "1.78.0"
-version = "1.0.0-k9"
+version = "2.0.0-k9"
 authors = ["WALA House"]
 license = "GPL"
 edition = "2021"
@@ -18,8 +18,8 @@ repository = "https://github.com/waglayla/wala-wagdx"
 [workspace.dependencies]
 
 rust-embed = "6"
-wala-wagdx = { version = "1.0.0-k9", path = "app/", default-features = false }
-wala-wagdx-core = { version = "1.0.0-k9", path = "core/", default-features = false }
+wala-wagdx = { version = "2.0.0-k9", path = "app/", default-features = false }
+wala-wagdx-core = { version = "2.0.0-k9", path = "core/", default-features = false }
 
 # EGUI
 
@@ -100,10 +100,12 @@ ritehash = "0.2.0"
 rlimit = "0.10.1"
 separator = "0.4.1"
 serde = { version = "1.0.190", features = ["derive", "rc"] }
+serde_yaml = "0.9"
 serde_bytes = "0.11.12"
 serde_json = "1.0.107"
 serde_repr = "0.1.18"
 serde-wasm-bindgen = "0.6.1"
+humantime = "2.1"
 slug = "0.1.5"
 smallvec = { version = "1.11.1", features = ["serde"] }
 sysinfo = "0.29.10"
