@@ -177,7 +177,7 @@ impl ThemeColor {
       toggle_active: Color32::from_rgb(33, 184, 255),
 
       bg_color: Color32::from_rgb(192, 236, 252),
-      fg_color: Color32::from_rgb(255, 255, 255),
+      fg_color: Color32::from_rgb(249, 254, 255),
 
       null_balance_color: Color32::from_rgb(232, 250, 255),
 
@@ -192,8 +192,8 @@ impl ThemeColor {
       qr_background: Color32::from_rgba(255, 255, 255, 0),
       qr_foreground: Color32::BLACK,
 
-      text_off_color_1: Color32::from_rgb(232, 250, 255),
-      text_off_color_2: Color32::from_rgb(232, 250, 255),
+      text_off_color_1: Color32::from_rgb(242, 252, 255),
+      text_off_color_2: Color32::from_rgb(242, 252, 255),
       text_on_color_1: Color32::from_rgb(2, 130, 184),
       text_on_color_2: Color32::from_rgb(2, 130, 184),
 

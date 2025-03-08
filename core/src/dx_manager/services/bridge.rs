@@ -10,6 +10,12 @@ use tokio::process::{Command, Child};
 use waglayla_wallet_core::storage::local::storage::Storage;
 use tokio::io::{AsyncRead, AsyncBufReadExt, BufReader};
 
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
+
+#[cfg(windows)]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+
 pub enum BridgeEvents {
   Enable,
   Disable,
@@ -108,11 +114,21 @@ impl Service for BridgeService {
     const MAX_BACKOFF: u64 = 16;
   
     loop {
-      let mut child_process = match Command::new(&target_path)
+      let mut command = Command::new(&target_path);
+
+      command
         .current_dir(target_path.parent().unwrap_or_else(|| Path::new(".")))
+        .stdin(Stdio::null())
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
+        .stderr(Stdio::piped());
+
+      #[cfg(windows)]
+      {
+        command.creation_flags(CREATE_NO_WINDOW);
+      }
+
+      let mut child_process = match
+        command.spawn()
       {
         Ok(child) => child,
         Err(e) => {

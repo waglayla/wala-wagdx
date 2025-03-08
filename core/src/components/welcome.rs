@@ -143,8 +143,8 @@ impl Welcome {
     });
     
     ui.vertical_centered(|ui| {
-      ui.add_space(32.0);
-      ui.colored_label(theme_color().alert_color, "Please note - this is a beta release - WagLayla Wag-DX is still in early development and is not yet ready for production use.");
+      // ui.add_space(32.0);
+      // ui.colored_label(theme_color().alert_color, "Please note - this is a beta release - WagLayla Wag-DX is still in early development and is not yet ready for production use.");
       ui.add_space(32.0);
       ui.label(format!("WagLayla Wag-DX v{}  •  WagLayla Rusty v{}", env!("CARGO_PKG_VERSION"), waglayla_wallet_core::version()));
       ui.hyperlink_to(
