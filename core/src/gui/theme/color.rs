@@ -165,7 +165,7 @@ impl ThemeColor {
 
   pub fn snow() -> Self {
     Self {
-      name: i18n("Snow").to_string(),
+      name: i18n("Arctic").to_string(),
       dark_mode: false,
       hyperlink_color: Color32::from_rgb(15, 84, 73),
 
