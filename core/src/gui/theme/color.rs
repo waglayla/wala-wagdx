@@ -172,7 +172,7 @@ impl ThemeColor {
       default_color: Color32::from_rgb(60, 151, 194),
       strong_color: Color32::from_rgb(2, 130, 184),
 
-      separator_color: Color32::from_rgb(235, 238, 240),
+      separator_color: Color32::from_rgb(207, 223, 232),
       button_color: Color32::from_rgb(192, 236, 252),
       toggle_active: Color32::from_rgb(33, 184, 255),
 

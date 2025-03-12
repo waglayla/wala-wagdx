@@ -366,51 +366,84 @@ impl Settings {
       // Edit fields
       ui.horizontal(|ui| {
         ui.label("Stratum Port:");
-        ui.text_edit_singleline(&mut settings.stratum_port);
+        ui.text_edit_singleline(&mut settings.stratum_port)
+          .on_hover_text_at_pointer(i18n(
+            "The port that will be listening for incoming stratum traffic, preceded by a colon ':'."
+          ));
       });
       ui.horizontal(|ui| {
         ui.label("Waglayla Address:");
-        ui.text_edit_singleline(&mut settings.waglayla_address);
+        ui.text_edit_singleline(&mut settings.waglayla_address)
+          .on_hover_text_at_pointer(i18n(
+            "The <address>:<port> combo of an available WagLayla node, i.e 127.0.0.1:13110."
+          ));
       });
       ui.horizontal(|ui| {
         ui.label("Min Share Diff:");
-        ui.add(egui::DragValue::new(&mut settings.min_share_diff).speed(1));
+        ui.add(egui::DragValue::new(&mut settings.min_share_diff).speed(1))
+          .on_hover_text_at_pointer(i18n(
+            "Only accept shares of the specified difficulty (or higher) from the miner(s)."
+          ));
       });
       ui.horizontal(|ui| {
-        ui.add(toggle(&mut settings.var_diff));
+        ui.add(toggle(&mut settings.var_diff))
+          .on_hover_text_at_pointer(i18n(
+            "Enables the auto-adjusting variable share difficulty mechanism. Allows for hashrate estimation."
+          ));
         ui.label(i18n("Enable Vardiff"));
       });
       ui.horizontal(|ui| {
         ui.label("Shares Per Min:");
-        ui.add(egui::DragValue::new(&mut settings.shares_per_min).speed(1));
+        ui.add(egui::DragValue::new(&mut settings.shares_per_min).speed(1))
+          .on_hover_text_at_pointer(i18n(
+            "The number of shares per minute the vardiff engine should target for every worker. Higher settings enable accurate hashrate estimation, at the cost of more network traffic."
+          ));
       });
+      // ui.horizontal(|ui| {
+      //   ui.add(toggle(&mut settings.var_diff_stats));
+      //   ui.label(i18n("Vardiff Stats"));
+      // });
       ui.horizontal(|ui| {
-        ui.add(toggle(&mut settings.var_diff_stats));
-        ui.label(i18n("Vardiff Stats"));
-      });
-      ui.horizontal(|ui| {
-        ui.add(toggle(&mut settings.solo_mining));
+        ui.add(toggle(&mut settings.solo_mining))
+          .on_hover_text_at_pointer(i18n(
+            "Disables stratum settings & vardiff calculations in favor of using the network difficulty directly."
+          ));
         ui.label(i18n("Solo Mining Mode"));
       });
       ui.horizontal(|ui| {
         ui.label("Block Wait Time:");
-        ui.text_edit_singleline(&mut settings.block_wait_time);
+        ui.text_edit_singleline(&mut settings.block_wait_time)
+          .on_hover_text_at_pointer(i18n(
+            "Amount of time to wait after a new block message from waglaylad before manually requesting a fresh template."
+          ));
       });
       ui.horizontal(|ui| {
         ui.label("Extranonce Size:");
-        ui.add(egui::DragValue::new(&mut settings.extranonce_size).range(0..=3));
+        ui.add(egui::DragValue::new(&mut settings.extranonce_size).range(0..=3))
+          .on_hover_text_at_pointer(i18n(
+            "Size in bytes for organizing worker jobs, from 0 (no extranonce) to 3. With no extranonce (0), all workers will search through the same nonce-space, deferring to miner-side randomization."
+          ));
       });
       ui.horizontal(|ui| {
-        ui.add(toggle(&mut settings.print_stats));
+        ui.add(toggle(&mut settings.print_stats))
+          .on_hover_text_at_pointer(i18n(
+            "Enable printing stats to the console. Otherwise, only workers joining/disconnecting, blocks found, and errors will be printed."
+          ));
         ui.label(i18n("Print Stats"));
       });
       ui.horizontal(|ui| {
-        ui.add(toggle(&mut settings.log_to_file));
+        ui.add(toggle(&mut settings.log_to_file))
+          .on_hover_text_at_pointer(i18n(
+            "Write logs to a file local to the executable, in addition to the console."
+          ));
         ui.label(i18n("Log to File"));
       });
       ui.horizontal(|ui| {
         ui.label("Prometheus Port:");
-        ui.text_edit_singleline(&mut settings.prom_port);
+        ui.text_edit_singleline(&mut settings.prom_port)
+          .on_hover_text_at_pointer(i18n(
+            "Prometheus will serve stats on the port provided."
+          ));
       });
 
       if let Some(error) = bridge_settings_error {
