@@ -11,6 +11,14 @@ use std::fs;
 
 // https://docs.rs/vergen/latest/vergen/struct.EmitBuilder.html#method.emit
 fn main() -> Result<(), Box<dyn Error>> {
+  static_vcruntime::metabuild();
+  EmitBuilder::builder()
+    .all_build()
+    .all_cargo()
+    .all_git()
+    .all_rustc()
+    .emit()?;
+
   println!("cargo:rerun-if-changed=build.rs");
 
   let target = env::var("TARGET")?;
@@ -132,13 +140,5 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-changed={}", embed_file_path.display());
   }
 
-
-  static_vcruntime::metabuild();
-  EmitBuilder::builder()
-    .all_build()
-    .all_cargo()
-    .all_git()
-    .all_rustc()
-    .emit()?;
   Ok(())
 }
