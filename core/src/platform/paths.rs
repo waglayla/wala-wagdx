@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::fs::{self, File, OpenOptions};
 use std::io;
 use std::env;
-
+use workflow_core::dirs;
 
 /// Get appropriate log file path based on platform
 pub fn get_log_file_path(service_name: &str) -> PathBuf {
