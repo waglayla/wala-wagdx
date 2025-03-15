@@ -590,6 +590,15 @@ impl Settings {
     use workflow_store::fs::read_json;
 
     let storage = try_store("wala-wagdx.settings")?;
+    let bridge_cfg_storage = try_store("config.yaml")?;
+
+    if !bridge_cfg_storage.exists().await.unwrap_or(false) {
+      let yaml = serde_yaml::to_string(&this.bridge).expect("Bridge Config Error");
+      if let Err(err) = workflow_store::fs::write_string(bridge_cfg_storage.filename(), &yaml).await {
+        log_error!("Settings::store_sync() error: {}", err);
+      }
+    }
+
     if storage.exists().await.unwrap_or(false) {
       match read_json::<Self>(storage.filename()).await {
         Ok(mut settings) => {
