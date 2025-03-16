@@ -173,13 +173,13 @@ impl ThemeColor {
       strong_color: Color32::from_rgb(2, 130, 184),
 
       separator_color: Color32::from_rgb(207, 223, 232),
-      button_color: Color32::from_rgb(192, 236, 252),
+      button_color: Color32::from_rgb(184, 228, 244),
       toggle_active: Color32::from_rgb(33, 184, 255),
 
-      bg_color: Color32::from_rgb(192, 236, 252),
+      bg_color: Color32::from_rgb(184, 228, 244),
       fg_color: Color32::from_rgb(249, 254, 255),
 
-      null_balance_color: Color32::from_rgb(232, 250, 255),
+      null_balance_color: Color32::from_rgb(156, 217, 239),
 
       node_data_color: Color32::BLACK,
       balance_color: Color32::BLACK,
@@ -192,8 +192,8 @@ impl ThemeColor {
       qr_background: Color32::from_rgba(255, 255, 255, 0),
       qr_foreground: Color32::BLACK,
 
-      text_off_color_1: Color32::from_rgb(242, 252, 255),
-      text_off_color_2: Color32::from_rgb(242, 252, 255),
+      text_off_color_1: Color32::from_rgb(255, 255, 255),
+      text_off_color_2: Color32::from_rgb(255, 255, 255),
       text_on_color_1: Color32::from_rgb(2, 130, 184),
       text_on_color_2: Color32::from_rgb(2, 130, 184),
 

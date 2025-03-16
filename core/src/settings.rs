@@ -593,7 +593,8 @@ impl Settings {
     let bridge_cfg_storage = try_store("config.yaml")?;
 
     if !bridge_cfg_storage.exists().await.unwrap_or(false) {
-      let yaml = serde_yaml::to_string(&this.bridge).expect("Bridge Config Error");
+      let def = Self::default();
+      let yaml = serde_yaml::to_string(&def.bridge).expect("Bridge Config Error");
       if let Err(err) = workflow_store::fs::write_string(bridge_cfg_storage.filename(), &yaml).await {
         log_error!("Settings::store_sync() error: {}", err);
       }

@@ -1,11 +1,11 @@
 use super::*;
 
-define_animation_frames!(SONIC_RUN, 192, "/resources/animation/layla/wag");
+define_animation_frames!(WALA_WAG, 192, "/resources/animation/layla/wag");
 
 pub struct Outline {
   selected_tab: Tab,
   account_dropdown_open: bool,
-  sonic_animation: Option<SpriteAnimation>,
+  wala_animation: Option<SpriteAnimation>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
@@ -74,6 +74,9 @@ impl ComponentT for Outline {
         let info_space = ui.allocate_space(egui::Vec2::new(ui.available_width(), 132.0));
         let info_rect = info_space.1;
         
+        self.render_platform(ui, core, &info_rect);
+        self.render_layla(ui, core, &info_rect);
+
         self.render_account_section(ui, core, &info_rect);
         self.render_balance_section(ui, core, &info_rect);
 
@@ -81,9 +84,7 @@ impl ComponentT for Outline {
           egui::TextStyle::Button,
           egui::FontId::new(30.0, get_font_family("DINishCondensed", false, false))
         );
-
-        self.render_layla(ui, core, &info_rect);
-
+        
         for tab in self.available_tabs(core) {
           if self.tab_button(ui, ctx, tab) {
             self.selected_tab = tab;
@@ -96,17 +97,17 @@ impl ComponentT for Outline {
 
 impl Outline {
   pub fn new(ctx: &egui::Context) -> Self {
-    let sonic_animation = Some(
+    let wala_animation = Some(
       SpriteAnimationBuilder::new()
         .fps(30.0)
         .looping(true)
-        .build(ctx, &SONIC_RUN)
+        .build(ctx, &WALA_WAG)
     );
 
     Self {
       selected_tab: Tab::iter().next().unwrap(),
       account_dropdown_open: false,
-      sonic_animation,
+      wala_animation,
     }
   }
 
@@ -245,8 +246,24 @@ impl Outline {
     });
   }
 
+  fn render_platform(&mut self, ui: &mut Ui, core: &Core, info_rect: &Rect) {
+    if let Some(animation) = &mut self.wala_animation {
+      let platform_pos = egui::Pos2 {
+        x: info_rect.max.x - 54.0,
+        y: info_rect.min.y + 10.0,
+      };
+
+      match theme_color().name().to_string().as_str() {
+        s if s == i18n("Arctic") => {
+          DXImage::paint_at(ui, &Assets::get().snow_platform, 107.0, platform_pos, egui::Align2::CENTER_TOP);
+        },
+        _ => {}
+      }
+    }
+  }
+
   fn render_layla(&mut self, ui: &mut Ui, core: &Core, info_rect: &Rect) {
-    if let Some(animation) = &mut self.sonic_animation {
+    if let Some(animation) = &mut self.wala_animation {
       let animation_pos = egui::Pos2 {
         x: info_rect.max.x - 92.0,
         y: info_rect.min.y + 5.0,
