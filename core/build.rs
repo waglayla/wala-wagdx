@@ -9,6 +9,10 @@ use std::process::{Command, Stdio};
 use std::io::{self, BufRead, Write};
 use std::fs;
 
+#[cfg(windows)]
+#[link(name = "advapi32")]
+extern "system" {}
+
 // https://docs.rs/vergen/latest/vergen/struct.EmitBuilder.html#method.emit
 fn main() -> Result<(), Box<dyn Error>> {
   static_vcruntime::metabuild();

@@ -1,0 +1,6 @@
+name: i18n_autofill
+
+environment:
+  sdk: '^3.2.0'
+dependencies:
+  translator: ^0.1.7

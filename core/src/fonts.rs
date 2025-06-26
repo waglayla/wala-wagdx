@@ -65,31 +65,114 @@ pub fn get_font_family(base_name: &str, bold: bool, italic: bool) -> egui::FontF
 }
 
 macro_rules! load_font_family {
-  ($fonts:expr, $base_name:literal, $($variant:ident),+) => {{      
+  ($fonts:expr, $base_name:literal, $sub_family:literal, $($variant:ident),+) => {{      
     $(
       let variant_suffix = stringify!($variant);
       let name = if variant_suffix == "Regular" {
-        format!("{}", $base_name)
+        format!("{}{}", $base_name, $sub_family)
       } else {
-        format!("{}-{}", $base_name, variant_suffix)
+        format!("{}{}-{}", $base_name, $sub_family, variant_suffix)
       };
       
       $fonts.font_data.insert(
         name.clone(),
         FontData::from_static(include_bytes!(
-          concat!("../resources/fonts/", $base_name, "/", $base_name, "-", stringify!($variant), ".ttf")
+          concat!("../resources/fonts/", $base_name, $sub_family, "/", $base_name, $sub_family, "-", stringify!($variant), ".ttf")
         )).into()
       );
       $fonts.families
-      .entry(FontFamily::Name(name.clone().into()))
-      .or_default()
-      .insert(0, name.into());
+        .entry(FontFamily::Name(name.clone().into()))
+        .or_default()
+        .insert(0, name.clone().into());
     )+
   }};
 }
 
+macro_rules! load_fallback_styles {
+  (
+    $fonts:expr,
+    $base_name:literal,
+    $sub_family:literal,
+    $lang:literal,
+    $noto_folder:literal,
+    $noto_subdir:literal,
+    $noto_family:literal
+  ) => {{
+    $fonts.add_static(
+      egui::FontFamily::Name(concat!($base_name, $sub_family).into()),
+      $noto_family,
+      include_bytes!(concat!(
+        "../resources/fonts/",
+        $noto_folder, "/",
+        $noto_subdir, "/",
+        $noto_family, "-Regular.ttf"
+      )),
+    );
 
+    $fonts.add_static(
+      egui::FontFamily::Name(concat!($base_name, $sub_family, "-Bold").into()),
+      $noto_family,
+      include_bytes!(concat!(
+        "../resources/fonts/",
+        $noto_folder, "/",
+        $noto_subdir, "/",
+        $noto_family, "-Bold.ttf"
+      )),
+    );
 
+    $fonts.add_static(
+      egui::FontFamily::Name(concat!($base_name, $sub_family, "-Italic").into()),
+      $noto_family,
+      include_bytes!(concat!(
+        "../resources/fonts/",
+        $noto_folder, "/",
+        $noto_subdir, "/",
+        $noto_family, "-Regular.ttf"
+      )),
+    );
+
+    $fonts.add_static(
+      egui::FontFamily::Name(concat!($base_name, $sub_family, "-BoldItalic").into()),
+      $noto_family,
+      include_bytes!(concat!(
+        "../resources/fonts/",
+        $noto_folder, "/",
+        $noto_subdir, "/",
+        $noto_family, "-Bold.ttf"
+      )),
+    );
+
+    if let Some(font_data) = $fonts.font_data.get_mut($noto_family) {
+      font_data.tweak.scale = 0.75;
+      font_data.tweak.y_offset_factor = 0.0;
+      font_data.tweak.y_offset = -3.0;
+    }
+  }};
+}
+
+macro_rules! load_font_family_fallbacks {
+  (
+    $fonts:expr,
+    base = $base_name:literal,
+    sub = $sub_family:literal,
+    fallback = $noto_subdir:literal,
+    langs = [ $( ($lang:literal, $noto_folder:literal, $noto_family:literal) ),+ $(,)? ]
+  ) => {{
+    if runtime::is_native() || runtime::is_chrome_extension() {
+      $(
+        load_fallback_styles!(
+          $fonts,
+          $base_name,
+          $sub_family,
+          $lang,
+          $noto_folder,
+          $noto_subdir,
+          $noto_family
+        );
+      )+
+    }
+  }};
+}
 
 pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
   let mut fonts = FontDefinitions::default();
@@ -98,8 +181,38 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
   add_to_fonts(&mut fonts, egui_phosphor::Variant::Fill);
   add_to_fonts(&mut fonts, egui_phosphor::Variant::Light);
 
+  load_font_family_fallbacks!(
+    fonts,
+    base = "DINish",
+    sub = "Condensed",
+    fallback = "static",
+    langs = [
+      ("ar", "NotoSansArabic", "NotoSansArabic_ExtraCondensed"),
+      ("he", "NotoSansHebrew", "NotoSansHebrew_ExtraCondensed"),
+      ("ja", "NotoSansJP", "NotoSansJP"),
+      ("hi", "NotoSansDevanagari", "NotoSansDevanagari_ExtraCondensed"),
+      ("zh", "NotoSansSC", "NotoSansSC"),
+      ("ko", "NotoSansKR", "NotoSansKR")
+    ]
+  );
+
+  load_font_family_fallbacks!(
+    fonts,
+    base = "DINish",
+    sub = "",
+    fallback = "static",
+    langs = [
+      ("ar", "NotoSansArabic", "NotoSansArabic"),
+      ("he", "NotoSansHebrew", "NotoSansHebrew"),
+      ("ja", "NotoSansJP", "NotoSansJP"),
+      ("hi", "NotoSansDevanagari", "NotoSansDevanagari"),
+      ("zh", "NotoSansSC", "NotoSansSC"),
+      ("ko", "NotoSansKR", "NotoSansKR")
+    ]
+  );
+
   // ---
-  load_font_family!(fonts, "DINishCondensed", Regular, Bold, Italic, BoldItalic);
+  load_font_family!(fonts, "DINish", "Condensed", Regular, Bold, Italic, BoldItalic);
   let variants = ["", "-Bold", "-Italic", "-BoldItalic"];
   for variant in variants {
     let font_name = format!("{}{}", "DINishCondensed", variant);
@@ -109,7 +222,7 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
     }
   }
 
-  load_font_family!(fonts, "DINish", Regular, Bold, Italic, BoldItalic);
+  load_font_family!(fonts, "DINish", "", Regular, Bold, Italic, BoldItalic);
   let variants = ["", "-Bold", "-Italic", "-BoldItalic"];
   for variant in variants {
     let font_name = format!("{}{}", "DINish", variant);
@@ -118,6 +231,9 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
       font_data.tweak.y_offset = -3.0;
     }
   }
+
+  // load_font_family_fallback!(fonts, "DINish", "Condensed", "_ExtraCondensed");
+  // load_font_family_fallback!(fonts, "DINish", "", "");
   // ---
 
   fonts
@@ -165,59 +281,16 @@ pub fn init_fonts(cc: &eframe::CreationContext<'_>) {
   // ---
 
   if runtime::is_native() || runtime::is_chrome_extension() {
-    fonts.add_static(
-      FontFamily::Proportional,
-      "ar",
-      include_bytes!(
-        // "../resources/fonts/NotoSansArabic/NotoSansArabic-Light.ttf"
-        "../resources/fonts/NotoSansArabic/NotoSansArabic-Regular.ttf"
-      ),
-    );
-
-    fonts.add_static(
-      FontFamily::Proportional,
-      "he",
-      include_bytes!(
-        // "../resources/fonts/NotoSansHebrew/NotoSansHebrew-Light.ttf"
-        "../resources/fonts/NotoSansHebrew/NotoSansHebrew-Regular.ttf"
-      ),
-    );
-
-    fonts.add_static(
-      FontFamily::Proportional,
-      "ja",
-      include_bytes!(
-        // "../resources/fonts/NotoSansJP/NotoSansJP-Light.ttf"
-        "../resources/fonts/NotoSansJP/NotoSansJP-Regular.ttf"
-      ),
-    );
-
-    fonts.add_static(
-      FontFamily::Proportional,
-      "hi",
-      include_bytes!(
-        // "../resources/fonts/NotoSansJP/NotoSansJP-Light.ttf"
-        "../resources/fonts/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf"
-      ),
-    );
-
-    fonts.add_static(
-      FontFamily::Proportional,
-      "zh",
-      include_bytes!(
-        // "../resources/fonts/NotoSansSC/NotoSansSC-Light.ttf"
-        "../resources/fonts/NotoSansSC/NotoSansSC-Regular.ttf"
-      ),
-    );
-
-    fonts.add_static(
-      FontFamily::Proportional,
-      "ko",
-      include_bytes!(
-        // "../resources/fonts/NotoSansKR/NotoSansKR-Light.ttf"
-        "../resources/fonts/NotoSansKR/NotoSansKR-Regular.ttf"
-      ),
-    );
+    for (lang, path) in [
+      ("ar", include_bytes!("../resources/fonts/NotoSansArabic/static/NotoSansArabic-Regular.ttf") as &[u8]),
+      ("he", include_bytes!("../resources/fonts/NotoSansHebrew/static/NotoSansHebrew-Regular.ttf") as &[u8]),
+      ("ja", include_bytes!("../resources/fonts/NotoSansJP/static/NotoSansJP-Regular.ttf") as &[u8]),
+      ("hi", include_bytes!("../resources/fonts/NotoSansDevanagari/static/NotoSansDevanagari-Regular.ttf") as &[u8]),
+      ("zh", include_bytes!("../resources/fonts/NotoSansSC/static/NotoSansSC-Regular.ttf") as &[u8]),
+      ("ko", include_bytes!("../resources/fonts/NotoSansKR/static/NotoSansKR-Regular.ttf") as &[u8]),
+    ] {
+      fonts.add_static(FontFamily::Proportional, lang, path);
+    }
   }
 
   cc.egui_ctx.set_fonts(fonts);

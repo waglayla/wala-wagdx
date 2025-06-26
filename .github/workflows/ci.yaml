@@ -261,8 +261,8 @@ jobs:
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: wala-wagdx-${{ env.SHORT_SHA }}-win32-x86_64-static.zip
-          path: wala-wagdx-${{ env.SHORT_SHA }}-win32-x86_64-static.zip
+          name: wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static.zip
+          path: wala-wagdx-${{ env.SHORT_SHA }}-windows-x86_64-static.zip
 
       - name: Set up Python
         if: runner.os == 'macOS'
