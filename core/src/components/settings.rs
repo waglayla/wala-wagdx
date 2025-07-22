@@ -334,6 +334,7 @@ impl Settings {
 
                 if restart {
                   self.manager.waglayla_service().update_services(&self.settings.node, None);
+                  self.manager.bridge_service().update_services(&self.settings.node, None);
                 }
               },
               Confirm::No => {

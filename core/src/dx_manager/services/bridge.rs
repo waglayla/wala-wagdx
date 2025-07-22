@@ -31,12 +31,14 @@ pub struct BridgeService {
 }
 
 impl BridgeService {
-  pub fn new(application_events: ApplicationEventsChannel, _settings: &Settings, bridge_sender: Sender<DaemonMessage>) -> Self {
+  pub fn new(application_events: ApplicationEventsChannel, settings: &Settings, bridge_sender: Sender<DaemonMessage>) -> Self {
     Self {
       application_events,
       service_events: Channel::unbounded(),
       task_ctl: Channel::oneshot(),
-      is_enabled: Arc::new(AtomicBool::new(true)),
+      is_enabled: Arc::new(AtomicBool::new(
+        settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon
+      )),
       bridge_sender,
     }
   }
@@ -45,6 +47,13 @@ impl BridgeService {
     self.service_events
       .sender
       .try_send(BridgeEvents::Enable)
+      .unwrap();
+  }
+
+  pub fn exit(&self) {
+    self.service_events
+      .sender
+      .try_send(BridgeEvents::Exit)
       .unwrap();
   }
 
@@ -67,6 +76,17 @@ impl BridgeService {
       if sender.send(DaemonMessage(log_message.clone())).await.is_err() {
         eprintln!("Failed to send {} output to bridge_sender", source);
         break;
+      }
+    }
+  }
+
+  pub fn update_services(&self, node_settings: &NodeSettings, options: Option<RpcOptions>) {
+    match node_settings.node_kind {
+      WagLayladNodeKind::IntegratedAsDaemon => {
+        self.enable()
+      },
+      _ => {
+        self.disable();
       }
     }
   }
@@ -112,7 +132,9 @@ impl Service for BridgeService {
   
     let mut backoff = 1;
     const MAX_BACKOFF: u64 = 16;
-  
+
+    let mut exit_requested = false;
+
     loop {
       let mut command = Command::new(&target_path);
 
@@ -127,67 +149,97 @@ impl Service for BridgeService {
         command.creation_flags(CREATE_NO_WINDOW);
       }
 
-      let mut child_process = match
-        command.spawn()
-      {
-        Ok(child) => child,
-        Err(e) => {
-          eprintln!("Failed to start bridge process: {}. Retrying...", e);
-          tokio::time::sleep(Duration::from_secs(backoff)).await;
-          backoff = (backoff * 2).min(MAX_BACKOFF);
-          continue;
+      if self.is_enabled.load(Ordering::Relaxed) == true {
+        let mut child_process = match
+          command.spawn()
+        {
+          Ok(child) => child,
+          Err(e) => {
+            eprintln!("Failed to start bridge process: {}. Retrying...", e);
+            tokio::time::sleep(Duration::from_secs(backoff)).await;
+            backoff = (backoff * 2).min(MAX_BACKOFF);
+            continue;
+          }
+        };
+
+        if let Some(stdout) = child_process.stdout.take() {
+          let sender = self.bridge_sender.clone();
+          tokio::spawn(Self::pipe_output(stdout, sender, "stdout"));
         }
-      };
+        
+        if let Some(stderr) = child_process.stderr.take() {
+          let sender = self.bridge_sender.clone();
+          tokio::spawn(Self::pipe_output(stderr, sender, "stderr"));
+        }
 
-      if let Some(stdout) = child_process.stdout.take() {
-        let sender = self.bridge_sender.clone();
-        tokio::spawn(Self::pipe_output(stdout, sender, "stdout"));
-      }
-      
-      if let Some(stderr) = child_process.stderr.take() {
-        let sender = self.bridge_sender.clone();
-        tokio::spawn(Self::pipe_output(stderr, sender, "stderr"));
-      }
-
-      let mut exit_requested = false;
-
-      loop {
-        select! {
-          msg = this.as_ref().service_events.receiver.recv().fuse() => {
-            if let Ok(event) = msg {
-              match event {
-                BridgeEvents::Enable => {
-                  self.is_enabled.store(true, Ordering::Relaxed);
+        loop {
+          select! {
+            msg = this.as_ref().service_events.receiver.recv().fuse() => {
+              if let Ok(event) = msg {
+                match event {
+                  BridgeEvents::Enable => {
+                    self.is_enabled.store(true, Ordering::Relaxed);
+                  },
+                  BridgeEvents::Disable => {
+                    self.is_enabled.store(false, Ordering::Relaxed);
+                    let _ = child_process.kill().await.expect("failed to kill bridge");
+                    let _ = child_process.wait().await.expect("Failed to wait for bridge exit");
+                    break;
+                  },
+                  BridgeEvents::Exit => {
+                    let _ = child_process.kill().await.expect("failed to kill bridge");
+                    let _ = child_process.wait().await.expect("Failed to wait for bridge exit");
+                    exit_requested = true;
+                    break;
+                  }
                 }
-                BridgeEvents::Disable => {
-                  self.is_enabled.store(false, Ordering::Relaxed);
-                }
-                BridgeEvents::Exit => {
-                  exit_requested = true;
-                  break;
-                }
+              } else {
+                break;
               }
-            } else {
-              break;
+            }
+            _ = tokio::time::sleep(Duration::from_secs(1)).fuse() => {
+              if let Ok(Some(status)) = child_process.try_wait() {
+                if !exit_requested {
+                  eprintln!("Bridge process exited with status: {}. Restarting...", status);
+                }
+                break;
+              }
             }
           }
-          _ = tokio::time::sleep(Duration::from_secs(1)).fuse() => {
-            if  let Ok(Some(status)) = child_process.try_wait() {
-              eprintln!("Bridge process exited with status: {}. Restarting...", status);
-              break;
+        }
+
+        tokio::time::sleep(Duration::from_secs(backoff)).await;
+        backoff = (backoff * 2).min(MAX_BACKOFF);
+      } else {
+        loop {
+          select! {
+            msg = this.as_ref().service_events.receiver.recv().fuse() => {
+              if let Ok(event) = msg {
+                match event {
+                  BridgeEvents::Enable => {
+                    self.is_enabled.store(true, Ordering::Relaxed);
+                    break;
+                  },
+                  BridgeEvents::Disable => {
+                    self.is_enabled.store(false, Ordering::Relaxed);
+                  },
+                  BridgeEvents::Exit => {
+                    exit_requested = true;
+                    break;
+                  }
+                }
+              } else {
+                break;
+              }
             }
+            _ = tokio::time::sleep(Duration::from_secs(1)).fuse() => {}
           }
         }
       }
 
       if exit_requested {
-        let _ = child_process.kill().await.expect("failed to kill bridge");
-        let _ = child_process.wait().await.expect("Failed to wait for bridge exit");
         break;
       }
-
-      tokio::time::sleep(Duration::from_secs(backoff)).await;
-      backoff = (backoff * 2).min(MAX_BACKOFF);
     }
 
     this.task_ctl.send(()).await?;
@@ -203,7 +255,6 @@ impl Service for BridgeService {
 
   async fn join(self: Arc<Self>) -> Result<()> {
     self.task_ctl.recv().await.unwrap();
-
     Ok(())
   }
 }

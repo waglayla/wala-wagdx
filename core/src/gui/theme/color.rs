@@ -1,12 +1,15 @@
 use crate::imports::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum AccentImgID {
   Paw,
   Snow,
+  Meadow,
+  Beach,
+  Cash,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub struct ThemeColor {
   pub name: String,
@@ -29,6 +32,7 @@ pub struct ThemeColor {
 
   pub separator_color: Color32,
   pub button_color: Color32,
+  pub toggle_inactive: Color32,
   pub toggle_active: Color32,
 
   pub bg_color: Color32,
@@ -57,6 +61,7 @@ impl ThemeColor {
 
       separator_color: Color32::from_rgb(69, 77, 99),
       button_color: Color32::from_rgb(14, 22, 42),
+      toggle_inactive: Color32::from_rgb(14, 22, 42),
       toggle_active: Color32::from_rgb(223, 117, 141),
 
       bg_color: Color32::from_rgb(223, 117, 141),
@@ -96,6 +101,7 @@ impl ThemeColor {
 
       separator_color: Color32::from_rgb(60, 60, 60),
       button_color: Color32::from_rgb(13, 13, 13),
+      toggle_inactive: Color32::from_rgb(13, 13, 13),
       toggle_active: Color32::from_rgb(223, 117, 141),
 
       bg_color: Color32::from_rgb(13, 13, 13),
@@ -135,6 +141,7 @@ impl ThemeColor {
 
       separator_color: Color32::from_rgb(255, 255, 255),
       button_color: Color32::from_rgb(255, 227, 244),
+      toggle_inactive: Color32::from_rgb(255, 227, 244),
       toggle_active: Color32::from_rgb(255, 99, 160),
 
       bg_color: Color32::WHITE,
@@ -174,6 +181,7 @@ impl ThemeColor {
 
       separator_color: Color32::from_rgb(207, 223, 232),
       button_color: Color32::from_rgb(184, 228, 244),
+      toggle_inactive: Color32::from_rgb(184, 228, 244),
       toggle_active: Color32::from_rgb(33, 184, 255),
 
       bg_color: Color32::from_rgb(184, 228, 244),
@@ -201,6 +209,126 @@ impl ThemeColor {
       accent_img: AccentImgID::Snow,
     }
   }
+
+  pub fn meadow() -> Self {
+    Self {
+      name: i18n("Meadow").to_string(),
+      dark_mode: true,
+      hyperlink_color: Color32::from_rgb(15, 84, 73),
+
+      default_color: Color32::from_rgb(175, 223, 159),
+      strong_color: Color32::from_rgb(255, 255, 255),
+
+      separator_color: Color32::from_rgb(102, 194, 99),
+      button_color: Color32::from_rgb(45, 130, 55),
+      toggle_inactive: Color32::from_rgb(45, 130, 55),
+      toggle_active: Color32::from_rgb(0, 210, 25),
+
+      bg_color: Color32::from_rgb(45, 130, 55),
+      fg_color: Color32::from_rgb(76, 175, 73),
+
+      null_balance_color: Color32::from_rgb(40, 115, 48),
+
+      node_data_color: Color32::BLACK,
+      balance_color: Color32::BLACK,
+      balance_syncing_color: Color32::LIGHT_GRAY,
+      error_color: Color32::from_rgb(255, 69, 0),
+      alert_color: Color32::from_rgb(255, 69, 0),
+      warning_color: egui::Color32::from_rgb(77, 77, 41),
+      info_color: egui::Color32::from_rgb(41, 56, 77),
+
+      qr_background: Color32::from_rgba(255, 255, 255, 0),
+      qr_foreground: Color32::from_rgb(45, 130, 55),
+
+      text_off_color_1: Color32::from_rgb(102, 182, 96),
+      text_off_color_2: Color32::from_rgb(102, 182, 96),
+      text_on_color_1: Color32::from_rgb(255, 255, 255),
+      text_on_color_2: Color32::from_rgb(255, 255, 255),
+
+      disabled_a: 95,
+      accent_img: AccentImgID::Meadow,
+    }
+  }
+
+  pub fn beach() -> Self {
+    Self {
+      name: i18n("Beach").to_string(),
+      dark_mode: true,
+      hyperlink_color: Color32::from_rgb(15, 84, 73),
+
+      default_color: Color32::from_rgb(250, 238, 209),
+      strong_color: Color32::from_rgb(255, 255, 255),
+
+      separator_color: Color32::from_rgb(238, 217, 163),
+      button_color: Color32::from_rgb(200, 156, 71),
+      toggle_inactive: Color32::from_rgb(200, 156, 71),
+      toggle_active: Color32::from_rgb(63, 145, 201),
+
+      bg_color: Color32::from_rgb(200, 156, 71),
+      fg_color: Color32::from_rgb(230, 195, 106),
+
+      null_balance_color: Color32::from_rgb(187, 145, 64),
+
+      node_data_color: Color32::BLACK,
+      balance_color: Color32::BLACK,
+      balance_syncing_color: Color32::LIGHT_GRAY,
+      error_color: Color32::from_rgb(255, 69, 0),
+      alert_color: Color32::from_rgb(255, 69, 0),
+      warning_color: egui::Color32::from_rgb(77, 77, 41),
+      info_color: egui::Color32::from_rgb(41, 56, 77),
+
+      qr_background: Color32::from_rgba(255, 255, 255, 0),
+      qr_foreground: Color32::from_rgb(200, 156, 71),
+
+      text_off_color_1: Color32::from_rgb(227, 190, 95),
+      text_off_color_2: Color32::from_rgb(227, 190, 95),
+      text_on_color_1: Color32::from_rgb(255, 255, 255),
+      text_on_color_2: Color32::from_rgb(255, 255, 255),
+
+      disabled_a: 95,
+      accent_img: AccentImgID::Beach,
+    }
+  }
+
+  pub fn pimp() -> Self {
+    Self {
+      name: i18n("Pimpin").to_string(),
+      dark_mode: true,
+      hyperlink_color: Color32::from_rgb(15, 84, 73),
+
+      default_color: Color32::from_rgb(250, 238, 209),
+      strong_color: Color32::from_rgb(255, 255, 255),
+
+      separator_color: Color32::from_rgb(60, 60, 60),
+      button_color: Color32::from_rgb(239, 171, 18),
+      toggle_inactive: Color32::from_rgb(0, 0, 0),
+      toggle_active: Color32::from_rgb(239, 171, 18),
+
+      bg_color: Color32::from_rgb(0, 0, 0),
+      fg_color: Color32::from_rgb(13, 13, 13),
+
+      null_balance_color: Color32::from_rgb(77, 60, 21),
+
+      node_data_color: Color32::BLACK,
+      balance_color: Color32::BLACK,
+      balance_syncing_color: Color32::LIGHT_GRAY,
+      error_color: Color32::from_rgb(255, 69, 0),
+      alert_color: Color32::from_rgb(255, 69, 0),
+      warning_color: egui::Color32::from_rgb(77, 77, 41),
+      info_color: egui::Color32::from_rgb(41, 56, 77),
+
+      qr_background: Color32::from_rgba(255, 255, 255, 0),
+      qr_foreground: Color32::from_rgb(200, 156, 71),
+
+      text_off_color_1: Color32::from_rgb(140, 102, 18),
+      text_off_color_2: Color32::from_rgb(140, 102, 18),
+      text_on_color_1: Color32::from_rgb(227, 190, 95),
+      text_on_color_2: Color32::from_rgb(227, 190, 95),
+
+      disabled_a: 95,
+      accent_img: AccentImgID::Cash,
+    }
+  }
 }
 
 impl Default for ThemeColor {
@@ -220,7 +348,10 @@ pub fn theme_colors() -> &'static HashMap<String, ThemeColor> {
   unsafe {
     THEME_COLOR_LIST.get_or_insert_with(|| {
       let mut themes = HashMap::new();
-      [ThemeColor::pink(), ThemeColor::dark(), ThemeColor::light(), ThemeColor::snow()]
+      [
+        ThemeColor::pink(), ThemeColor::dark(), ThemeColor::light(), ThemeColor::snow(), ThemeColor::meadow(),
+        ThemeColor::beach(), ThemeColor::pimp()
+      ]
         .into_iter()
         .for_each(|theme| {
           themes.insert(theme.name.clone(), theme.clone());

@@ -34,6 +34,8 @@ pub fn toggle_ui(ui: &mut egui::Ui, on: &mut bool) -> egui::Response {
 
     if *on {
       visuals.bg_fill = theme_color().toggle_active;
+    } else {
+      visuals.bg_fill = theme_color().toggle_inactive;
     }
 
     let rect = rect.expand(visuals.expansion);

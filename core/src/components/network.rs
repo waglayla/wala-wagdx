@@ -65,12 +65,33 @@ impl ComponentT for NetworkInfo {
     _frame: &mut eframe::Frame,
     ui: &mut egui::Ui,
   ) {
-    DXImage::paint_at(
-      ui, 
-      theme_accent_img(),
-      ui.available_width().min(ui.available_height()),
-      ui.available_rect_before_wrap().center(), Align2::CENTER_CENTER
-    );
+    egui::CentralPanel::default()
+      .frame(create_custom_frame(ctx))
+      .show_inside(ui, |ui| {
+    if *theme_color() == ThemeColor::pimp() {
+      DXImage::paint_at(
+        ui, 
+        theme_accent_img(),
+        ui.available_width().min(ui.available_height() - 66.0),
+        ui.available_rect_before_wrap().center() - vec2(ui.available_width()/2.0, -33.0), 
+        Align2::CENTER_CENTER
+      );
+
+      DXImage::paint_at(
+        ui, 
+        theme_accent_img(),
+        ui.available_width().min(ui.available_height() - 66.0),
+        ui.available_rect_before_wrap().center() + vec2(ui.available_width()/2.0, 33.0), 
+        Align2::CENTER_CENTER
+      );
+    } else {
+      DXImage::paint_at(
+        ui, 
+        theme_accent_img(),
+        ui.available_width().min(ui.available_height()),
+        ui.available_rect_before_wrap().center(), Align2::CENTER_CENTER
+      );
+    }
 
     let mut endpoint = core.node_state().url().clone().unwrap_or("N/A".to_string());
     endpoint = if endpoint.contains("127.0.0.1") {
@@ -165,5 +186,6 @@ impl ComponentT for NetworkInfo {
         ui
       );
     });
+  });
   }
 }

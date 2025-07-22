@@ -9,7 +9,7 @@ default-members = ["app"]
 
 [workspace.package]
 rust-version = "1.78.0"
-version = "2.0.0-k9"
+version = "3.0.0-k9"
 authors = ["WALA House"]
 license = "GPL"
 edition = "2021"
@@ -18,8 +18,8 @@ repository = "https://github.com/waglayla/wala-wagdx"
 [workspace.dependencies]
 
 rust-embed = "6"
-wala-wagdx = { version = "2.0.0-k9", path = "app/", default-features = false }
-wala-wagdx-core = { version = "2.0.0-k9", path = "core/", default-features = false }
+wala-wagdx = { version = "3.0.0-k9", path = "app/", default-features = false }
+wala-wagdx-core = { version = "3.0.0-k9", path = "core/", default-features = false }
 
 # EGUI
 

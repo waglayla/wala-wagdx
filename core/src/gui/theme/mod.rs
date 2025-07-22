@@ -87,6 +87,9 @@ pub fn theme_accent_img() -> &'static TextureHandle {
     match &theme().color.accent_img {
         AccentImgID::Paw => &Assets::get().paw_watermark,
         AccentImgID::Snow => &Assets::get().snow_watermark,
+        AccentImgID::Meadow => &Assets::get().meadow_watermark,
+        AccentImgID::Beach => &Assets::get().sand_watermark,
+        AccentImgID::Cash => &Assets::get().cash_watermark,
     }
 }
 

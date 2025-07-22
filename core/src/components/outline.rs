@@ -257,6 +257,9 @@ impl Outline {
         s if s == i18n("Arctic") => {
           DXImage::paint_at(ui, &Assets::get().snow_platform, 107.0, platform_pos, egui::Align2::CENTER_TOP);
         },
+        s if s == i18n("Meadow") => {
+          DXImage::paint_at(ui, &Assets::get().tree, 92.0, platform_pos + vec2(15.0, -9.0), egui::Align2::CENTER_TOP);
+        }
         _ => {}
       }
     }
