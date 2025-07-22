@@ -259,6 +259,12 @@ impl Outline {
         },
         s if s == i18n("Meadow") => {
           DXImage::paint_at(ui, &Assets::get().tree, 92.0, platform_pos + vec2(15.0, -9.0), egui::Align2::CENTER_TOP);
+        },
+        s if s == i18n("Beach") => {
+          DXImage::paint_at(ui, &Assets::get().brella, 113.0, platform_pos + vec2(-3.0, -9.0), egui::Align2::CENTER_TOP);
+        }
+        s if s == i18n("Pimpin") => {
+          DXImage::paint_at(ui, &Assets::get().coins, 120.0, platform_pos + vec2(-8.0, 0.0), egui::Align2::CENTER_TOP);
         }
         _ => {}
       }

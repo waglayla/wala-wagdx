@@ -12,6 +12,8 @@ pub struct Assets {
   pub snow_platform: TextureHandle,
   pub meadow_watermark: TextureHandle,
   pub tree: TextureHandle,
+  pub brella: TextureHandle,
+  pub coins: TextureHandle,
   pub sand_watermark: TextureHandle,
   pub cash_watermark: TextureHandle,
   pub bark_incoming: Vec<u8>,
@@ -44,6 +46,8 @@ impl Assets {
         snow_platform: Self::load_snow_platform_png(ctx),
         meadow_watermark: Self::load_meadow_watermark_png(ctx),
         tree: Self::load_tree_png(&ctx),
+        brella: Self::load_brella_png(&ctx),
+        coins: Self::load_coins_png(&ctx),
         sand_watermark: Self::load_sand_watermark_png(ctx),
         cash_watermark: Self::load_cash_watermark_png(ctx),
         bark_incoming: load_bytes!("/resources/sound/barks/incoming.wav"),
@@ -261,6 +265,47 @@ impl Assets {
     
     ctx.load_texture(
       "tree",
+      image,
+      egui::TextureOptions {
+        magnification: TextureFilter::Linear,
+        minification: TextureFilter::Linear,
+        mipmap_mode: Some(TextureFilter::Linear),
+        .. Default::default()
+      }
+    )
+  }
+
+  fn load_brella_png(ctx: &Context) -> TextureHandle {
+    let image_bytes = include_bytes!(concat!(
+      env!("CARGO_MANIFEST_DIR"),
+      "/resources/images/brella.png"
+    ));
+    
+    let image = load_image_bytes(image_bytes)
+      .expect("Failed to load brella image");
+    
+    ctx.load_texture(
+      "brella",
+      image,
+      egui::TextureOptions {
+        magnification: TextureFilter::Linear,
+        minification: TextureFilter::Linear,
+        mipmap_mode: Some(TextureFilter::Linear),
+        .. Default::default()
+      }
+    )
+  }
+  fn load_coins_png(ctx: &Context) -> TextureHandle {
+    let image_bytes = include_bytes!(concat!(
+      env!("CARGO_MANIFEST_DIR"),
+      "/resources/images/coins.png"
+    ));
+    
+    let image = load_image_bytes(image_bytes)
+      .expect("Failed to coins brella image");
+    
+    ctx.load_texture(
+      "brella",
       image,
       egui::TextureOptions {
         magnification: TextureFilter::Linear,
