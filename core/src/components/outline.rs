@@ -528,8 +528,11 @@ impl Outline {
     let mut tabs = vec![Tab::Wallet];
 
     if core.settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon {
-      #[cfg(not(target_arch = "wasm32"))]
-      tabs.push(Tab::WalaBridge);
+      if core.settings.node.enable_bridge
+      {
+        #[cfg(not(target_arch = "wasm32"))]
+        tabs.push(Tab::WalaBridge);
+      }
       
       tabs.push(Tab::WalaNode);
     }

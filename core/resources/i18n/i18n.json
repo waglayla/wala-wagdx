@@ -11,7 +11,6 @@
     "af",
     "ar",
     "bg",
-    "bn",
     "cs",
     "da",
     "de",
@@ -30,13 +29,11 @@
     "it",
     "iw",
     "ja",
-    "ka",
     "ko",
     "lt",
     "mn",
     "nl",
     "no",
-    "pa",
     "pl",
     "pt",
     "ro",
@@ -45,9 +42,6 @@
     "sl",
     "sr",
     "sv",
-    "ta",
-    "te",
-    "th",
     "tl",
     "tr",
     "uk",
@@ -131,6 +125,7 @@
       "Arctic": "Arkties",
       "Back": "Agter",
       "Beach": "Strand",
+      "Big Pimpin": "Groot pimpin",
       "Block Explorer": "Blok Explorer",
       "Block Found!": "Blok gevind!",
       "Block Reward": "Blokbeloning",
@@ -337,6 +332,7 @@
       "Phishing Hint:": "Phishing wenk:",
       "Phishing Protection": "Phishing -beskerming",
       "Phishing Protection:": "Phishing -beskerming:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Kies 'n beursie",
       "Please configure your WagLayla Wag-DX settings": "Stel asseblief u WagLayla Wag-DX-instellings op",
       "Please confirm word 1 of your seed phrase:": "Bevestig asseblief woord 1 van u saadfrase:",
@@ -501,9 +497,7 @@
       "wRPC Connection Settings": "wRPC -verbindingsinstellings",
       "wRPC Encoding:": "wRPC -kodering:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: voorvoegsel benodig",
-      "Big Pimpin": "Groot pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: voorvoegsel benodig"
     },
     "ar": {
       "12 Words": "12 كلمة",
@@ -530,6 +524,7 @@
       "Arctic": "القطب الشمالي",
       "Back": "خلف",
       "Beach": "شاطئ",
+      "Big Pimpin": "بيمبين كبير",
       "Block Explorer": "بلوك المستكشف",
       "Block Found!": "تم العثور على كتلة!",
       "Block Reward": "مكافأة كتلة",
@@ -736,6 +731,7 @@
       "Phishing Hint:": "تلميح التصيد:",
       "Phishing Protection": "حماية التصيد",
       "Phishing Protection:": "حماية التصيد:",
+      "Pimpin": "القواد",
       "Please Select a Wallet": "الرجاء تحديد محفظة",
       "Please configure your WagLayla Wag-DX settings": "يرجى تكوين إعدادات WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "يرجى تأكيد الكلمة 1 من عبارة البذور:",
@@ -900,9 +896,7 @@
       "wRPC Connection Settings": "إعدادات اتصال wRPC",
       "wRPC Encoding:": "تشفير wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: بادئة مطلوبة",
-      "Big Pimpin": "بيمبين كبير",
-      "Pimpin": "القواد"
+      "waglayla: prefix required": "Waglayla: بادئة مطلوبة"
     },
     "bg": {
       "12 Words": "12 думи",
@@ -929,6 +923,7 @@
       "Arctic": "Арктика",
       "Back": "Назад",
       "Beach": "Плаж",
+      "Big Pimpin": "Голям сводник",
       "Block Explorer": "Блок Explorer",
       "Block Found!": "Блок намерен!",
       "Block Reward": "Блок награда",
@@ -1135,6 +1130,7 @@
       "Phishing Hint:": "Фишинг намек:",
       "Phishing Protection": "Фишинг защита",
       "Phishing Protection:": "Фишинг защита:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Моля, изберете портфейл",
       "Please configure your WagLayla Wag-DX settings": "Моля, конфигурирайте вашите настройки на WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Моля, потвърдете дума 1 от вашата фраза за семена:",
@@ -1299,9 +1295,7 @@
       "wRPC Connection Settings": "Настройки на wRPC връзка",
       "wRPC Encoding:": "wRPC кодиране:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: Необходим префикс",
-      "Pimpin": "Pimpin",
-      "Big Pimpin": "Голям сводник"
+      "waglayla: prefix required": "Waglayla: Необходим префикс"
     },
     "bn": {
       "12 Words": "12 শব্দ",
@@ -1328,6 +1322,7 @@
       "Arctic": "আর্কটিক",
       "Back": "পিছনে",
       "Beach": "সৈকত",
+      "Big Pimpin": "বড় পিম্পিন",
       "Block Explorer": "ব্লক এক্সপ্লোরার",
       "Block Found!": "ব্লক পাওয়া গেছে!",
       "Block Reward": "ব্লক পুরষ্কার",
@@ -1534,6 +1529,7 @@
       "Phishing Hint:": "ফিশিং ইঙ্গিত:",
       "Phishing Protection": "ফিশিং সুরক্ষা",
       "Phishing Protection:": "ফিশিং সুরক্ষা:",
+      "Pimpin": "পিম্পিন",
       "Please Select a Wallet": "একটি ওয়ালেট নির্বাচন করুন",
       "Please configure your WagLayla Wag-DX settings": "দয়া করে আপনার ওয়াগল্লা ওয়াগ-ডিএক্স সেটিংস কনফিগার করুন",
       "Please confirm word 1 of your seed phrase:": "আপনার বীজ বাক্যাংশের শব্দ 1 নিশ্চিত করুন:",
@@ -1698,9 +1694,7 @@
       "wRPC Connection Settings": "ডাব্লুআরপিসি সংযোগ সেটিংস",
       "wRPC Encoding:": "ডাব্লুআরপিসি এনকোডিং:",
       "wRPC URL:": "ডাব্লুআরপিসি ইউআরএল:",
-      "waglayla: prefix required": "ওয়াগলায়লা: উপসর্গ প্রয়োজনীয়",
-      "Big Pimpin": "বড় পিম্পিন",
-      "Pimpin": "পিম্পিন"
+      "waglayla: prefix required": "ওয়াগলায়লা: উপসর্গ প্রয়োজনীয়"
     },
     "cs": {
       "12 Words": "12 slov",
@@ -1727,6 +1721,7 @@
       "Arctic": "Arktický",
       "Back": "Zadní",
       "Beach": "Pláž",
+      "Big Pimpin": "Velký pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blok nalezen!",
       "Block Reward": "Blokovací odměna",
@@ -1933,6 +1928,7 @@
       "Phishing Hint:": "Phishingový nápověda:",
       "Phishing Protection": "Phishingová ochrana",
       "Phishing Protection:": "Phishingová ochrana:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Vyberte prosím peněženku",
       "Please configure your WagLayla Wag-DX settings": "Nakonfigurujte nastavení WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Potvrďte prosím slovo 1 vaší fráze semen:",
@@ -2097,9 +2093,7 @@
       "wRPC Connection Settings": "Nastavení připojení wRPC",
       "wRPC Encoding:": "Kódování wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "WAGLAYLA: Vyžaduje se předpona",
-      "Pimpin": "Pimpin",
-      "Big Pimpin": "Velký pimpin"
+      "waglayla: prefix required": "WAGLAYLA: Vyžaduje se předpona"
     },
     "da": {
       "12 Words": "12 ord",
@@ -2126,6 +2120,7 @@
       "Arctic": "Arktisk",
       "Back": "Tilbage",
       "Beach": "Strand",
+      "Big Pimpin": "Big Pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blok fundet!",
       "Block Reward": "Bloker belønning",
@@ -2332,6 +2327,7 @@
       "Phishing Hint:": "Phishing tip:",
       "Phishing Protection": "Phishing beskyttelse",
       "Phishing Protection:": "Phishing beskyttelse:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Vælg en tegnebog",
       "Please configure your WagLayla Wag-DX settings": "Konfigurer venligst dine WagLayla Wag-DX-indstillinger",
       "Please confirm word 1 of your seed phrase:": "Bekræft venligst ord 1 i din frøfrase:",
@@ -2496,9 +2492,7 @@
       "wRPC Connection Settings": "wRPC -forbindelsesindstillinger",
       "wRPC Encoding:": "wRPC kodning:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: Præfiks krævet",
-      "Big Pimpin": "Big Pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Præfiks krævet"
     },
     "de": {
       "12 Words": "12 Wörter",
@@ -2525,6 +2519,7 @@
       "Arctic": "Arktis",
       "Back": "Zurück",
       "Beach": "Strand",
+      "Big Pimpin": "Großer Zuhälter",
       "Block Explorer": "Blockforscher",
       "Block Found!": "Block gefunden!",
       "Block Reward": "Blockbelohnung",
@@ -2731,6 +2726,7 @@
       "Phishing Hint:": "Phishing Hinweis:",
       "Phishing Protection": "Phishing -Schutz",
       "Phishing Protection:": "Phishing -Schutz:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Bitte wählen Sie eine Brieftasche aus",
       "Please configure your WagLayla Wag-DX settings": "Bitte konfigurieren Sie Ihre WagLayla Wag-DX-Einstellungen",
       "Please confirm word 1 of your seed phrase:": "Bitte bestätigen Sie das Wort 1 Ihres Samenphrase:",
@@ -2895,9 +2891,7 @@
       "wRPC Connection Settings": "wRPC -Verbindungseinstellungen",
       "wRPC Encoding:": "wRPC -Codierung:",
       "wRPC URL:": "wRPC -URL:",
-      "waglayla: prefix required": "Waglayla: Präfix erforderlich",
-      "Pimpin": "Pimpin",
-      "Big Pimpin": "Großer Zuhälter"
+      "waglayla: prefix required": "Waglayla: Präfix erforderlich"
     },
     "el": {
       "12 Words": "12 λέξεις",
@@ -2924,6 +2918,7 @@
       "Arctic": "αρκτικός",
       "Back": "Πίσω",
       "Beach": "Παραλία",
+      "Big Pimpin": "Μεγάλος Pimpin",
       "Block Explorer": "Μπλοκ εξερευνητής",
       "Block Found!": "Βρέθηκε μπλοκ!",
       "Block Reward": "Μπλοκ ανταμοιβής",
@@ -3130,6 +3125,7 @@
       "Phishing Hint:": "Συμβουλή ψαρέματος:",
       "Phishing Protection": "Προστασία του ηλεκτρονικού ψαρέματος",
       "Phishing Protection:": "Προστασία του ηλεκτρονικού ψαρέματος:",
+      "Pimpin": "Πελματίδων",
       "Please Select a Wallet": "Επιλέξτε ένα πορτοφόλι",
       "Please configure your WagLayla Wag-DX settings": "Διαμορφώστε τις ρυθμίσεις WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Επιβεβαιώστε τη λέξη 1 της φράσης σπόρου σας:",
@@ -3294,9 +3290,7 @@
       "wRPC Connection Settings": "Ρυθμίσεις σύνδεσης wRPC",
       "wRPC Encoding:": "Κωδικοποίηση wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: Απαιτείται πρόθεμα",
-      "Pimpin": "Πελματίδων",
-      "Big Pimpin": "Μεγάλος Pimpin"
+      "waglayla: prefix required": "Waglayla: Απαιτείται πρόθεμα"
     },
     "en": {
       "12 Words": "12 Words",
@@ -3398,6 +3392,7 @@
       "Donation Info": "Donation Info",
       "Donation Wallets": "Donation Wallets",
       "Done": "Done",
+      "Enable": "Enable",
       "Enable Phishing Protection": "Enable Phishing Protection",
       "Enable Phishing Protection:": "Enable Phishing Protection:",
       "Enable UPnP": "Enable UPnP",
@@ -3516,6 +3511,7 @@
       "Opening": "Opening",
       "Opening wallet:": "Opening wallet:",
       "PREV": "PREV",
+      "Park": "Park",
       "Passwords": "Passwords",
       "Passwords do not match": "Passwords do not match",
       "Payment Password": "Payment Password",
@@ -3722,6 +3718,7 @@
       "Arctic": "Ártico",
       "Back": "Atrás",
       "Beach": "Playa",
+      "Big Pimpin": "Pimpin grande",
       "Block Explorer": "Explorador de bloques",
       "Block Found!": "¡Bloque encontrado!",
       "Block Reward": "Bloquear recompensa",
@@ -3928,6 +3925,7 @@
       "Phishing Hint:": "Phishing Sugerencia:",
       "Phishing Protection": "Protección de phishing",
       "Phishing Protection:": "Protección de phishing:",
+      "Pimpin": "Chispeante",
       "Please Select a Wallet": "Seleccione una billetera",
       "Please configure your WagLayla Wag-DX settings": "Configure su configuración WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Confirme la palabra 1 de su frase de semillas:",
@@ -4092,9 +4090,7 @@
       "wRPC Connection Settings": "Configuración de conexión de wRPC",
       "wRPC Encoding:": "Codificación de wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: requerido prefijo",
-      "Pimpin": "Chispeante",
-      "Big Pimpin": "Pimpin grande"
+      "waglayla: prefix required": "Waglayla: requerido prefijo"
     },
     "et": {
       "12 Words": "12 sõna",
@@ -4121,6 +4117,7 @@
       "Arctic": "Arktiline",
       "Back": "Tagurpidi",
       "Beach": "Rand",
+      "Big Pimpin": "Suur vist",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Plokk leitud!",
       "Block Reward": "Plokkitasu",
@@ -4327,6 +4324,7 @@
       "Phishing Hint:": "Andmepüügi vihje:",
       "Phishing Protection": "Andmepüügi kaitse",
       "Phishing Protection:": "Andmepüügi kaitse:",
+      "Pimpin": "Vist",
       "Please Select a Wallet": "Valige rahakott",
       "Please configure your WagLayla Wag-DX settings": "Palun konfigureerige oma WagLayla Wag-DX sätted",
       "Please confirm word 1 of your seed phrase:": "Palun kinnitage oma seemnefraasi sõna 1:",
@@ -4491,9 +4489,7 @@
       "wRPC Connection Settings": "wRPC ühenduse seaded",
       "wRPC Encoding:": "wRPC kodeerimine:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: vajalik eesliide",
-      "Big Pimpin": "Suur vist",
-      "Pimpin": "Vist"
+      "waglayla: prefix required": "Waglayla: vajalik eesliide"
     },
     "fa": {
       "12 Words": "12 کلمه",
@@ -4520,6 +4516,7 @@
       "Arctic": "وابسته به قطب شمال",
       "Back": "پشت",
       "Beach": "ساحل",
+      "Big Pimpin": "محبت بزرگ",
       "Block Explorer": "کاوشگر بلوک",
       "Block Found!": "بلوک پیدا شد!",
       "Block Reward": "پاداش بلوک",
@@ -4726,6 +4723,7 @@
       "Phishing Hint:": "اشاره فیشینگ:",
       "Phishing Protection": "حفاظت فیشینگ",
       "Phishing Protection:": "محافظت از فیشینگ:",
+      "Pimpin": "محبت",
       "Please Select a Wallet": "لطفا یک کیف پول را انتخاب کنید",
       "Please configure your WagLayla Wag-DX settings": "لطفاً تنظیمات WagLayla Wag-DX خود را پیکربندی کنید",
       "Please confirm word 1 of your seed phrase:": "لطفاً کلمه 1 عبارت دانه خود را تأیید کنید:",
@@ -4890,9 +4888,7 @@
       "wRPC Connection Settings": "تنظیمات اتصال wRPC",
       "wRPC Encoding:": "رمزگذاری wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: پیشوند مورد نیاز است",
-      "Pimpin": "محبت",
-      "Big Pimpin": "محبت بزرگ"
+      "waglayla: prefix required": "Waglayla: پیشوند مورد نیاز است"
     },
     "fi": {
       "12 Words": "12 sanaa",
@@ -4919,6 +4915,7 @@
       "Arctic": "Arktinen",
       "Back": "Takaisin",
       "Beach": "Ranta",
+      "Big Pimpin": "Iso pimpin",
       "Block Explorer": "Esittelijä",
       "Block Found!": "Löydä!",
       "Block Reward": "Estää palkkio",
@@ -5125,6 +5122,7 @@
       "Phishing Hint:": "Tiedonkalasteluvinkki:",
       "Phishing Protection": "Tietojenkalastelusuoja",
       "Phishing Protection:": "Tiedonkalastelujen suoja:",
+      "Pimpin": "Pimppi",
       "Please Select a Wallet": "Valitse lompakko",
       "Please configure your WagLayla Wag-DX settings": "Määritä WagLayla Wag-DX -asetukset",
       "Please confirm word 1 of your seed phrase:": "Vahvista siemenlauseesi sana 1:",
@@ -5289,9 +5287,7 @@
       "wRPC Connection Settings": "wRPC -yhteysasetukset",
       "wRPC Encoding:": "wRPC -koodaus:",
       "wRPC URL:": "wRPC -URL:",
-      "waglayla: prefix required": "Waglayla: Etuliite vaaditaan",
-      "Pimpin": "Pimppi",
-      "Big Pimpin": "Iso pimpin"
+      "waglayla: prefix required": "Waglayla: Etuliite vaaditaan"
     },
     "fr": {
       "12 Words": "12 mots",
@@ -5318,6 +5314,7 @@
       "Arctic": "Arctique",
       "Back": "Dos",
       "Beach": "Plage",
+      "Big Pimpin": "Grand pimpin",
       "Block Explorer": "Explorateur de blocs",
       "Block Found!": "Bloc trouvé!",
       "Block Reward": "Récompense de blocage",
@@ -5524,6 +5521,7 @@
       "Phishing Hint:": "Indice de phishing:",
       "Phishing Protection": "Protection contre le phishing",
       "Phishing Protection:": "Protection du phishing:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Veuillez sélectionner un portefeuille",
       "Please configure your WagLayla Wag-DX settings": "Veuillez configurer vos paramètres WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Veuillez confirmer le mot 1 de votre phrase de semence:",
@@ -5688,9 +5686,7 @@
       "wRPC Connection Settings": "Paramètres de connexion wRPC",
       "wRPC Encoding:": "Encodage wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: préfixe requis",
-      "Big Pimpin": "Grand pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: préfixe requis"
     },
     "hi": {
       "12 Words": "12 शब्द",
@@ -5717,6 +5713,7 @@
       "Arctic": "आर्कटिक",
       "Back": "पीछे",
       "Beach": "समुद्र तट",
+      "Big Pimpin": "बिग पिम्पिन",
       "Block Explorer": "ब्लॉक एक्सप्लोरर",
       "Block Found!": "ब्लॉक मिला!",
       "Block Reward": "ब्लॉक इनाम",
@@ -5923,6 +5920,7 @@
       "Phishing Hint:": "फ़िशिंग संकेत:",
       "Phishing Protection": "फ़िशिंग संरक्षण",
       "Phishing Protection:": "फ़िशिंग संरक्षण:",
+      "Pimpin": "पिम्पिन",
       "Please Select a Wallet": "कृपया एक बटुआ चुनें",
       "Please configure your WagLayla Wag-DX settings": "कृपया अपनी WagLayla Wag-DX सेटिंग्स कॉन्फ़िगर करें",
       "Please confirm word 1 of your seed phrase:": "कृपया अपने बीज वाक्यांश के शब्द 1 की पुष्टि करें:",
@@ -6087,9 +6085,7 @@
       "wRPC Connection Settings": "wRPC कनेक्शन सेटिंग्स",
       "wRPC Encoding:": "wRPC एन्कोडिंग:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "waglayla: उपसर्ग आवश्यक",
-      "Pimpin": "पिम्पिन",
-      "Big Pimpin": "बिग पिम्पिन"
+      "waglayla: prefix required": "waglayla: उपसर्ग आवश्यक"
     },
     "hr": {
       "12 Words": "12 riječi",
@@ -6116,6 +6112,7 @@
       "Arctic": "Arktik",
       "Back": "Nazad",
       "Beach": "Plaža",
+      "Big Pimpin": "Veliki Pimpin",
       "Block Explorer": "Blok Explorer",
       "Block Found!": "Blok pronađen!",
       "Block Reward": "Blokirati nagradu",
@@ -6322,6 +6319,7 @@
       "Phishing Hint:": "Phishing Savjet:",
       "Phishing Protection": "Phishing zaštita",
       "Phishing Protection:": "Zaštita krađe identiteta:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Odaberite novčanik",
       "Please configure your WagLayla Wag-DX settings": "Molimo konfigurirajte svoje postavke WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Potvrdite riječ 1 svoje sjemenske fraze:",
@@ -6486,9 +6484,7 @@
       "wRPC Connection Settings": "wRPC Postavke veze",
       "wRPC Encoding:": "wRPC kodiranje:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: Potreban prefiks",
-      "Big Pimpin": "Veliki Pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Potreban prefiks"
     },
     "hu": {
       "12 Words": "12 szó",
@@ -6515,6 +6511,7 @@
       "Arctic": "Sarkvidéki",
       "Back": "Vissza",
       "Beach": "Strand",
+      "Big Pimpin": "Nagy pimpin",
       "Block Explorer": "Blokk felfedező",
       "Block Found!": "Blokk megtalálta!",
       "Block Reward": "Blokk jutalom",
@@ -6721,6 +6718,7 @@
       "Phishing Hint:": "Adathalász tipp:",
       "Phishing Protection": "Adathalász védelem",
       "Phishing Protection:": "Adathalász védelem:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Kérjük, válasszon egy pénztárcát",
       "Please configure your WagLayla Wag-DX settings": "Kérjük, konfigurálja a WagLayla Wag-DX beállításait",
       "Please confirm word 1 of your seed phrase:": "Kérjük, erősítse meg a vetőmag -kifejezés 1. szót:",
@@ -6885,9 +6883,7 @@
       "wRPC Connection Settings": "wRPC kapcsolatbeállítások",
       "wRPC Encoding:": "wRPC kódolás:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: előtag szükséges",
-      "Pimpin": "Pimpin",
-      "Big Pimpin": "Nagy pimpin"
+      "waglayla: prefix required": "Waglayla: előtag szükséges"
     },
     "id": {
       "12 Words": "12 kata",
@@ -6914,6 +6910,7 @@
       "Arctic": "Arktik",
       "Back": "Kembali",
       "Beach": "Pantai",
+      "Big Pimpin": "Pimpin Besar",
       "Block Explorer": "Blok Explorer",
       "Block Found!": "Blok Ditemukan!",
       "Block Reward": "Blokir hadiah",
@@ -7120,6 +7117,7 @@
       "Phishing Hint:": "Petunjuk phishing:",
       "Phishing Protection": "Perlindungan phishing",
       "Phishing Protection:": "Perlindungan phishing:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Pilih dompet",
       "Please configure your WagLayla Wag-DX settings": "Harap Konfigurasikan Pengaturan WagLayla Wag-DX Anda",
       "Please confirm word 1 of your seed phrase:": "Harap konfirmasi kata 1 dari frasa benih Anda:",
@@ -7284,9 +7282,7 @@
       "wRPC Connection Settings": "Pengaturan Koneksi wRPC",
       "wRPC Encoding:": "Pengkodean wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: Diperlukan awalan",
-      "Big Pimpin": "Pimpin Besar",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Diperlukan awalan"
     },
     "is": {
       "12 Words": "12 orð",
@@ -7313,6 +7309,7 @@
       "Arctic": "Norðurslóð",
       "Back": "Aftur",
       "Beach": "Strönd",
+      "Big Pimpin": "Stór pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blokk fannst!",
       "Block Reward": "Blokka umbun",
@@ -7519,6 +7516,7 @@
       "Phishing Hint:": "Vísbending um phishing:",
       "Phishing Protection": "Phishing vernd",
       "Phishing Protection:": "Phishing vernd:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Vinsamlegast veldu veski",
       "Please configure your WagLayla Wag-DX settings": "Vinsamlegast stilltu WagLayla Wag-DX stillingarnar þínar",
       "Please confirm word 1 of your seed phrase:": "Vinsamlegast staðfestu orð 1 af fræ setningunni þinni:",
@@ -7683,9 +7681,7 @@
       "wRPC Connection Settings": "wRPC tengingarstillingar",
       "wRPC Encoding:": "wRPC kóðun:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: Forskeyti krafist",
-      "Pimpin": "Pimpin",
-      "Big Pimpin": "Stór pimpin"
+      "waglayla: prefix required": "Waglayla: Forskeyti krafist"
     },
     "it": {
       "12 Words": "12 parole",
@@ -7712,6 +7708,7 @@
       "Arctic": "artico",
       "Back": "Indietro",
       "Beach": "Spiaggia",
+      "Big Pimpin": "Big Pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blocco trovato!",
       "Block Reward": "Ricompensa di blocchi",
@@ -7918,6 +7915,7 @@
       "Phishing Hint:": "Suggerimento di phishing:",
       "Phishing Protection": "Protezione del phishing",
       "Phishing Protection:": "Protezione del phishing:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Seleziona un portafoglio",
       "Please configure your WagLayla Wag-DX settings": "Si prega di configurare le tue impostazioni WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Conferma la parola 1 della tua frase di seme:",
@@ -8082,9 +8080,7 @@
       "wRPC Connection Settings": "Impostazioni di connessione wRPC",
       "wRPC Encoding:": "codifica wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "WAGLAYLA: prefisso richiesto",
-      "Pimpin": "Pimpin",
-      "Big Pimpin": "Big Pimpin"
+      "waglayla: prefix required": "WAGLAYLA: prefisso richiesto"
     },
     "iw": {
       "12 Words": "12 מילים",
@@ -8111,6 +8107,7 @@
       "Arctic": "אַרקטִי",
       "Back": "בְּחֲזָרָה",
       "Beach": "חוֹף",
+      "Big Pimpin": "פימפין גדול",
       "Block Explorer": "חוסן חסימה",
       "Block Found!": "בלוק נמצא!",
       "Block Reward": "חסום תגמול",
@@ -8317,6 +8314,7 @@
       "Phishing Hint:": "רמז דיוג:",
       "Phishing Protection": "הגנת דיוג",
       "Phishing Protection:": "הגנת דיוג:",
+      "Pimpin": "פימפין",
       "Please Select a Wallet": "אנא בחר ארנק",
       "Please configure your WagLayla Wag-DX settings": "אנא קבע את התצורה של הגדרות WagLayla Wag-DX שלך",
       "Please confirm word 1 of your seed phrase:": "אנא אשר מילה 1 בביטוי הזרע שלך:",
@@ -8481,9 +8479,7 @@
       "wRPC Connection Settings": "הגדרות חיבור wRPC",
       "wRPC Encoding:": "קידוד wRPC:",
       "wRPC URL:": "כתובת URL wRPC:",
-      "waglayla: prefix required": "Waglayla: קידומת נדרשת",
-      "Pimpin": "פימפין",
-      "Big Pimpin": "פימפין גדול"
+      "waglayla: prefix required": "Waglayla: קידומת נדרשת"
     },
     "ja": {
       "12 Words": "12語",
@@ -8510,6 +8506,7 @@
       "Arctic": "北極",
       "Back": "戻る",
       "Beach": "ビーチ",
+      "Big Pimpin": "大きなピンピン",
       "Block Explorer": "ブロックエクスプローラー",
       "Block Found!": "ブロックが見つかりました！",
       "Block Reward": "報酬をブロックします",
@@ -8716,6 +8713,7 @@
       "Phishing Hint:": "フィッシングのヒント：",
       "Phishing Protection": "フィッシング保護",
       "Phishing Protection:": "フィッシング保護：",
+      "Pimpin": "ピンピン",
       "Please Select a Wallet": "ウォレットを選択してください",
       "Please configure your WagLayla Wag-DX settings": "WagLayla Wag-DX設定を構成してください",
       "Please confirm word 1 of your seed phrase:": "シードフレーズの単語1を確認してください：",
@@ -8880,9 +8878,7 @@
       "wRPC Connection Settings": "wRPC接続設定",
       "wRPC Encoding:": "wRPCエンコーディング：",
       "wRPC URL:": "wRPC URL：",
-      "waglayla: prefix required": "Waglayla：プレフィックスが必要です",
-      "Pimpin": "ピンピン",
-      "Big Pimpin": "大きなピンピン"
+      "waglayla: prefix required": "Waglayla：プレフィックスが必要です"
     },
     "ka": {
       "12 Words": "12 სიტყვა",
@@ -8909,6 +8905,7 @@
       "Arctic": "არქაული",
       "Back": "ზურგი",
       "Beach": "ზღვის ნაპირი",
+      "Big Pimpin": "დიდი პიმპინი",
       "Block Explorer": "ბლოკი Explorer",
       "Block Found!": "ბლოკი იპოვნეს!",
       "Block Reward": "დაბლოკოს ჯილდო",
@@ -9115,6 +9112,7 @@
       "Phishing Hint:": "ფიშინგის მინიშნება:",
       "Phishing Protection": "ფიშინგის დაცვა",
       "Phishing Protection:": "ფიშინგის დაცვა:",
+      "Pimpin": "პიმპინი",
       "Please Select a Wallet": "გთხოვთ აირჩიოთ საფულე",
       "Please configure your WagLayla Wag-DX settings": "გთხოვთ, დააკონფიგურიროთ თქვენი WagLayla Wag-DX პარამეტრები",
       "Please confirm word 1 of your seed phrase:": "გთხოვთ დაადასტუროთ თქვენი თესლის ფრაზის სიტყვა 1:",
@@ -9279,9 +9277,7 @@
       "wRPC Connection Settings": "wRPC კავშირის პარამეტრები",
       "wRPC Encoding:": "wRPC კოდირება:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: საჭიროა პრეფიქსი",
-      "Pimpin": "პიმპინი",
-      "Big Pimpin": "დიდი პიმპინი"
+      "waglayla: prefix required": "Waglayla: საჭიროა პრეფიქსი"
     },
     "ko": {
       "12 Words": "12 단어",
@@ -9308,6 +9304,7 @@
       "Arctic": "북극",
       "Back": "뒤쪽에",
       "Beach": "해변",
+      "Big Pimpin": "큰 포주",
       "Block Explorer": "블록 탐색기",
       "Block Found!": "블록이 발견되었습니다!",
       "Block Reward": "보상을 차단하십시오",
@@ -9514,6 +9511,7 @@
       "Phishing Hint:": "피싱 힌트 :",
       "Phishing Protection": "피싱 보호",
       "Phishing Protection:": "피싱 보호 :",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "지갑을 선택하십시오",
       "Please configure your WagLayla Wag-DX settings": "WagLayla Wag-DX 설정을 구성하십시오",
       "Please confirm word 1 of your seed phrase:": "시드 문구의 단어 1을 확인하십시오 :",
@@ -9678,9 +9676,7 @@
       "wRPC Connection Settings": "wRPC 연결 설정",
       "wRPC Encoding:": "wRPC 인코딩 :",
       "wRPC URL:": "wRPC URL :",
-      "waglayla: prefix required": "WAGLAYLA : PREFIX 필수",
-      "Big Pimpin": "큰 포주",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "WAGLAYLA : PREFIX 필수"
     },
     "lt": {
       "12 Words": "12 žodžių",
@@ -9707,6 +9703,7 @@
       "Arctic": "Arktis",
       "Back": "Atgal",
       "Beach": "Paplūdimys",
+      "Big Pimpin": "Didelis Pimpinas",
       "Block Explorer": "„Block Explorer“",
       "Block Found!": "Blokas rastas!",
       "Block Reward": "Blokuoti atlygį",
@@ -9913,6 +9910,7 @@
       "Phishing Hint:": "Sukčiavimo užuomina:",
       "Phishing Protection": "Apsauga nuo sukčiavimo",
       "Phishing Protection:": "Apsauga nuo sukčiavimo:",
+      "Pimpin": "Pimpinas",
       "Please Select a Wallet": "Pasirinkite piniginę",
       "Please configure your WagLayla Wag-DX settings": "Konfigūruokite „Waglala Wag-DX“ nustatymus",
       "Please confirm word 1 of your seed phrase:": "Patvirtinkite savo sėklos frazės 1 žodį:",
@@ -10077,9 +10075,7 @@
       "wRPC Connection Settings": "wRPC ryšio parametrai",
       "wRPC Encoding:": "wRPC kodavimas:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "„Waglala“: reikalingas priešdėlis",
-      "Pimpin": "Pimpinas",
-      "Big Pimpin": "Didelis Pimpinas"
+      "waglayla: prefix required": "„Waglala“: reikalingas priešdėlis"
     },
     "mn": {
       "12 Words": "12 үг",
@@ -10106,6 +10102,7 @@
       "Arctic": "Антархан",
       "Back": "Буцах",
       "Beach": "Далайн эрэг",
+      "Big Pimpin": "Том pimpin",
       "Block Explorer": "Explorer-ийг хаах",
       "Block Found!": "Блок олдсон!",
       "Block Reward": "Блок шагнал",
@@ -10312,6 +10309,7 @@
       "Phishing Hint:": "Фишинг зөвлөмж:",
       "Phishing Protection": "Фишинг хамгаалах",
       "Phishing Protection:": "Фишинг хамгаалах:",
+      "Pimpin": "Спум",
       "Please Select a Wallet": "Түрийвчийг сонгоно уу",
       "Please configure your WagLayla Wag-DX settings": "WagLayla Wag-DX Тохиргоог тохируулна уу",
       "Please confirm word 1 of your seed phrase:": "Таны Үрийн өгүүлбэрийн 1-р үгийг баталгаажуулна уу:",
@@ -10476,9 +10474,7 @@
       "wRPC Connection Settings": "wRPC холболтын тохиргоо",
       "wRPC Encoding:": "wRPC кодчилол:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "WAGLAYLA: угтвар шаардлагатай",
-      "Pimpin": "Спум",
-      "Big Pimpin": "Том pimpin"
+      "waglayla: prefix required": "WAGLAYLA: угтвар шаардлагатай"
     },
     "nl": {
       "12 Words": "12 woorden",
@@ -10505,6 +10501,7 @@
       "Arctic": "Noordpoolgebied",
       "Back": "Rug",
       "Beach": "Strand",
+      "Big Pimpin": "Grote pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blok gevonden!",
       "Block Reward": "Blokbeloning",
@@ -10711,6 +10708,7 @@
       "Phishing Hint:": "Phishing hint:",
       "Phishing Protection": "Phishing -bescherming",
       "Phishing Protection:": "PHISCHE BESCHERMING:",
+      "Pimpin": "Pooier",
       "Please Select a Wallet": "Selecteer een portemonnee",
       "Please configure your WagLayla Wag-DX settings": "Configureer uw WagLayla Wag-DX-instellingen",
       "Please confirm word 1 of your seed phrase:": "Bevestig woord 1 van uw zaadzin:",
@@ -10875,9 +10873,7 @@
       "wRPC Connection Settings": "wRPC -verbindingsinstellingen",
       "wRPC Encoding:": "wRPC -codering:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "waglayla: voorvoegsel vereist",
-      "Big Pimpin": "Grote pimpin",
-      "Pimpin": "Pooier"
+      "waglayla: prefix required": "waglayla: voorvoegsel vereist"
     },
     "no": {
       "12 Words": "12 ord",
@@ -10904,6 +10900,7 @@
       "Arctic": "Arktis",
       "Back": "Tilbake",
       "Beach": "Strand",
+      "Big Pimpin": "Stor pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blokk funnet!",
       "Block Reward": "Blokkerer belønning",
@@ -11110,6 +11107,7 @@
       "Phishing Hint:": "Phishing hint:",
       "Phishing Protection": "Phishing beskyttelse",
       "Phishing Protection:": "Phishing beskyttelse:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Velg en lommebok",
       "Please configure your WagLayla Wag-DX settings": "Konfigurer WagLayla Wag-DX-innstillingene",
       "Please confirm word 1 of your seed phrase:": "Bekreft ord 1 i frøfrasen din:",
@@ -11274,9 +11272,7 @@
       "wRPC Connection Settings": "wRPC -tilkoblingsinnstillinger",
       "wRPC Encoding:": "wRPC -koding:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: Prefiks påkrevd",
-      "Big Pimpin": "Stor pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Prefiks påkrevd"
     },
     "pa": {
       "12 Words": "12 ਸ਼ਬਦ",
@@ -11303,6 +11299,7 @@
       "Arctic": "ਆਰਕਟਿਕ",
       "Back": "ਵਾਪਸ",
       "Beach": "ਬੀਚ",
+      "Big Pimpin": "ਵੱਡੇ ਪਿਮਪਿਨ",
       "Block Explorer": "ਬਲਾਕ ਐਕਸਪਲੋਰਰ",
       "Block Found!": "ਬਲਾਕ ਮਿਲਿਆ!",
       "Block Reward": "ਬਲਾਕ ਇਨਾਮ",
@@ -11509,6 +11506,7 @@
       "Phishing Hint:": "ਫਿਸ਼ਿੰਗ ਇਸ਼ਾਰਾ:",
       "Phishing Protection": "ਫਿਸ਼ਿੰਗ ਪ੍ਰੋਟੈਕਸ਼ਨ",
       "Phishing Protection:": "ਫਿਸ਼ਿੰਗ ਪ੍ਰੋਟੈਕਸ਼ਨ:",
+      "Pimpin": "ਪਿਮਪਿਨ",
       "Please Select a Wallet": "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵਾਲਿਟ ਦੀ ਚੋਣ ਕਰੋ",
       "Please configure your WagLayla Wag-DX settings": "ਆਪਣੀ ਵਾਗਲੇਲਾ ਵੈਗ-ਡੀਐਕਸ ਸੈਟਿੰਗਜ਼ ਨੂੰ ਕੌਂਫਿਗਰ ਕਰੋ ਜੀ",
       "Please confirm word 1 of your seed phrase:": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਬੀਜ ਮੁਹਾਵਰੇ ਦੇ ਸ਼ਬਦ 1 ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ:",
@@ -11673,9 +11671,7 @@
       "wRPC Connection Settings": "ਡਬਲਯੂਆਰਪੀਸੀ ਕੁਨੈਕਸ਼ਨ ਸੈਟਿੰਗਜ਼",
       "wRPC Encoding:": "wRPC ਇੰਕੋਡਿੰਗ:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "ਵੈਗਲੈਲਾ: ਅਗੇਤਰ ਲੋੜੀਂਦਾ",
-      "Big Pimpin": "ਵੱਡੇ ਪਿਮਪਿਨ",
-      "Pimpin": "ਪਿਮਪਿਨ"
+      "waglayla: prefix required": "ਵੈਗਲੈਲਾ: ਅਗੇਤਰ ਲੋੜੀਂਦਾ"
     },
     "pl": {
       "12 Words": "12 słów",
@@ -11702,6 +11698,7 @@
       "Arctic": "Arktyczny",
       "Back": "Z powrotem",
       "Beach": "Plaża",
+      "Big Pimpin": "Wielki Pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Znaleziono blok!",
       "Block Reward": "Nagroda blokująca",
@@ -11908,6 +11905,7 @@
       "Phishing Hint:": "Wskazówka:",
       "Phishing Protection": "Ochrona phishingowa",
       "Phishing Protection:": "Ochrona phishingowa:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Wybierz portfel",
       "Please configure your WagLayla Wag-DX settings": "Skonfiguruj ustawienia WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Potwierdź słowo 1 wyrażenia nasion:",
@@ -12072,9 +12070,7 @@
       "wRPC Connection Settings": "Ustawienia połączenia wRPC",
       "wRPC Encoding:": "Kodowanie wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: Wymagany prefiks",
-      "Big Pimpin": "Wielki Pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Wymagany prefiks"
     },
     "pt": {
       "12 Words": "12 palavras",
@@ -12101,6 +12097,7 @@
       "Arctic": "ártico",
       "Back": "Voltar",
       "Beach": "Praia",
+      "Big Pimpin": "Big Pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Bloco encontrado!",
       "Block Reward": "Bloquear a recompensa",
@@ -12307,6 +12304,7 @@
       "Phishing Hint:": "Dica de phishing:",
       "Phishing Protection": "Proteção de phishing",
       "Phishing Protection:": "Proteção de phishing:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Selecione uma carteira",
       "Please configure your WagLayla Wag-DX settings": "Configure suas configurações WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Confirme a palavra 1 da sua frase de semente:",
@@ -12471,9 +12469,7 @@
       "wRPC Connection Settings": "Configurações de conexão wRPC",
       "wRPC Encoding:": "codificação wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: Prefixo necessário",
-      "Pimpin": "Pimpin",
-      "Big Pimpin": "Big Pimpin"
+      "waglayla: prefix required": "Waglayla: Prefixo necessário"
     },
     "ro": {
       "12 Words": "12 cuvinte",
@@ -12500,6 +12496,7 @@
       "Arctic": "Arctic",
       "Back": "Spate",
       "Beach": "Plajă",
+      "Big Pimpin": "Pimpin mare",
       "Block Explorer": "Bloc Explorer",
       "Block Found!": "Bloc găsit!",
       "Block Reward": "Recompensă de bloc",
@@ -12706,6 +12703,7 @@
       "Phishing Hint:": "Sugestie de phishing:",
       "Phishing Protection": "Protecția phishingului",
       "Phishing Protection:": "Protecția phishingului:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Vă rugăm să selectați un portofel",
       "Please configure your WagLayla Wag-DX settings": "Vă rugăm să configurați setările WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Vă rugăm să confirmați cuvântul 1 al expresiei dvs. de sămânță:",
@@ -12870,9 +12868,7 @@
       "wRPC Connection Settings": "Setări de conexiune wRPC",
       "wRPC Encoding:": "codificare wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: prefixul necesar",
-      "Big Pimpin": "Pimpin mare",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: prefixul necesar"
     },
     "ru": {
       "12 Words": "12 слов",
@@ -12899,6 +12895,7 @@
       "Arctic": "Арктика",
       "Back": "Назад",
       "Beach": "Пляж",
+      "Big Pimpin": "Большой пимп",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Блок найден!",
       "Block Reward": "Блок награда",
@@ -13105,6 +13102,7 @@
       "Phishing Hint:": "Фишинг -подсказка:",
       "Phishing Protection": "Фишинговая защита",
       "Phishing Protection:": "Фишинговая защита:",
+      "Pimpin": "Пиппин",
       "Please Select a Wallet": "Пожалуйста, выберите кошелек",
       "Please configure your WagLayla Wag-DX settings": "Настройте настройки настройки WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Пожалуйста, подтвердите слово 1 вашей семенной фразы:",
@@ -13269,9 +13267,7 @@
       "wRPC Connection Settings": "Настройки соединения wRPC",
       "wRPC Encoding:": "wRPC Кодирование:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: требуется префикс",
-      "Big Pimpin": "Большой пимп",
-      "Pimpin": "Пиппин"
+      "waglayla: prefix required": "Waglayla: требуется префикс"
     },
     "sk": {
       "12 Words": "12 slov",
@@ -13298,6 +13294,7 @@
       "Arctic": "Arktický",
       "Back": "Chrbát",
       "Beach": "Pláž",
+      "Big Pimpin": "Veľká pasáž",
       "Block Explorer": "Prieskumník",
       "Block Found!": "Blok našiel!",
       "Block Reward": "Bloková odmena",
@@ -13504,6 +13501,7 @@
       "Phishing Hint:": "Phishing Rad:",
       "Phishing Protection": "Ochrana proti phishingu",
       "Phishing Protection:": "Ochrana proti phishingu:",
+      "Pimpin": "Breh",
       "Please Select a Wallet": "Vyberte peňaženku",
       "Please configure your WagLayla Wag-DX settings": "Konfigurujte svoje nastavenia WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Potvrďte slovo 1 z vašej frázy semien:",
@@ -13668,9 +13666,7 @@
       "wRPC Connection Settings": "Nastavenia pripojenia wRPC",
       "wRPC Encoding:": "Kódovanie wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: Vyžaduje sa predpona",
-      "Big Pimpin": "Veľká pasáž",
-      "Pimpin": "Breh"
+      "waglayla: prefix required": "Waglayla: Vyžaduje sa predpona"
     },
     "sl": {
       "12 Words": "12 besed",
@@ -13697,6 +13693,7 @@
       "Arctic": "Arktika",
       "Back": "Nazaj",
       "Beach": "Plaža",
+      "Big Pimpin": "Veliki pimpin",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blok najdeno!",
       "Block Reward": "Blok nagrada",
@@ -13903,6 +13900,7 @@
       "Phishing Hint:": "Lažno namig:",
       "Phishing Protection": "Zaščita za lažno predstavljanje",
       "Phishing Protection:": "Zaščita lažnega predstavljanja:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Izberite denarnico",
       "Please configure your WagLayla Wag-DX settings": "Konfigurirajte svoje nastavitve WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Potrdite besedo 1 vašega semenskega stanja:",
@@ -14067,9 +14065,7 @@
       "wRPC Connection Settings": "Nastavitve povezave wRPC",
       "wRPC Encoding:": "wRPC kodiranje:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: Potrebna predpona",
-      "Big Pimpin": "Veliki pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Potrebna predpona"
     },
     "sr": {
       "12 Words": "12 речи",
@@ -14096,6 +14092,7 @@
       "Arctic": "Арктички",
       "Back": "Назад",
       "Beach": "Плажа",
+      "Big Pimpin": "Велики пимпин",
       "Block Explorer": "Блокирати истраживач",
       "Block Found!": "Блок је пронађен!",
       "Block Reward": "Наградити награду",
@@ -14302,6 +14299,7 @@
       "Phishing Hint:": "Пишући наговештај:",
       "Phishing Protection": "Заштита на пхисхинг-у",
       "Phishing Protection:": "Пхисхинг заштита:",
+      "Pimpin": "Пампанин",
       "Please Select a Wallet": "Изаберите новчаник",
       "Please configure your WagLayla Wag-DX settings": "Конфигуришите своје ВАГЛАИЛЕ ВАГ-ДКС подешавања",
       "Please confirm word 1 of your seed phrase:": "Потврдите реч 1 фразе семена:",
@@ -14466,9 +14464,7 @@
       "wRPC Connection Settings": "Подешавања везе са ВРПЦ-ом",
       "wRPC Encoding:": "ВРПЦ кодирање:",
       "wRPC URL:": "ВРПЦ УРЛ:",
-      "waglayla: prefix required": "Ваглаила: Префикс је потребан",
-      "Big Pimpin": "Велики пимпин",
-      "Pimpin": "Пампанин"
+      "waglayla: prefix required": "Ваглаила: Префикс је потребан"
     },
     "sv": {
       "12 Words": "12 ord",
@@ -14495,6 +14491,7 @@
       "Arctic": "Arktisk",
       "Back": "Tillbaka",
       "Beach": "Strand",
+      "Big Pimpin": "Big Pimpin",
       "Block Explorer": "Blockutforskare",
       "Block Found!": "Blockera!",
       "Block Reward": "Blockbelöning",
@@ -14701,6 +14698,7 @@
       "Phishing Hint:": "Phishing Tips:",
       "Phishing Protection": "Fishingskydd",
       "Phishing Protection:": "Phishing -skydd:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Välj en plånbok",
       "Please configure your WagLayla Wag-DX settings": "Konfigurera dina WagLayla Wag-DX-inställningar",
       "Please confirm word 1 of your seed phrase:": "Bekräfta ord 1 i din fröfras:",
@@ -14865,9 +14863,7 @@
       "wRPC Connection Settings": "wRPC -anslutningsinställningar",
       "wRPC Encoding:": "wRPC -kodning:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: Prefix krävs",
-      "Big Pimpin": "Big Pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Prefix krävs"
     },
     "ta": {
       "12 Words": "12 வார்த்தைகள்",
@@ -14894,6 +14890,7 @@
       "Arctic": "ஆர்க்டிக்",
       "Back": "பின்",
       "Beach": "கடற்கரை",
+      "Big Pimpin": "பெரிய பிம்பின்",
       "Block Explorer": "தொகுதி எக்ஸ்ப்ளோரர்",
       "Block Found!": "தொகுதி கிடைத்தது!",
       "Block Reward": "தொகுதி வெகுமதி",
@@ -15100,6 +15097,7 @@
       "Phishing Hint:": "ஃபிஷிங் குறிப்பு:",
       "Phishing Protection": "ஃபிஷிங் பாதுகாப்பு",
       "Phishing Protection:": "ஃபிஷிங் பாதுகாப்பு:",
+      "Pimpin": "பிம்பின்",
       "Please Select a Wallet": "ஒரு பணப்பையைத் தேர்ந்தெடுக்கவும்",
       "Please configure your WagLayla Wag-DX settings": "உங்கள் வாக்லைலா Wag-DX அமைப்புகளை உள்ளமைக்கவும்",
       "Please confirm word 1 of your seed phrase:": "உங்கள் விதை சொற்றொடரின் சொல் 1 ஐ உறுதிப்படுத்தவும்:",
@@ -15264,9 +15262,7 @@
       "wRPC Connection Settings": "wRPC இணைப்பு அமைப்புகள்",
       "wRPC Encoding:": "wRPC குறியாக்கம்:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "வாக்லைலா: முன்னொட்டு தேவை",
-      "Big Pimpin": "பெரிய பிம்பின்",
-      "Pimpin": "பிம்பின்"
+      "waglayla: prefix required": "வாக்லைலா: முன்னொட்டு தேவை"
     },
     "te": {
       "12 Words": "12 పదాలు",
@@ -15293,6 +15289,7 @@
       "Arctic": "ఆర్కిటిక్",
       "Back": "తిరిగి",
       "Beach": "బీచ్",
+      "Big Pimpin": "పెద్ద పింపిన్",
       "Block Explorer": "బ్లాక్ ఎక్స్‌ప్లోరర్",
       "Block Found!": "బ్లాక్ కనుగొనబడింది!",
       "Block Reward": "బ్లాక్ రివార్డ్",
@@ -15499,6 +15496,7 @@
       "Phishing Hint:": "ఫిషింగ్ సూచన:",
       "Phishing Protection": "ఫిషింగ్ రక్షణ",
       "Phishing Protection:": "ఫిషింగ్ రక్షణ:",
+      "Pimpin": "పింపిన్",
       "Please Select a Wallet": "దయచేసి వాలెట్ ఎంచుకోండి",
       "Please configure your WagLayla Wag-DX settings": "దయచేసి మీ వాగ్లేలా వాగ్-డిఎక్స్ సెట్టింగులను కాన్ఫిగర్ చేయండి",
       "Please confirm word 1 of your seed phrase:": "దయచేసి మీ విత్తన పదబంధంలోని పదం 1 ను నిర్ధారించండి:",
@@ -15663,9 +15661,7 @@
       "wRPC Connection Settings": "wRPC కనెక్షన్ సెట్టింగులు",
       "wRPC Encoding:": "wRPC ఎన్కోడింగ్:",
       "wRPC URL:": "wRPC url:",
-      "waglayla: prefix required": "వాగ్లేలా: ఉపసర్గ అవసరం",
-      "Big Pimpin": "పెద్ద పింపిన్",
-      "Pimpin": "పింపిన్"
+      "waglayla: prefix required": "వాగ్లేలా: ఉపసర్గ అవసరం"
     },
     "th": {
       "12 Words": "12 คำ",
@@ -15692,6 +15688,7 @@
       "Arctic": "อาร์กติก",
       "Back": "กลับ",
       "Beach": "ชายหาด",
+      "Big Pimpin": "แมงดาตัวใหญ่",
       "Block Explorer": "Block Explorer",
       "Block Found!": "พบบล็อก!",
       "Block Reward": "บล็อกรางวัล",
@@ -15898,6 +15895,7 @@
       "Phishing Hint:": "คำใบ้ฟิชชิ่ง:",
       "Phishing Protection": "การป้องกันฟิชชิง",
       "Phishing Protection:": "การป้องกันฟิชชิง:",
+      "Pimpin": "แมงดา",
       "Please Select a Wallet": "กรุณาเลือกกระเป๋าเงิน",
       "Please configure your WagLayla Wag-DX settings": "โปรดกำหนดค่าการตั้งค่า WagLayla Wag-DX ของคุณ",
       "Please confirm word 1 of your seed phrase:": "โปรดยืนยันคำ 1 ของวลีเมล็ดพันธุ์ของคุณ:",
@@ -16062,9 +16060,7 @@
       "wRPC Connection Settings": "การตั้งค่าการเชื่อมต่อ wRPC",
       "wRPC Encoding:": "การเข้ารหัส wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: จำเป็นต้องใช้คำนำหน้า",
-      "Pimpin": "แมงดา",
-      "Big Pimpin": "แมงดาตัวใหญ่"
+      "waglayla: prefix required": "Waglayla: จำเป็นต้องใช้คำนำหน้า"
     },
     "tl": {
       "12 Words": "12 salita",
@@ -16091,6 +16087,7 @@
       "Arctic": "Arctic",
       "Back": "Balik",
       "Beach": "Beach",
+      "Big Pimpin": "Big Pimpin",
       "Block Explorer": "I -block ang Explorer",
       "Block Found!": "Natagpuan ang block!",
       "Block Reward": "I -block ang gantimpala",
@@ -16297,6 +16294,7 @@
       "Phishing Hint:": "Hint ng phishing:",
       "Phishing Protection": "Proteksyon ng phishing",
       "Phishing Protection:": "Proteksyon ng Phishing:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Mangyaring pumili ng isang pitaka",
       "Please configure your WagLayla Wag-DX settings": "Mangyaring i-configure ang iyong mga setting ng WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Mangyaring kumpirmahin ang salita 1 ng iyong pariralang binhi:",
@@ -16461,9 +16459,7 @@
       "wRPC Connection Settings": "Mga setting ng koneksyon ng wRPC",
       "wRPC Encoding:": "wRPC encoding:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "Waglayla: Kinakailangan ang prefix",
-      "Big Pimpin": "Big Pimpin",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Kinakailangan ang prefix"
     },
     "tr": {
       "12 Words": "12 kelime",
@@ -16490,6 +16486,7 @@
       "Arctic": "Arktik",
       "Back": "Geri",
       "Beach": "Sahil",
+      "Big Pimpin": "Büyük Pezevenk",
       "Block Explorer": "Block Explorer",
       "Block Found!": "Blok bulundu!",
       "Block Reward": "Blok Ödül",
@@ -16696,6 +16693,7 @@
       "Phishing Hint:": "Kimlik avı ipucu:",
       "Phishing Protection": "Kimlik avı koruması",
       "Phishing Protection:": "Kimlik avı koruması:",
+      "Pimpin": "Pezevenk",
       "Please Select a Wallet": "Lütfen bir cüzdan seçin",
       "Please configure your WagLayla Wag-DX settings": "Lütfen WagLayla Wag-DX ayarlarınızı yapılandırın",
       "Please confirm word 1 of your seed phrase:": "Lütfen tohum ifadenizin 1. kelimesini onaylayın:",
@@ -16860,9 +16858,7 @@
       "wRPC Connection Settings": "wRPC bağlantı ayarları",
       "wRPC Encoding:": "wRPC kodlama:",
       "wRPC URL:": "wRPC URL'si:",
-      "waglayla: prefix required": "waglayla: önek gerekli",
-      "Big Pimpin": "Büyük Pezevenk",
-      "Pimpin": "Pezevenk"
+      "waglayla: prefix required": "waglayla: önek gerekli"
     },
     "uk": {
       "12 Words": "12 слів",
@@ -16889,6 +16885,7 @@
       "Arctic": "Арктичний",
       "Back": "Спинка",
       "Beach": "Пляж",
+      "Big Pimpin": "Великий сутен",
       "Block Explorer": "Блокувати дослідник",
       "Block Found!": "Блок знайдено!",
       "Block Reward": "Винагорода",
@@ -17095,6 +17092,7 @@
       "Phishing Hint:": "Фішинг підказка:",
       "Phishing Protection": "Фішинг -захист",
       "Phishing Protection:": "Фішинг -захист:",
+      "Pimpin": "Сутін",
       "Please Select a Wallet": "Виберіть гаманець",
       "Please configure your WagLayla Wag-DX settings": "Налаштуйте налаштування WagLayla Wag-DX",
       "Please confirm word 1 of your seed phrase:": "Будь ласка, підтвердьте слово 1 вашої насіннєвої фрази:",
@@ -17259,9 +17257,7 @@
       "wRPC Connection Settings": "Налаштування з'єднання wRPC",
       "wRPC Encoding:": "кодування wRPC:",
       "wRPC URL:": "URL -адреса wRPC:",
-      "waglayla: prefix required": "WAGLAYLA: Потрібен префікс",
-      "Pimpin": "Сутін",
-      "Big Pimpin": "Великий сутен"
+      "waglayla: prefix required": "WAGLAYLA: Потрібен префікс"
     },
     "ur": {
       "12 Words": "12 الفاظ",
@@ -17288,6 +17284,7 @@
       "Arctic": "آرکٹک",
       "Back": "واپس",
       "Beach": "ساحل سمندر",
+      "Big Pimpin": "بڑا دلال",
       "Block Explorer": "بلاک ایکسپلورر",
       "Block Found!": "بلاک ملا!",
       "Block Reward": "انعام کو مسدود کریں",
@@ -17494,6 +17491,7 @@
       "Phishing Hint:": "فشنگ اشارہ:",
       "Phishing Protection": "فشنگ پروٹیکشن",
       "Phishing Protection:": "فشنگ پروٹیکشن:",
+      "Pimpin": "پمپین",
       "Please Select a Wallet": "براہ کرم ایک پرس منتخب کریں",
       "Please configure your WagLayla Wag-DX settings": "براہ کرم اپنی واگلیلا واگ-ڈی ایکس ترتیبات کو تشکیل دیں",
       "Please confirm word 1 of your seed phrase:": "براہ کرم اپنے بیج کے فقرے کا لفظ 1 کی تصدیق کریں:",
@@ -17658,9 +17656,7 @@
       "wRPC Connection Settings": "wRPC کنکشن کی ترتیبات",
       "wRPC Encoding:": "wRPC انکوڈنگ:",
       "wRPC URL:": "wRPC URL:",
-      "waglayla: prefix required": "واگلیلا: سابقہ ​​درکار ہے",
-      "Pimpin": "پمپین",
-      "Big Pimpin": "بڑا دلال"
+      "waglayla: prefix required": "واگلیلا: سابقہ ​​درکار ہے"
     },
     "vi": {
       "12 Words": "12 từ",
@@ -17687,6 +17683,7 @@
       "Arctic": "Bắc Cực",
       "Back": "Mặt sau",
       "Beach": "Bãi biển",
+      "Big Pimpin": "Pimpin lớn",
       "Block Explorer": "Khối Explorer",
       "Block Found!": "Khối tìm thấy!",
       "Block Reward": "Khối thưởng",
@@ -17893,6 +17890,7 @@
       "Phishing Hint:": "Gợi ý lừa đảo:",
       "Phishing Protection": "Bảo vệ lừa đảo",
       "Phishing Protection:": "Bảo vệ lừa đảo:",
+      "Pimpin": "Pimpin",
       "Please Select a Wallet": "Vui lòng chọn ví",
       "Please configure your WagLayla Wag-DX settings": "Vui lòng định cấu hình cài đặt WagLayla Wag-DX của bạn",
       "Please confirm word 1 of your seed phrase:": "Vui lòng xác nhận Word 1 của cụm từ hạt giống của bạn:",
@@ -18057,9 +18055,7 @@
       "wRPC Connection Settings": "Cài đặt kết nối wRPC",
       "wRPC Encoding:": "Mã hóa wRPC:",
       "wRPC URL:": "URL wRPC:",
-      "waglayla: prefix required": "Waglayla: Tiền tố cần thiết",
-      "Big Pimpin": "Pimpin lớn",
-      "Pimpin": "Pimpin"
+      "waglayla: prefix required": "Waglayla: Tiền tố cần thiết"
     },
     "zh-cn": {
       "12 Words": "12个字",
@@ -18086,6 +18082,7 @@
       "Arctic": "北极",
       "Back": "后退",
       "Beach": "海滩",
+      "Big Pimpin": "大皮丁",
       "Block Explorer": "Block Explorer",
       "Block Found!": "找到街区！",
       "Block Reward": "块奖励",
@@ -18292,6 +18289,7 @@
       "Phishing Hint:": "网络钓鱼提示：",
       "Phishing Protection": "网络钓鱼保护",
       "Phishing Protection:": "网络钓鱼保护：",
+      "Pimpin": "皮金",
       "Please Select a Wallet": "请选择钱包",
       "Please configure your WagLayla Wag-DX settings": "请配置您的WagLayla Wag-DX设置",
       "Please confirm word 1 of your seed phrase:": "请确认您的种子短语的单词1：",
@@ -18456,9 +18454,7 @@
       "wRPC Connection Settings": "wRPC连接设置",
       "wRPC Encoding:": "wRPC编码：",
       "wRPC URL:": "wRPC URL：",
-      "waglayla: prefix required": "Waglayla：需要前缀",
-      "Big Pimpin": "大皮丁",
-      "Pimpin": "皮金"
+      "waglayla: prefix required": "Waglayla：需要前缀"
     },
     "zh-tw": {
       "12 Words": "12個字",
@@ -18485,6 +18481,7 @@
       "Arctic": "北極",
       "Back": "後退",
       "Beach": "海灘",
+      "Big Pimpin": "大皮丁",
       "Block Explorer": "Block Explorer",
       "Block Found!": "找到街區！",
       "Block Reward": "塊獎勵",
@@ -18691,6 +18688,7 @@
       "Phishing Hint:": "網絡釣魚提示：",
       "Phishing Protection": "網絡釣魚保護",
       "Phishing Protection:": "網絡釣魚保護：",
+      "Pimpin": "皮金",
       "Please Select a Wallet": "請選擇錢包",
       "Please configure your WagLayla Wag-DX settings": "請配置您的WagLayla Wag-DX設置",
       "Please confirm word 1 of your seed phrase:": "請確認您的種子短語的單詞1：",
@@ -18855,9 +18853,7 @@
       "wRPC Connection Settings": "wRPC連接設置",
       "wRPC Encoding:": "wRPC編碼：",
       "wRPC URL:": "wRPC URL：",
-      "waglayla: prefix required": "Waglayla：需要前綴",
-      "Big Pimpin": "大皮丁",
-      "Pimpin": "皮金"
+      "waglayla: prefix required": "Waglayla：需要前綴"
     }
   }
 }

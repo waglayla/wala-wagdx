@@ -53,20 +53,60 @@ impl ComponentT for Donate {
     let font_size = (ui.available_height() / 28.5).min(ui.available_width() / 28.5);
     let factor = font_size/19.5;
 
+    let beach = ThemeColor::beach();
+    let theme = theme_color().clone();
+
     render_centered_content_noback(ctx, ui, i18n("Donation Wallets"), base_estimated_height*factor, |ui| {
+      let l_offset: f32 = match theme {
+        ref beach => {
+          25.0
+        }
+        _ => {
+          0.0
+        }
+      };
+
+      let r_offset: f32 = match theme {
+        ref beach => {
+          -25.0
+        }
+        _ => {
+          0.0
+        }
+      };
+
+      let scale_off: f32 = match theme {
+        ref beach => {
+          0.9
+        }
+        _ => {
+          1.0
+        }
+      };
+
+      if *theme_color() == ThemeColor::beach() {
+        DXImage::paint_at(
+          ui, 
+          &Assets::get().beach,
+          ui.available_width()*1.3,
+          ui.available_rect_before_wrap().center() - vec2(0.0, 35.0),
+          Align2::CENTER_CENTER
+        );
+      }
+
       DXImage::paint_at(
         ui, 
         theme_accent_img(),
-        ui.available_width().min(ui.available_height()),
-        ui.available_rect_before_wrap().center() - vec2(ui.available_width()/2.0, 0.0), 
+        ui.available_width().min(ui.available_height())*scale_off,
+        ui.available_rect_before_wrap().center() - vec2(ui.available_width()/2.0 - l_offset, 0.0), 
         Align2::CENTER_CENTER
       );
 
       DXImage::paint_at(
         ui, 
         theme_accent_img(),
-        ui.available_width().min(ui.available_height()),
-        ui.available_rect_before_wrap().center() + vec2(ui.available_width()/2.0, 0.0), 
+        ui.available_width().min(ui.available_height())*scale_off,
+        ui.available_rect_before_wrap().center() + vec2(ui.available_width()/2.0 + r_offset, 0.0), 
         Align2::CENTER_CENTER
       );
 

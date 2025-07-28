@@ -15,6 +15,7 @@ pub struct Assets {
   pub brella: TextureHandle,
   pub coins: TextureHandle,
   pub sand_watermark: TextureHandle,
+  pub beach: TextureHandle,
   pub cash_watermark: TextureHandle,
   pub bark_incoming: Vec<u8>,
   pub bark_outgoing: Vec<u8>,
@@ -49,6 +50,7 @@ impl Assets {
         brella: Self::load_brella_png(&ctx),
         coins: Self::load_coins_png(&ctx),
         sand_watermark: Self::load_sand_watermark_png(ctx),
+        beach: Self::load_beach_png(ctx),
         cash_watermark: Self::load_cash_watermark_png(ctx),
         bark_incoming: load_bytes!("/resources/sound/barks/incoming.wav"),
         bark_outgoing: load_bytes!("/resources/sound/barks/outgoing.wav"),
@@ -306,6 +308,26 @@ impl Assets {
     
     ctx.load_texture(
       "brella",
+      image,
+      egui::TextureOptions {
+        magnification: TextureFilter::Linear,
+        minification: TextureFilter::Linear,
+        mipmap_mode: Some(TextureFilter::Linear),
+        .. Default::default()
+      }
+    )
+  }
+  fn load_beach_png(ctx: &Context) -> TextureHandle {
+    let image_bytes = include_bytes!(concat!(
+      env!("CARGO_MANIFEST_DIR"),
+      "/resources/images/beach.png"
+    ));
+    
+    let image = load_image_bytes(image_bytes)
+      .expect("Failed to coins beach image");
+    
+    ctx.load_texture(
+      "beach",
       image,
       egui::TextureOptions {
         magnification: TextureFilter::Linear,

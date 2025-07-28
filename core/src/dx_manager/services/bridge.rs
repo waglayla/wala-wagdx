@@ -37,7 +37,8 @@ impl BridgeService {
       service_events: Channel::unbounded(),
       task_ctl: Channel::oneshot(),
       is_enabled: Arc::new(AtomicBool::new(
-        settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon
+        settings.node.node_kind == WagLayladNodeKind::IntegratedAsDaemon &&
+        settings.node.enable_bridge
       )),
       bridge_sender,
     }
@@ -83,7 +84,11 @@ impl BridgeService {
   pub fn update_services(&self, node_settings: &NodeSettings, options: Option<RpcOptions>) {
     match node_settings.node_kind {
       WagLayladNodeKind::IntegratedAsDaemon => {
-        self.enable()
+        if (node_settings.enable_bridge) {
+          self.enable();
+        } else {
+          self.disable();
+        }
       },
       _ => {
         self.disable();

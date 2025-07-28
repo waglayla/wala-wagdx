@@ -35,15 +35,13 @@ impl Settings {
     
     #[cfg(not(target_arch = "wasm32"))]
     {
-        // TODO
-        // CollapsingHeader::new(i18n("Stratum Bridge"))
-        //   .default_open(true)
-        //   .show(ui, |ui| {
-        //     ui.horizontal(|ui| {
-        //       let response = ui.add(toggle(&mut settings.enable_bridge));
-        //       ui.label(i18n("Enabled"));
-        //     });
-        //   });
+      CollapsingHeader::new(i18n("Stratum Bridge"))
+        .default_open(true)
+        .show(ui, |ui| {
+          ui.horizontal(|ui| {
+            let response = ui.add(toggle(&mut settings.enable_bridge));
+          });
+        });
     }
 
     #[cfg(not(target_arch = "wasm32"))]
@@ -200,19 +198,15 @@ impl Settings {
               });
 
               match self.settings.node.node_kind {
-                WagLayladNodeKind::Remote => {
-
-                },
+                WagLayladNodeKind::Remote => {},
                 WagLayladNodeKind::IntegratedAsDaemon => {
-                    // TODO
-                    // CollapsingHeader::new(i18n("Stratum Bridge"))
-                    //     .default_open(true)
-                    //     .show(ui, |ui| {
-                    //       ui.horizontal(|ui| {
-                    //         let response = ui.add(toggle(&mut self.settings.node.enable_bridge));
-                    //         ui.label(i18n("Enabled:"));
-                    //       });
-                    //     });
+                  CollapsingHeader::new(i18n("Stratum Bridge"))
+                    .default_open(true)
+                    .show(ui, |ui| {
+                      ui.horizontal(|ui| {
+                        let response = ui.add(toggle(&mut self.settings.node.enable_bridge));
+                      });
+                    });
                 },
                 _ => { }
               }
@@ -353,7 +347,9 @@ impl Settings {
     core: &mut Core,
     ui: &mut egui::Ui,
   ) {
-    if self.settings.node.node_kind != WagLayladNodeKind::IntegratedAsDaemon {
+    if self.settings.node.node_kind != WagLayladNodeKind::IntegratedAsDaemon ||
+      !self.settings.node.enable_bridge 
+    {
       return;
     }
 

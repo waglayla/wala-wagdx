@@ -68,7 +68,18 @@ impl ComponentT for NetworkInfo {
     egui::CentralPanel::default()
       .frame(create_custom_frame(ctx))
       .show_inside(ui, |ui| {
-    if *theme_color() == ThemeColor::pimp() {
+
+    if *theme_color() == ThemeColor::beach() {
+      DXImage::paint_at(
+        ui, 
+        &Assets::get().beach,
+        ui.available_width()*1.3,
+        ui.available_rect_before_wrap().center() - vec2(0.0, 20.0),
+        Align2::CENTER_CENTER
+      );
+    }
+
+    if *theme_color() == ThemeColor::pimp() || *theme_color() == ThemeColor::meadow() {
       DXImage::paint_at(
         ui, 
         theme_accent_img(),
