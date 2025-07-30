@@ -211,15 +211,31 @@ cfg_if! {
           let i18n_json_file_load = i18n_json_file.clone();
           let i18n_json_file_store = i18n_json_file.clone();
           
+          let embedded_json = I18N_EMBEDDED;
+          let should_overwrite = match fs::read_to_string(&i18n_json_file_store) {
+              Ok(existing_data) => existing_data != embedded_json,
+              Err(_) => true,
+          };
+
+          if should_overwrite {
+              fs::write(&i18n_json_file_store, embedded_json)?;
+          }
+
           i18n::Builder::new(settings.language_code.as_str(), "en")
-            .with_static_json_data(I18N_EMBEDDED)
-            .with_string_json_data(i18n_json_file.exists().then(move ||{
-              fs::read_to_string(i18n_json_file_load)
-            }).transpose()?)
-            .with_store(move |json_data: &str| {
-              Ok(fs::write(&i18n_json_file_store, json_data)?)
-            })
-            .try_init()?;
+              .with_static_json_data(embedded_json)
+              .with_string_json_data(
+                  i18n_json_file.exists()
+                      .then(|| fs::read_to_string(&i18n_json_file_load))
+                      .transpose()?
+              )
+              .with_store(move |json_data: &str| {
+                  let current_data = fs::read_to_string(&i18n_json_file_store).unwrap_or_default();
+                  if current_data != json_data {
+                      fs::write(&i18n_json_file_store, json_data)?;
+                  }
+                  Ok(())
+              })
+              .try_init()?;
 
           let manager: Arc<Mutex<Option<dx_manager::DX_Manager>>> = Arc::new(Mutex::new(None));
           let delegate = manager.clone();
